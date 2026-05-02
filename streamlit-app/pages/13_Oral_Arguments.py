@@ -4,6 +4,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 import streamlit as st
 import requests
+import datetime
+
+CURRENT_YEAR = datetime.date.today().year
 
 st.set_page_config(page_title="Oral Arguments Browser", page_icon="🎙️", layout="wide")
 
@@ -37,7 +40,7 @@ st.markdown(
     "the most comprehensive free source of Supreme Court audio."
 )
 
-term = st.selectbox("Select Term", list(range(2023, 1994, -1)))
+term = st.selectbox("Select Term", list(range(CURRENT_YEAR, CURRENT_YEAR - 32, -1)))
 
 with st.spinner("Loading cases..."):
     cases = fetch_term_cases(term)

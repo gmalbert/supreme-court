@@ -166,7 +166,8 @@ st.info(
     "Selecting many terms will take longer to load."
 )
 
-available_terms = list(range(2023, 1999, -1))
+import datetime as _dt; _CURRENT_YEAR = _dt.date.today().year
+available_terms = list(range(_CURRENT_YEAR, _CURRENT_YEAR - 27, -1))
 selected_terms = st.multiselect(
     "Select Terms to Analyze",
     options=available_terms,

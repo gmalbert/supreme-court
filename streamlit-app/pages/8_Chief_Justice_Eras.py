@@ -18,7 +18,7 @@ ERAS = {
     "Warren Court (1953–1969)": (1953, 1969, "#2980B9"),
     "Burger Court (1969–1986)": (1969, 1986, "#8E44AD"),
     "Rehnquist Court (1986–2005)": (1986, 2005, "#E67E22"),
-    "Roberts Court (2005–present)": (2005, 2023, "#C0392B"),
+    "Roberts Court (2005–present)": (2005, __import__('datetime').date.today().year, "#C0392B"),
 }
 
 ISSUE_LABELS = [

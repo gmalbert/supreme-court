@@ -8,6 +8,9 @@ import plotly.express as px
 import plotly.graph_objects as go
 import requests
 import time
+import datetime
+
+CURRENT_YEAR = datetime.date.today().year
 
 st.set_page_config(page_title="Reversal Rate Scorecard", page_icon="📊", layout="wide")
 
@@ -111,7 +114,7 @@ st.markdown(
     "Load historical data across multiple terms to build the full scorecard."
 )
 
-available_terms = list(range(2023, 2004, -1))
+available_terms = list(range(CURRENT_YEAR, CURRENT_YEAR - 25, -1))
 selected_terms = st.multiselect(
     "Terms to include",
     options=available_terms,

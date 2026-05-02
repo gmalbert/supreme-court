@@ -106,7 +106,8 @@ with col1:
 with col2:
     court_b_label = st.selectbox("Court B", list(CIRCUIT_COURTS.keys()), index=4)  # 5th Circuit default
 
-available_terms = list(range(2023, 2004, -1))
+import datetime as _dt; _CURRENT_YEAR = _dt.date.today().year
+available_terms = list(range(_CURRENT_YEAR, _CURRENT_YEAR - 25, -1))
 selected_terms = st.multiselect(
     "Terms to analyze",
     options=available_terms,

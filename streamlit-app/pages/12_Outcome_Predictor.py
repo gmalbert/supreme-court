@@ -8,6 +8,9 @@ import plotly.graph_objects as go
 import plotly.express as px
 import requests
 import time
+import datetime
+
+CURRENT_YEAR = datetime.date.today().year
 
 st.set_page_config(page_title="Outcome Predictor", page_icon="🎯", layout="wide")
 
@@ -126,7 +129,7 @@ with st.form("predictor_form"):
     submitted = st.form_submit_button("Predict", type="primary")
 
 if submitted:
-    terms_tuple = tuple(range(2023, 2023 - num_terms, -1))
+    terms_tuple = tuple(range(CURRENT_YEAR, CURRENT_YEAR - num_terms, -1))
     with st.spinner(f"Loading {num_terms} terms of data from Oyez... (this may take a minute)"):
         df = load_historical_data(terms_tuple)
     st.session_state["predictor_df"] = df

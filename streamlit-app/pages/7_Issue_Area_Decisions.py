@@ -61,9 +61,11 @@ col1, col2, col3 = st.columns(3)
 with col1:
     issue = st.selectbox("Legal Issue Area", ISSUE_AREAS)
 with col2:
-    start_term = st.selectbox("From Term", list(range(2023, 1989, -1)), index=10)
+    import datetime as _dt; _CURRENT_YEAR = _dt.date.today().year
+    _term_range = list(range(_CURRENT_YEAR, 1989, -1))
+    start_term = st.selectbox("From Term", _term_range, index=10)
 with col3:
-    end_term = st.selectbox("To Term", list(range(2023, 1989, -1)), index=0)
+    end_term = st.selectbox("To Term", _term_range, index=0)
 
 if start_term > end_term:
     start_term, end_term = end_term, start_term
