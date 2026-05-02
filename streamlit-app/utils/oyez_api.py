@@ -1,7 +1,11 @@
 import requests
 import time
+import datetime
 
 BASE_URL = "https://api.oyez.org"
+
+def _current_year() -> int:
+    return datetime.date.today().year
 
 HEADERS = {
     "Accept": "application/json",
@@ -31,7 +35,7 @@ def search_cases(query: str) -> list:
     """Search cases by name across recent terms."""
     results = []
     query_lower = query.lower()
-    for term in range(2023, 1999, -1):
+    for term in range(_current_year(), _current_year() - 27, -1):
         cases = get_cases_by_term(term)
         for c in cases:
             name = c.get("name", "")
@@ -44,7 +48,8 @@ def search_cases(query: str) -> list:
 
 def get_recent_terms(n: int = 10) -> list[int]:
     """Return the n most recent SCOTUS terms."""
-    return list(range(2023, 2023 - n, -1))
+    cy = _current_year()
+    return list(range(cy, cy - n, -1))
 
 def extract_court_journey(detail: dict) -> list[dict]:
     """
