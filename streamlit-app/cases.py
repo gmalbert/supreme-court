@@ -149,7 +149,7 @@ for step in steps:
 
 if not justices:
     # Pull directly from detail
-    decisions = detail.get("decisions", [])
+    decisions = detail.get("decisions") or []
     for dec in decisions:
         for vote in dec.get("votes", []):
             member = vote.get("member", {}) or {}
