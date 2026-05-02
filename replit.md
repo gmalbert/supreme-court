@@ -33,17 +33,27 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 
 ```
 streamlit-app/
-├── cases.py                  # Main entry — case journey diagram + justice votes
-├── .streamlit/config.toml    # Server config (port 5000, headless)
+├── cases.py                      # Main entry — case journey diagram + justice votes
+├── .streamlit/config.toml        # Server config (port 5000, CORS/XSRF disabled for proxy)
 ├── utils/
-│   ├── oyez_api.py           # Oyez API client (free, no key required)
-│   └── charts.py             # Plotly chart builders
+│   ├── oyez_api.py               # Oyez API client (free, no key required)
+│   └── charts.py                 # Plotly chart builders (journey diagram, voting, trends)
 └── pages/
-    ├── 1_Search_Cases.py     # Search by case name across terms
-    ├── 2_Justice_Voting.py   # Justice voting patterns per case
-    ├── 3_Timeline_Browser.py # Multi-term timeline + issue area charts
-    └── 4_Statistics.py       # Dispositions, issue areas, case listing
+    ├── 1_Search_Cases.py         # Search by case name across terms
+    ├── 2_Justice_Voting.py       # Justice voting patterns per case
+    ├── 3_Timeline_Browser.py     # Multi-term timeline + issue area charts
+    ├── 4_Statistics.py           # Dispositions, issue areas, case listing
+    ├── 5_Justice_Career.py       # Full career overview: votes, dissent rate, issue areas
+    ├── 6_Court_Comparison.py     # Side-by-side circuit court reversal/affirmance analysis
+    ├── 7_Issue_Area_Decisions.py # Browse all decisions in a legal domain with drilldown
+    ├── 8_Chief_Justice_Eras.py   # Warren/Burger/Rehnquist/Roberts court era comparisons
+    └── 9_Landmark_Cases.py       # Curated landmark cases with journey + votes
 ```
 
 ### Data Source
 - **Oyez API** (https://api.oyez.org) — free, no API key, covers cases from ~1792 onward with rich metadata, lower court info, justice votes, and oral argument audio links.
+
+### Journey Diagram Design
+- Circles are size 180, positioned in the left column (x=2 in data space)
+- Court name labels are positioned in the right column (x=5.5) using data coordinates so they never overlap circles
+- Short bold labels inside circles: "Trial Court", "Appeals Court", "SCOTUS"
