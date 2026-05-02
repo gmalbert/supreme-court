@@ -9,25 +9,25 @@ LEVEL_COLORS = {
 }
 
 LEVEL_LABELS = {
-    "Lower Court": "Trial\nCourt",
-    "Appeals Court": "Appeals\nCourt",
+    "Lower Court": "Trial Court",
+    "Appeals Court": "Appeals Court",
     "Supreme Court": "SCOTUS",
 }
 
 def build_journey_diagram(steps: list[dict], case_name: str) -> go.Figure:
-    """Build a vertical flowchart of the case journey through courts."""
+    """Build a vertical flowchart using a single data coordinate system.
+    Circles sit in the left column (x=2), labels in the right column (x=5.5).
+    All annotations use xref='x', yref='y' so they align perfectly.
+    """
     if not steps:
         return None
 
     n = len(steps)
-    # Spread nodes evenly between 0.15 and 0.85 on the y axis
-    if n == 1:
-        node_y = [0.5]
-    else:
-        node_y = [0.85 - i * (0.70 / (n - 1)) for i in range(n)]
-    node_x = [0.5] * n
+    # Y positions in data space: top = (n-1)*4, bottom = 0, step = 4
+    node_y = [(n - 1 - i) * 4 for i in range(n)]
+    node_x = [2] * n  # circles in left column
 
-    # Edge traces with arrowhead effect
+    # Connecting lines between circles
     edge_traces = []
     for i in range(n - 1):
         edge_traces.append(go.Scatter(
@@ -39,7 +39,6 @@ def build_journey_diagram(steps: list[dict], case_name: str) -> go.Figure:
             showlegend=False,
         ))
 
-    # Short label inside the circle
     node_inner = []
     node_colors = []
     hover_texts = []
@@ -58,61 +57,62 @@ def build_journey_diagram(steps: list[dict], case_name: str) -> go.Figure:
         y=node_y,
         mode="markers+text",
         marker=dict(
-            size=120,
+            size=180,
             color=node_colors,
-            line=dict(width=4, color="white"),
+            line=dict(width=5, color="white"),
             opacity=0.95,
         ),
         text=node_inner,
         textposition="middle center",
-        textfont=dict(size=13, color="white", family="Arial Black, Arial, sans-serif"),
+        textfont=dict(size=14, color="white", family="Arial Black, Arial, sans-serif"),
         hovertext=hover_texts,
         hoverinfo="text",
         showlegend=False,
     )
 
-    # Build annotations: court name to the right, decision below
+    # Annotations in data coordinates so they line up with the circles
     annotations = []
     for i, step in enumerate(steps):
         court = step.get("court", "")
         decision = step.get("decision", "")
-        level = step.get("level", "")
 
-        # Court name label to the right of the circle
         annotations.append(dict(
-            x=0.62,
-            y=node_y[i],
-            xref="paper",
-            yref="paper",
+            x=5.5,
+            y=node_y[i] + 0.35,
+            xref="x",
+            yref="y",
             text=f"<b>{court}</b>",
             showarrow=False,
-            font=dict(size=14, color="#2C3E50"),
+            font=dict(size=15, color="#2C3E50"),
             align="left",
             xanchor="left",
-            yanchor="middle",
+            yanchor="bottom",
         ))
-        # Decision sub-label
         if decision:
             annotations.append(dict(
-                x=0.62,
-                y=node_y[i] - 0.04,
-                xref="paper",
-                yref="paper",
+                x=5.5,
+                y=node_y[i] - 0.35,
+                xref="x",
+                yref="y",
                 text=f"<i>Outcome: {decision}</i>",
                 showarrow=False,
-                font=dict(size=11, color="#7F8C8D"),
+                font=dict(size=12, color="#7F8C8D"),
                 align="left",
                 xanchor="left",
                 yanchor="top",
             ))
 
+    x_max = 14  # enough room for long court names
+    y_min = -2
+    y_max = (n - 1) * 4 + 2
+
     fig = go.Figure(data=edge_traces + [node_trace])
     fig.update_layout(
         title=dict(text=f"Case Journey: {case_name}", font=dict(size=16)),
         annotations=annotations,
-        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False, range=[0, 1]),
-        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, range=[0, 1]),
-        height=max(350, 220 * n),
+        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False, range=[0, x_max]),
+        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, range=[y_min, y_max]),
+        height=max(380, 260 * n),
         margin=dict(l=20, r=20, t=60, b=20),
         plot_bgcolor="white",
         paper_bgcolor="white",
