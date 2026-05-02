@@ -4,12 +4,20 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 import streamlit as st
 import pandas as pd
+import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
 import requests
 import time
 import datetime
+import threading
 from collections import defaultdict
+from pathlib import Path
+
+from utils.ml_predictor import (
+    collect_training_data, train_models, predict, load_meta,
+    is_trained, CACHE_CSV, extract_circuit,
+)
 
 st.set_page_config(page_title="Predictions Hub", page_icon="🔮", layout="wide")
 
@@ -19,67 +27,79 @@ CURRENT_YEAR = datetime.date.today().year
 TODAY        = datetime.date.today()
 CURRENT_TERM = CURRENT_YEAR if TODAY.month >= 10 else CURRENT_YEAR - 1
 
-# ── Current court roster ──────────────────────────────────────────────────────
-CURRENT_JUSTICES = [
-    {"name": "John G. Roberts",      "short": "Roberts",   "lean": "Conservative", "role": "Chief Justice", "appointed_by": "G.W. Bush"},
-    {"name": "Clarence Thomas",      "short": "Thomas",    "lean": "Conservative", "role": "Associate",     "appointed_by": "G.H.W. Bush"},
-    {"name": "Samuel Alito",         "short": "Alito",     "lean": "Conservative", "role": "Associate",     "appointed_by": "G.W. Bush"},
-    {"name": "Sonia Sotomayor",      "short": "Sotomayor", "lean": "Liberal",      "role": "Associate",     "appointed_by": "Obama"},
-    {"name": "Elena Kagan",          "short": "Kagan",     "lean": "Liberal",      "role": "Associate",     "appointed_by": "Obama"},
-    {"name": "Neil Gorsuch",         "short": "Gorsuch",   "lean": "Conservative", "role": "Associate",     "appointed_by": "Trump"},
-    {"name": "Brett Kavanaugh",      "short": "Kavanaugh", "lean": "Moderate",     "role": "Associate",     "appointed_by": "Trump"},
-    {"name": "Amy Coney Barrett",    "short": "Barrett",   "lean": "Conservative", "role": "Associate",     "appointed_by": "Trump"},
-    {"name": "Ketanji Brown Jackson","short": "Jackson",   "lean": "Liberal",      "role": "Associate",     "appointed_by": "Biden"},
+# ── Court roster for display ──────────────────────────────────────────────────
+CURRENT_JUSTICES_DISPLAY = [
+    {"short": "Roberts",   "lean": "Conservative", "full": "John G. Roberts"},
+    {"short": "Thomas",    "lean": "Conservative", "full": "Clarence Thomas"},
+    {"short": "Alito",     "lean": "Conservative", "full": "Samuel Alito"},
+    {"short": "Sotomayor", "lean": "Liberal",      "full": "Sonia Sotomayor"},
+    {"short": "Kagan",     "lean": "Liberal",      "full": "Elena Kagan"},
+    {"short": "Gorsuch",   "lean": "Conservative", "full": "Neil Gorsuch"},
+    {"short": "Kavanaugh", "lean": "Moderate",     "full": "Brett Kavanaugh"},
+    {"short": "Barrett",   "lean": "Conservative", "full": "Amy Coney Barrett"},
+    {"short": "Jackson",   "lean": "Liberal",      "full": "Ketanji Brown Jackson"},
 ]
-
 LEAN_COLORS = {"Conservative": "#E74C3C", "Moderate": "#F39C12", "Liberal": "#3498DB"}
 
-# Historical base rates (based on SCOTUS data 1990–2024)
+CIRCUIT_OPTIONS = [
+    "1st Circuit","2nd Circuit","3rd Circuit","4th Circuit","5th Circuit",
+    "6th Circuit","7th Circuit","8th Circuit","9th Circuit","10th Circuit",
+    "11th Circuit","D.C. Circuit","Federal Circuit","State Supreme Court","Other",
+]
+ISSUE_OPTIONS = [
+    "Criminal Procedure","Civil Rights","First Amendment","Due Process","Privacy",
+    "Economic Activity","Judicial Power","Federalism","Federal Taxation","Unions",
+    "Attorneys","Miscellaneous","Interstate Relations","Private Action",
+]
+PETITIONER_TYPES = [
+    "Federal Government","State / Local Gov't","Corporation / Org","Individual / Other"
+]
+# Historical stats for the static fallback path
 CIRCUIT_REVERSAL_RATES = {
-    "9th Circuit": 0.76, "6th Circuit": 0.74, "11th Circuit": 0.72, "5th Circuit": 0.68,
-    "4th Circuit": 0.65, "8th Circuit": 0.63, "7th Circuit": 0.61, "3rd Circuit": 0.60,
-    "2nd Circuit": 0.58, "1st Circuit": 0.56, "10th Circuit": 0.62, "D.C. Circuit": 0.55,
-    "Federal Circuit": 0.52, "State Supreme Court": 0.60, "Other": 0.62,
+    "9th Circuit":0.76,"6th Circuit":0.74,"11th Circuit":0.72,"5th Circuit":0.68,
+    "4th Circuit":0.65,"8th Circuit":0.63,"7th Circuit":0.61,"3rd Circuit":0.60,
+    "2nd Circuit":0.58,"1st Circuit":0.56,"10th Circuit":0.62,"D.C. Circuit":0.55,
+    "Federal Circuit":0.52,"State Supreme Court":0.60,"Other":0.62,
 }
 ISSUE_REVERSAL_RATES = {
-    "Criminal Procedure": 0.72, "Civil Rights": 0.65, "First Amendment": 0.60, "Due Process": 0.64,
-    "Privacy": 0.58, "Economic Activity": 0.55, "Judicial Power": 0.70, "Federalism": 0.62,
-    "Federal Taxation": 0.54, "Unions": 0.63, "Attorneys": 0.60, "Miscellaneous": 0.61,
-    "Interstate Relations": 0.59, "Private Action": 0.57,
+    "Criminal Procedure":0.72,"Civil Rights":0.65,"First Amendment":0.60,"Due Process":0.64,
+    "Privacy":0.58,"Economic Activity":0.55,"Judicial Power":0.70,"Federalism":0.62,
+    "Federal Taxation":0.54,"Unions":0.63,"Attorneys":0.60,"Miscellaneous":0.61,
+    "Interstate Relations":0.59,"Private Action":0.57,
 }
-PETITIONER_RATE_BONUS = {
-    "Federal Government": +0.12, "State / Local Gov't": -0.03, "Corporation / Org": +0.02, "Individual / Other": -0.05,
+PETITIONER_BONUS = {
+    "Federal Government":+0.12,"State / Local Gov't":-0.03,
+    "Corporation / Org":+0.02,"Individual / Other":-0.05,
+}
+
+CERT_FACTORS = {
+    "Circuit Split":0.045,"Federal Gov't Petitioner (SG)":0.038,
+    "Civil Rights / Equal Protection Issue":0.032,"First Amendment Issue":0.030,
+    "Judicial Power / Separation of Powers Issue":0.035,
+    "Lower Court Struck Down Federal Law":0.040,"CVSG (Call for Views from SG)":0.060,
+    "Prior SCOTUS Case Needs Clarification":0.028,"Significant Economic Impact":0.020,
+    "Long-standing Circuit Disagreement (5+ yrs)":0.050,
 }
 ISSUE_CERT_RATES = {
-    "Criminal Procedure": 0.028, "Civil Rights": 0.025, "First Amendment": 0.030, "Due Process": 0.022,
-    "Privacy": 0.027, "Economic Activity": 0.018, "Judicial Power": 0.035, "Federalism": 0.032,
-    "Federal Taxation": 0.016, "Unions": 0.021, "Attorneys": 0.013, "Miscellaneous": 0.010,
-    "Interstate Relations": 0.015, "Private Action": 0.012,
+    "Criminal Procedure":0.028,"Civil Rights":0.025,"First Amendment":0.030,
+    "Due Process":0.022,"Privacy":0.027,"Economic Activity":0.018,
+    "Judicial Power":0.035,"Federalism":0.032,"Federal Taxation":0.016,
+    "Unions":0.021,"Attorneys":0.013,"Miscellaneous":0.010,
+    "Interstate Relations":0.015,"Private Action":0.012,
 }
-CIRCUIT_CERT_MULTIPLIER = {
-    "9th Circuit": 1.8, "D.C. Circuit": 2.2, "2nd Circuit": 1.6, "4th Circuit": 1.3,
-    "5th Circuit": 1.5, "6th Circuit": 1.4, "7th Circuit": 1.3, "8th Circuit": 1.1,
-    "10th Circuit": 1.1, "11th Circuit": 1.3, "3rd Circuit": 1.2, "1st Circuit": 1.0,
-    "Federal Circuit": 0.9, "State Supreme Court": 0.7, "Other": 0.8,
-}
-# Per-justice voting tendencies by issue area (fraction of time they vote with majority reversal)
-JUSTICE_REVERSAL_TENDENCIES = {
-    "Roberts":    {"Criminal Procedure":0.68,"Civil Rights":0.55,"First Amendment":0.60,"Due Process":0.58,"Economic Activity":0.54,"Judicial Power":0.72,"Federalism":0.65,"default":0.60},
-    "Thomas":     {"Criminal Procedure":0.82,"Civil Rights":0.50,"First Amendment":0.62,"Due Process":0.50,"Economic Activity":0.58,"Judicial Power":0.80,"Federalism":0.78,"default":0.72},
-    "Alito":      {"Criminal Procedure":0.78,"Civil Rights":0.52,"First Amendment":0.65,"Due Process":0.52,"Economic Activity":0.56,"Judicial Power":0.75,"Federalism":0.70,"default":0.68},
-    "Sotomayor":  {"Criminal Procedure":0.45,"Civil Rights":0.75,"First Amendment":0.62,"Due Process":0.70,"Economic Activity":0.42,"Judicial Power":0.40,"Federalism":0.38,"default":0.48},
-    "Kagan":      {"Criminal Procedure":0.48,"Civil Rights":0.72,"First Amendment":0.65,"Due Process":0.68,"Economic Activity":0.45,"Judicial Power":0.42,"Federalism":0.40,"default":0.50},
-    "Gorsuch":    {"Criminal Procedure":0.72,"Civil Rights":0.48,"First Amendment":0.70,"Due Process":0.52,"Economic Activity":0.60,"Judicial Power":0.68,"Federalism":0.75,"default":0.65},
-    "Kavanaugh":  {"Criminal Procedure":0.62,"Civil Rights":0.55,"First Amendment":0.60,"Due Process":0.58,"Economic Activity":0.55,"Judicial Power":0.62,"Federalism":0.60,"default":0.58},
-    "Barrett":    {"Criminal Procedure":0.70,"Civil Rights":0.50,"First Amendment":0.65,"Due Process":0.52,"Economic Activity":0.58,"Judicial Power":0.70,"Federalism":0.68,"default":0.63},
-    "Jackson":    {"Criminal Procedure":0.42,"Civil Rights":0.78,"First Amendment":0.64,"Due Process":0.72,"Economic Activity":0.40,"Judicial Power":0.38,"Federalism":0.36,"default":0.46},
+CIRCUIT_CERT_MULT = {
+    "9th Circuit":1.8,"D.C. Circuit":2.2,"2nd Circuit":1.6,"4th Circuit":1.3,
+    "5th Circuit":1.5,"6th Circuit":1.4,"7th Circuit":1.3,"8th Circuit":1.1,
+    "10th Circuit":1.1,"11th Circuit":1.3,"3rd Circuit":1.2,"1st Circuit":1.0,
+    "Federal Circuit":0.9,"State Supreme Court":0.7,"Other":0.8,
 }
 
 # ── Fetch helpers ─────────────────────────────────────────────────────────────
 @st.cache_data(show_spinner=False, ttl=600)
 def _pred_fetch_term(term: int) -> list[dict]:
     try:
-        r = requests.get(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=150&page=0", headers=HEADERS, timeout=12)
+        r = requests.get(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=150&page=0",
+                         headers=HEADERS, timeout=12)
         r.raise_for_status(); return r.json()
     except Exception: return []
 
@@ -96,477 +116,718 @@ def _parse_date(ts) -> datetime.date | None:
     except Exception: pass
     return None
 
-def _case_status(detail: dict) -> str:
-    if detail.get("decided_on"): return "Decided"
-    oral = detail.get("oral_argument_audio") or []
-    if oral: return "Argued"
-    return "Cert Granted"
-
-STATUS_COLORS = {"Decided":"#27AE60","Argued":"#3498DB","Cert Granted":"#E67E22","Unknown":"#95A5A6"}
-STATUS_ICONS  = {"Decided":"✅","Argued":"🔵","Cert Granted":"📌","Unknown":"❓"}
-
-def _compute_reversal_probability(circuit: str, issue_area: str, petitioner_type: str,
-                                   sg_support: bool, circuit_split: bool,
-                                   n_conservative: int) -> dict:
-    base = 0.62
+# ── Static fallback predictor ─────────────────────────────────────────────────
+def _static_predict(circuit, issue_area, petitioner_type, sg_support, circuit_split, n_conservative):
+    base       = 0.62
     circ_rate  = CIRCUIT_REVERSAL_RATES.get(circuit, 0.62)
     issue_rate = ISSUE_REVERSAL_RATES.get(issue_area, 0.62)
-    pet_bonus  = PETITIONER_RATE_BONUS.get(petitioner_type, 0.0)
-    sg_bonus   = 0.10 if sg_support else 0.0
-    split_bonus= 0.08 if circuit_split else 0.0
-    cons_adj   = (n_conservative - 5) * 0.025
+    pet_bonus  = PETITIONER_BONUS.get(petitioner_type, 0.0)
+    p_reverse  = (base*0.15 + circ_rate*0.35 + issue_rate*0.25 + pet_bonus
+                  + (0.10 if sg_support else 0) + (0.08 if circuit_split else 0)
+                  + (n_conservative - 5) * 0.025)
+    p_reverse  = max(0.05, min(0.95, p_reverse))
 
-    # Weighted combination
-    p_reverse = (base * 0.15 + circ_rate * 0.35 + issue_rate * 0.25 +
-                 pet_bonus + sg_bonus + split_bonus + cons_adj)
-    p_reverse = max(0.05, min(0.95, p_reverse))
-    p_affirm  = 1.0 - p_reverse
-
-    # Compute likely split
-    majority_size = round(5 + (p_reverse - 0.5) * 8)
-    majority_size = max(5, min(9, majority_size))
-    minority_size = 9 - majority_size
-    if majority_size >= 9: split_label = "9-0 (Unanimous)"
-    elif majority_size == 8: split_label = "8-1"
-    elif majority_size == 7: split_label = "7-2"
-    elif majority_size == 6: split_label = "6-3"
-    else: split_label = "5-4"
-
-    # Split probability distribution
     split_dist = {
-        "9-0 (Unanimous)": max(0, p_reverse * 0.08 + (1-p_reverse) * 0.08),
-        "8-1": max(0, p_reverse * 0.10 + (1-p_reverse) * 0.10),
-        "7-2": max(0, p_reverse * 0.15 + (1-p_reverse) * 0.15),
-        "6-3": max(0, p_reverse * 0.28 + (1-p_reverse) * 0.20),
-        "5-4": max(0, p_reverse * 0.39 + (1-p_reverse) * 0.47),
+        "9-0": max(0, 0.08), "8-1": max(0, 0.10), "7-2": max(0, 0.15),
+        "6-3": max(0, p_reverse*0.28 + (1-p_reverse)*0.20),
+        "5-4": max(0, p_reverse*0.39 + (1-p_reverse)*0.47),
     }
-    total_split = sum(split_dist.values())
-    split_dist = {k: v/total_split for k, v in split_dist.items()}
+    total = sum(split_dist.values())
+    split_dist = {k: v/total for k, v in split_dist.items()}
+    split_label = max(split_dist, key=split_dist.get)
 
-    # Per-justice probabilities
+    _JUST_TEND = {
+        "Roberts":   {"Criminal Procedure":0.68,"Civil Rights":0.55,"First Amendment":0.60,"default":0.60},
+        "Thomas":    {"Criminal Procedure":0.82,"Civil Rights":0.50,"First Amendment":0.62,"default":0.72},
+        "Alito":     {"Criminal Procedure":0.78,"Civil Rights":0.52,"First Amendment":0.65,"default":0.68},
+        "Sotomayor": {"Criminal Procedure":0.45,"Civil Rights":0.75,"First Amendment":0.62,"default":0.48},
+        "Kagan":     {"Criminal Procedure":0.48,"Civil Rights":0.72,"First Amendment":0.65,"default":0.50},
+        "Gorsuch":   {"Criminal Procedure":0.72,"Civil Rights":0.48,"First Amendment":0.70,"default":0.65},
+        "Kavanaugh": {"Criminal Procedure":0.62,"Civil Rights":0.55,"First Amendment":0.60,"default":0.58},
+        "Barrett":   {"Criminal Procedure":0.70,"Civil Rights":0.50,"First Amendment":0.65,"default":0.63},
+        "Jackson":   {"Criminal Procedure":0.42,"Civil Rights":0.78,"First Amendment":0.64,"default":0.46},
+    }
+    cons_adj = (n_conservative - 5) * 0.025
     justice_probs = {}
-    for j in CURRENT_JUSTICES:
-        short = j["short"]
-        tend = JUSTICE_REVERSAL_TENDENCIES.get(short, {})
-        j_rate = tend.get(issue_area, tend.get("default", 0.60))
-        # Adjust for court composition
-        j_rate = j_rate + cons_adj * 0.3
-        # Liberal justices adjust opposite direction
-        if j["lean"] == "Liberal": j_rate = 1 - (1 - j_rate) * (1 + cons_adj * 0.2)
-        j_rate = max(0.10, min(0.90, j_rate))
-        if p_reverse < 0.5:
-            j_rate = 1 - j_rate
-        justice_probs[short] = j_rate
+    for j in CURRENT_JUSTICES_DISPLAY:
+        sh = j["short"]
+        tend = _JUST_TEND.get(sh, {})
+        rate = tend.get(issue_area, tend.get("default", 0.60))
+        rate = rate + cons_adj * 0.3
+        if j["lean"] == "Liberal": rate = 1 - (1 - rate) * (1 + cons_adj * 0.2)
+        rate = max(0.10, min(0.90, rate))
+        if p_reverse < 0.5: rate = 1 - rate
+        justice_probs[sh] = rate
 
-    return {"p_reverse": p_reverse, "p_affirm": p_affirm, "split_label": split_label,
-            "split_dist": split_dist, "justice_probs": justice_probs}
+    return {"p_reverse": round(p_reverse,4), "p_affirm": round(1-p_reverse,4),
+            "split_probs": split_dist, "split_label": split_label,
+            "justice_probs": justice_probs, "source": "statistical"}
 
-# ── Page ─────────────────────────────────────────────────────────────────────
+# ── Page header ───────────────────────────────────────────────────────────────
 st.title("🔮 Predictions")
-st.markdown("Statistical tools for predicting SCOTUS outcomes, cert grants, and tracking the live term docket.")
 
-tab_predictor, tab_cert, tab_docket = st.tabs([
-    "🎯 Case Outcome Predictor", "📋 Cert Grant Predictor", "🔴 Docket Watch"
+meta = load_meta()
+model_ready = is_trained()
+
+if model_ready:
+    trained_at     = meta.get("trained_at","?")[:16].replace("T"," ")
+    total_cases    = meta.get("total_cases", "?")
+    total_votes    = meta.get("total_votes", "?")
+    terms_in_data  = meta.get("terms_in_data", [])
+    term_range     = f"{min(terms_in_data)}–{max(terms_in_data)}" if terms_in_data else "?"
+    out_acc        = meta.get("outcome_accuracy_cv5", None)
+    st.success(
+        f"✅ **ML model active** — trained on **{total_cases:,} cases** "
+        f"({total_votes:,} votes, {term_range} terms)  |  "
+        f"5-fold CV accuracy: **{out_acc*100:.1f}%**  |  trained {trained_at}"
+    )
+else:
+    st.warning("⚠️ ML model not yet trained. Predictions will use the statistical baseline. "
+               "Open **⚙️ Model Training** below to train on real Oyez data.")
+
+tab_predictor, tab_performance, tab_training, tab_cert, tab_docket = st.tabs([
+    "🎯 Case Outcome Predictor", "📈 Model Performance",
+    "⚙️ Model Training", "📋 Cert Grant Predictor", "🔴 Docket Watch",
 ])
 
-# ──────────────────────────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
 # TAB 1: CASE OUTCOME PREDICTOR
-# ──────────────────────────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
 with tab_predictor:
-    st.markdown(
-        "Enter the characteristics of an upcoming case and get a **statistically-driven probability estimate** "
-        "for the outcome, likely vote split, and how each current justice may vote. "
-        "Based on historical SCOTUS reversal rates (1990–2024) by circuit, issue area, and court composition."
-    )
-    st.info("This is a statistical model, not a legal prediction. Accuracy is typically 65–72% on held-out data.")
+    source_badge = ("🤖 **ML model**" if model_ready else "📊 **Statistical baseline**")
+    st.markdown(f"Using {source_badge}. Enter case characteristics to generate a prediction.")
+    if not model_ready:
+        st.info("Train the ML model in the **⚙️ Model Training** tab for higher accuracy predictions.")
 
     with st.form("predictor_form"):
         col1, col2, col3 = st.columns(3)
         with col1:
-            circuit_sel   = st.selectbox("Circuit of Origin", list(CIRCUIT_REVERSAL_RATES.keys()), index=0)
-            issue_area_sel= st.selectbox("Issue Area", list(ISSUE_REVERSAL_RATES.keys()), index=0)
+            circuit_sel    = st.selectbox("Circuit of Origin", CIRCUIT_OPTIONS, index=8)
+            issue_area_sel = st.selectbox("Issue Area", ISSUE_OPTIONS, index=0)
         with col2:
-            pet_type_sel  = st.selectbox("Petitioner Type", list(PETITIONER_RATE_BONUS.keys()), index=0)
-            sg_support    = st.checkbox("Solicitor General Supporting Petitioner", value=False)
+            pet_type_sel   = st.selectbox("Petitioner Type", PETITIONER_TYPES, index=0)
+            sg_support     = st.checkbox("Solicitor General Supporting Petitioner")
         with col3:
-            circuit_split = st.checkbox("Circuit Split Exists", value=False)
-            n_cons        = st.slider("Conservative Justices on Court", 4, 7, 6,
-                                      help="Current Roberts Court has 6 conservative justices")
-            case_name_inp = st.text_input("Case Name (optional)", placeholder="e.g. Smith v. Jones")
+            circuit_split  = st.checkbox("Circuit Split Exists")
+            n_cons         = st.slider("Conservative Justices on Court", 4, 7, 6)
+            case_name_inp  = st.text_input("Case Name (optional)", placeholder="e.g. Smith v. Jones")
         submitted = st.form_submit_button("Generate Prediction →", type="primary")
 
-    if submitted or "pred_result" in st.session_state:
-        if submitted:
-            result = _compute_reversal_probability(circuit_sel, issue_area_sel, pet_type_sel, sg_support, circuit_split, n_cons)
-            st.session_state["pred_result"] = result
-            st.session_state["pred_inputs"] = (circuit_sel, issue_area_sel, pet_type_sel, sg_support, circuit_split, n_cons, case_name_inp)
+    if submitted:
+        if model_ready:
+            try:
+                result = predict(
+                    circuit=circuit_sel, issue_area=issue_area_sel,
+                    n_conservative=n_cons, term_year=CURRENT_YEAR,
+                    sg_support=sg_support, circuit_split=circuit_split,
+                )
+                result["source"] = "ml"
+            except Exception as e:
+                st.warning(f"ML model error ({e}). Falling back to statistical baseline.")
+                result = _static_predict(circuit_sel, issue_area_sel, pet_type_sel,
+                                         sg_support, circuit_split, n_cons)
+        else:
+            result = _static_predict(circuit_sel, issue_area_sel, pet_type_sel,
+                                     sg_support, circuit_split, n_cons)
+        st.session_state["pred_result"] = result
+        st.session_state["pred_inputs"] = (circuit_sel, issue_area_sel, pet_type_sel,
+                                            sg_support, circuit_split, n_cons, case_name_inp)
 
+    if "pred_result" in st.session_state:
         result = st.session_state["pred_result"]
         inputs = st.session_state.get("pred_inputs", ())
         c_sel, ia_sel, pt_sel, sg_sel, cs_sel, nc_sel, cn_inp = inputs
 
         p_rev = result["p_reverse"]; p_aff = result["p_affirm"]
-        if p_rev > 0.66:     verdict_label = "🔴 LIKELY REVERSED"; verdict_color = "#E74C3C"
-        elif p_rev > 0.54:   verdict_label = "🟠 LEAN REVERSE";    verdict_color = "#E67E22"
-        elif p_aff > 0.66:   verdict_label = "🟢 LIKELY AFFIRMED"; verdict_color = "#27AE60"
-        elif p_aff > 0.54:   verdict_label = "🟡 LEAN AFFIRM";     verdict_color = "#F39C12"
-        else:                 verdict_label = "⚖️ TOSS-UP";         verdict_color = "#9B59B6"
+        if   p_rev > 0.66: verdict_label, verdict_color = "🔴 LIKELY REVERSED",   "#E74C3C"
+        elif p_rev > 0.54: verdict_label, verdict_color = "🟠 LEAN REVERSE",       "#E67E22"
+        elif p_aff > 0.66: verdict_label, verdict_color = "🟢 LIKELY AFFIRMED",    "#27AE60"
+        elif p_aff > 0.54: verdict_label, verdict_color = "🟡 LEAN AFFIRM",        "#F39C12"
+        else:               verdict_label, verdict_color = "⚖️ TOSS-UP",            "#9B59B6"
 
+        src_label  = "ML Model" if result.get("source") == "ml" else "Statistical Baseline"
         case_title = cn_inp if cn_inp else f"{c_sel} → {ia_sel} case"
-        st.markdown(f'<div style="background:{verdict_color}18;border-left:5px solid {verdict_color};'
-                    f'padding:16px 20px;border-radius:6px;margin:12px 0;">'
-                    f'<span style="font-size:1.35em;font-weight:bold;color:{verdict_color};">{verdict_label}</span>'
-                    f'<span style="color:#555;margin-left:16px;font-size:1em;">{case_title}</span></div>',
-                    unsafe_allow_html=True)
 
-        col_gauge, col_split, col_factors = st.columns(3)
+        st.markdown(
+            f'<div style="background:{verdict_color}18;border-left:5px solid {verdict_color};'
+            f'padding:16px 20px;border-radius:6px;margin:12px 0;">'
+            f'<span style="font-size:1.35em;font-weight:bold;color:{verdict_color};">{verdict_label}</span>'
+            f'<span style="color:#555;margin-left:16px;">{case_title}</span>'
+            f'<span style="float:right;font-size:0.8em;color:#888;background:#f0f0f0;'
+            f'padding:2px 8px;border-radius:3px;">{src_label}</span></div>',
+            unsafe_allow_html=True)
+
+        col_gauge, col_split_chart, col_factors = st.columns(3)
+
         with col_gauge:
-            fig_gauge = go.Figure(go.Indicator(
+            fig_g = go.Figure(go.Indicator(
                 mode="gauge+number+delta",
-                value=round(p_rev * 100, 1),
-                title={"text": "Reversal Probability", "font": {"size": 14}},
-                number={"suffix": "%", "font": {"size": 28}},
-                delta={"reference": 50, "relative": False, "valueformat": ".1f",
-                       "suffix": "% vs baseline"},
+                value=round(p_rev*100,1),
+                title={"text":"Reversal Probability","font":{"size":13}},
+                number={"suffix":"%","font":{"size":26}},
+                delta={"reference":50,"valueformat":".1f","suffix":"% vs 50%"},
                 gauge={
-                    "axis": {"range": [0, 100], "ticksuffix": "%"},
-                    "bar": {"color": verdict_color},
-                    "steps": [{"range": [0, 45], "color": "#D5F5E3"},
-                               {"range": [45, 55], "color": "#FCF3CF"},
-                               {"range": [55, 100], "color": "#FADBD8"}],
-                    "threshold": {"line": {"color": "#2C3E50", "width": 3}, "thickness": 0.75, "value": 50},
-                },
-            ))
-            fig_gauge.update_layout(height=260, margin=dict(l=20, r=20, t=40, b=20))
-            st.plotly_chart(fig_gauge, use_container_width=True)
+                    "axis":{"range":[0,100],"ticksuffix":"%"},
+                    "bar":{"color":verdict_color},
+                    "steps":[{"range":[0,45],"color":"#D5F5E3"},
+                              {"range":[45,55],"color":"#FCF3CF"},
+                              {"range":[55,100],"color":"#FADBD8"}],
+                    "threshold":{"line":{"color":"#2C3E50","width":3},"thickness":0.75,"value":50},
+                }))
+            fig_g.update_layout(height=250,margin=dict(l=20,r=20,t=40,b=20))
+            st.plotly_chart(fig_g, use_container_width=True)
 
-        with col_split:
-            split_df = pd.DataFrame(list(result["split_dist"].items()), columns=["Split", "Probability"])
-            split_df["Probability %"] = (split_df["Probability"] * 100).round(1)
-            split_df = split_df.sort_values("Split")
-            colors_split = ["#27AE60" if s == result["split_label"] else "#BDC3C7" for s in split_df["Split"]]
-            fig_split = go.Figure(go.Bar(
-                x=split_df["Split"], y=split_df["Probability %"],
-                marker_color=colors_split,
-                text=split_df["Probability %"].apply(lambda v: f"{v:.0f}%"),
+        with col_split_chart:
+            split_d  = result["split_probs"]
+            split_df = pd.DataFrame(list(split_d.items()), columns=["Split","Prob"])
+            split_df["Prob %"] = (split_df["Prob"]*100).round(1)
+            split_label_pred   = result["split_label"]
+            bar_colors = ["#27AE60" if s==split_label_pred else "#BDC3C7" for s in split_df["Split"]]
+            fig_sp = go.Figure(go.Bar(
+                x=split_df["Split"], y=split_df["Prob %"],
+                marker_color=bar_colors,
+                text=split_df["Prob %"].apply(lambda v: f"{v:.0f}%"),
                 textposition="outside"))
-            fig_split.update_layout(title=f"Most Likely Split: {result['split_label']}",
-                                     yaxis=dict(title="Probability %", range=[0, 65]),
-                                     height=260, plot_bgcolor="white", paper_bgcolor="white",
-                                     margin=dict(l=20, r=20, t=40, b=40))
-            st.plotly_chart(fig_split, use_container_width=True)
+            fig_sp.update_layout(
+                title=f"Most Likely Split: {split_label_pred}",
+                yaxis=dict(title="Probability %",range=[0,65]),
+                height=250,plot_bgcolor="white",paper_bgcolor="white",
+                margin=dict(l=20,r=20,t=40,b=40))
+            st.plotly_chart(fig_sp, use_container_width=True)
 
         with col_factors:
-            st.markdown("**Key Factors**")
-            base_rate = CIRCUIT_REVERSAL_RATES.get(c_sel, 0.62)
+            st.markdown("**Input Summary**")
             factors = [
-                (f"{c_sel} historical reversal rate", base_rate, "#3498DB"),
-                (f"{ia_sel} issue area rate", ISSUE_REVERSAL_RATES.get(ia_sel, 0.62), "#9B59B6"),
-                (f"{pt_sel} petitioner bonus", 0.5 + PETITIONER_RATE_BONUS.get(pt_sel, 0), "#27AE60"),
-                ("Solicitor General support", 0.60 if sg_sel else 0.50, "#E67E22"),
-                ("Circuit split exists", 0.58 if cs_sel else 0.50, "#E74C3C"),
+                (f"{c_sel}", CIRCUIT_REVERSAL_RATES.get(c_sel,0.62)*100, "#3498DB"),
+                (f"{ia_sel}", ISSUE_REVERSAL_RATES.get(ia_sel,0.62)*100, "#9B59B6"),
+                ("SG Support", (60 if sg_sel else 50), "#E67E22"),
+                ("Circuit Split", (58 if cs_sel else 50), "#27AE60"),
+                (f"{nc_sel} conservatives", 50 + (nc_sel-5)*2.5, "#E74C3C"),
             ]
             for label, val, color in factors:
-                pct = val * 100
-                st.markdown(f'<div style="margin:4px 0;">'
-                             f'<span style="font-size:0.82em;color:#555;">{label}</span><br>'
-                             f'<div style="background:#ECF0F1;border-radius:4px;height:16px;margin-top:2px;">'
-                             f'<div style="background:{color};width:{pct:.0f}%;height:100%;border-radius:4px;"></div></div>'
-                             f'<span style="font-size:0.82em;color:{color};">{pct:.0f}%</span></div>',
-                             unsafe_allow_html=True)
+                st.markdown(
+                    f'<div style="margin:4px 0;">'
+                    f'<span style="font-size:0.82em;color:#555;">{label}</span><br>'
+                    f'<div style="background:#ECF0F1;border-radius:4px;height:14px;margin-top:2px;">'
+                    f'<div style="background:{color};width:{min(val,100):.0f}%;height:100%;border-radius:4px;"></div></div>'
+                    f'<span style="font-size:0.8em;color:{color};">{val:.0f}%</span></div>',
+                    unsafe_allow_html=True)
 
         st.divider()
+        # Per-justice section
         st.subheader("Per-Justice Vote Probabilities")
-        st.caption("Probability that each justice votes with the likely majority (reversal or affirmance).")
-        justice_probs = result["justice_probs"]
         direction = "Reverse" if p_rev > 0.5 else "Affirm"
+        st.caption(f"Probability each justice votes with the predicted {direction} majority.")
+        justice_probs = result.get("justice_probs", {})
+
         j_cols = st.columns(3)
-        for i, j in enumerate(CURRENT_JUSTICES):
-            short = j["short"]; prob = justice_probs.get(short, 0.5)
+        for i, j in enumerate(CURRENT_JUSTICES_DISPLAY):
+            sh = j["short"]
+            prob = justice_probs.get(sh, 0.5)
             lean_color = LEAN_COLORS[j["lean"]]
-            bar_color = lean_color if prob > 0.55 else ("#95A5A6" if prob > 0.45 else "#BDC3C7")
+            if   prob > 0.65: badge = "✅ Likely Majority";  bar_c = lean_color
+            elif prob < 0.35: badge = "❌ Likely Dissent";   bar_c = "#95A5A6"
+            else:             badge = "🤔 Uncertain";        bar_c = "#BDC3C7"
             with j_cols[i % 3]:
                 st.markdown(
                     f'<div style="border:1px solid #E0E0E0;border-radius:6px;padding:10px;margin:4px 0;">'
                     f'<div style="display:flex;justify-content:space-between;">'
-                    f'<span style="font-weight:bold;font-size:0.95em;">{short}</span>'
-                    f'<span style="color:{lean_color};font-size:0.8em;">{j["lean"]}</span></div>'
-                    f'<div style="background:#ECF0F1;border-radius:4px;height:12px;margin:6px 0;">'
-                    f'<div style="background:{bar_color};width:{prob*100:.0f}%;height:100%;border-radius:4px;"></div></div>'
-                    f'<div style="display:flex;justify-content:space-between;font-size:0.82em;color:#555;">'
+                    f'<span style="font-weight:bold;font-size:0.95em;">{sh}</span>'
+                    f'<span style="color:{lean_color};font-size:0.78em;">{j["lean"]}</span></div>'
+                    f'<div style="background:#ECF0F1;border-radius:4px;height:10px;margin:5px 0;">'
+                    f'<div style="background:{bar_c};width:{prob*100:.0f}%;height:100%;border-radius:4px;"></div></div>'
+                    f'<div style="font-size:0.82em;color:#555;display:flex;justify-content:space-between;">'
                     f'<span>P({direction}): <b>{prob*100:.0f}%</b></span>'
-                    f'<span>{"✅" if prob > 0.55 else "❌" if prob < 0.45 else "🤔"}</span></div></div>',
+                    f'<span>{badge}</span></div></div>',
                     unsafe_allow_html=True)
 
         st.divider()
-        # Court bench visualization
-        st.subheader("Court Bench — Predicted Vote")
-        bench_votes = [(j["short"], justice_probs.get(j["short"], 0.5), j["lean"]) for j in CURRENT_JUSTICES]
-        bench_votes.sort(key=lambda x: -x[1])
+        # Bench diagram
+        st.subheader("Court Bench — Predicted Alignment")
+        bench = sorted(
+            [(j["short"], justice_probs.get(j["short"],0.5), j["lean"])
+             for j in CURRENT_JUSTICES_DISPLAY],
+            key=lambda x: -x[1])
         fig_bench = go.Figure()
-        xs = list(range(len(bench_votes))); ys = [1] * len(bench_votes)
-        colors_bench = [LEAN_COLORS[lean] for _, _, lean in bench_votes]
-        sizes_bench  = [max(30, int(prob * 50)) for _, prob, _ in bench_votes]
         fig_bench.add_trace(go.Scatter(
-            x=xs, y=ys, mode="markers+text",
-            marker=dict(size=sizes_bench, color=colors_bench, line=dict(color="white", width=2),
-                        symbol=["circle" if prob > 0.5 else "x" for _, prob, _ in bench_votes]),
-            text=[f"{short}<br>{int(prob*100)}%" for short, prob, _ in bench_votes],
-            textposition="bottom center", textfont=dict(size=9),
-            hovertemplate="<b>%{text}</b><extra></extra>"))
+            x=list(range(9)), y=[1]*9,
+            mode="markers+text",
+            marker=dict(
+                size=[40+int(p*20) for _,p,_ in bench],
+                color=[LEAN_COLORS[lean] for _,_,lean in bench],
+                opacity=[0.9 if p>0.5 else 0.35 for _,p,_ in bench],
+                line=dict(color="white",width=2),
+                symbol=["circle" if p>0.5 else "x" for _,p,_ in bench]),
+            text=[f"{sh}<br>{int(p*100)}%" for sh,p,_ in bench],
+            textposition="bottom center",
+            textfont=dict(size=9),
+            hovertemplate="%{text}<extra></extra>"))
         fig_bench.update_layout(
-            title=f"Predicted Votes for {direction} (sorted by probability)",
-            height=200, showlegend=False,
-            xaxis=dict(showticklabels=False, showgrid=False, zeroline=False, range=[-0.5, 8.5]),
-            yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, range=[0.5, 1.5]),
-            plot_bgcolor="white", paper_bgcolor="white", margin=dict(l=20, r=20, t=50, b=60),
-        )
+            title=f"Predicted to {direction} (filled circle = majority, ✕ = dissent)",
+            height=200,showlegend=False,
+            xaxis=dict(showticklabels=False,showgrid=False,zeroline=False,range=[-0.5,8.5]),
+            yaxis=dict(showticklabels=False,showgrid=False,zeroline=False,range=[0.4,1.6]),
+            plot_bgcolor="white",paper_bgcolor="white",
+            margin=dict(l=20,r=20,t=50,b=70))
         st.plotly_chart(fig_bench, use_container_width=True)
 
-        # Historical context
+        # Historical circuit context
         st.divider()
         st.subheader("Historical Context")
-        circ_r = CIRCUIT_REVERSAL_RATES.get(c_sel, 0.62) * 100
-        issue_r = ISSUE_REVERSAL_RATES.get(ia_sel, 0.62) * 100
-        col_ctx1, col_ctx2, col_ctx3 = st.columns(3)
-        col_ctx1.metric(f"{c_sel} Reversal Rate", f"{circ_r:.0f}%", "historical average")
-        col_ctx2.metric(f"{ia_sel} Reversal Rate", f"{issue_r:.0f}%", "historical average")
-        col_ctx3.metric("Overall SCOTUS Reversal Rate", "62%", "1990–2024 average")
+        all_circs = sorted(CIRCUIT_REVERSAL_RATES.items(), key=lambda x: -x[1])
+        hist_df   = pd.DataFrame(all_circs, columns=["Circuit","Reversal Rate"])
+        fig_hist = go.Figure(go.Bar(
+            x=hist_df["Circuit"], y=(hist_df["Reversal Rate"]*100).round(1),
+            marker_color=["#E74C3C" if c==c_sel else "#BDC3C7" for c in hist_df["Circuit"]],
+            text=(hist_df["Reversal Rate"]*100).round(0).astype(int).astype(str)+"%",
+            textposition="outside"))
+        fig_hist.update_layout(
+            title="Historical Reversal Rate by Circuit (1990–2024)",
+            xaxis_tickangle=-30, height=320,
+            yaxis=dict(title="Reversal %",range=[0,100]),
+            plot_bgcolor="white",paper_bgcolor="white")
+        st.plotly_chart(fig_hist, use_container_width=True)
 
-        all_circuits = list(CIRCUIT_REVERSAL_RATES.items())
-        all_circuits.sort(key=lambda x: -x[1])
-        fig_ctx = go.Figure(go.Bar(
-            x=[c[0] for c in all_circuits], y=[c[1]*100 for c in all_circuits],
-            marker_color=["#E74C3C" if c[0]==c_sel else "#BDC3C7" for c in all_circuits],
-            text=[f"{c[1]*100:.0f}%" for c in all_circuits], textposition="outside"))
-        fig_ctx.update_layout(title="Historical Reversal Rate by Circuit", xaxis_tickangle=-30,
-                               yaxis=dict(title="Reversal Rate (%)", range=[0, 100]),
-                               height=320, plot_bgcolor="white", paper_bgcolor="white")
-        st.plotly_chart(fig_ctx, use_container_width=True)
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB 2: MODEL PERFORMANCE
+# ══════════════════════════════════════════════════════════════════════════════
+with tab_performance:
+    if not model_ready:
+        st.info("No trained model yet. Go to **⚙️ Model Training** to train one.")
+    else:
+        st.subheader("Model Performance Summary")
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Outcome Accuracy (5-fold CV)", f"{meta.get('outcome_accuracy_cv5',0)*100:.1f}%")
+        c2.metric("Outcome Accuracy (hold-out)", f"{meta.get('outcome_accuracy_holdout',0)*100:.1f}%")
+        c3.metric("Vote-Split Accuracy (hold-out)", f"{meta.get('split_accuracy_holdout',0)*100:.1f}%")
+        c4.metric("Training Cases", f"{meta.get('total_cases',0):,}")
+        st.caption(
+            f"Hold-out = last 2 terms ({', '.join(str(t) for t in meta.get('test_terms',[]))}).  "
+            f"Baseline (always predict Reverse): ~62%."
+        )
+        st.divider()
 
-# ──────────────────────────────────────────────────────────────────────────────
-# TAB 2: CERT GRANT PREDICTOR
-# ──────────────────────────────────────────────────────────────────────────────
-with tab_cert:
-    st.markdown(
-        "The Supreme Court receives ~10,000 petitions for certiorari per year and grants about **1–2%** "
-        "(roughly 60–80 cases). Predict whether a petition is likely to be granted based on key factors."
-    )
-
-    CERT_FACTORS = {
-        "Circuit Split": 0.045,
-        "Federal Gov't Petitioner (SG)": 0.038,
-        "Civil Rights / Equal Protection Issue": 0.032,
-        "First Amendment Issue": 0.030,
-        "Judicial Power / Separation of Powers Issue": 0.035,
-        "Lower Court Struck Down Federal Law": 0.040,
-        "CVSG (Call for Views from SG)": 0.060,
-        "Prior SCOTUS Case Needs Clarification": 0.028,
-        "Significant Economic Impact": 0.020,
-        "Long-standing Circuit Disagreement (5+ yrs)": 0.050,
-    }
-
-    with st.form("cert_form"):
-        col1_c, col2_c = st.columns(2)
-        with col1_c:
-            cert_circuit = st.selectbox("Circuit of Origin", list(CIRCUIT_CERT_MULTIPLIER.keys()), key="cert_circuit")
-            cert_issue   = st.selectbox("Issue Area", list(ISSUE_CERT_RATES.keys()), key="cert_issue")
-        with col2_c:
-            cert_sg      = st.checkbox("Solicitor General is Petitioner or Supports Grant")
-            cert_split   = st.checkbox("Circuit Split Exists")
-            cert_cvsg    = st.checkbox("CVSG (Court invited SG view)")
-            cert_lower_struck = st.checkbox("Lower Court Struck Down Federal Law")
-        cert_factors_sel = st.multiselect("Additional Favorable Factors", list(CERT_FACTORS.keys()),
-                                           help="Select all that apply to this petition")
-        cert_submitted = st.form_submit_button("Predict Cert Grant Probability", type="primary")
-
-    if cert_submitted:
-        base_cert = ISSUE_CERT_RATES.get(cert_issue, 0.015)
-        mult      = CIRCUIT_CERT_MULTIPLIER.get(cert_circuit, 1.0)
-        if cert_sg:    base_cert += 0.038
-        if cert_split: base_cert += 0.045
-        if cert_cvsg:  base_cert += 0.060
-        if cert_lower_struck: base_cert += 0.040
-        for f in cert_factors_sel:
-            base_cert += CERT_FACTORS.get(f, 0)
-        cert_prob = max(0.005, min(0.85, base_cert * mult))
-
-        if cert_prob < 0.05:    cert_verdict = "🔴 Very Unlikely"; cert_c = "#E74C3C"
-        elif cert_prob < 0.10:  cert_verdict = "🟠 Unlikely";      cert_c = "#E67E22"
-        elif cert_prob < 0.20:  cert_verdict = "🟡 Possible";      cert_c = "#F39C12"
-        elif cert_prob < 0.40:  cert_verdict = "🟢 Likely";        cert_c = "#27AE60"
-        else:                   cert_verdict = "🟢 Very Likely";    cert_c = "#1ABC9C"
-
-        st.markdown(f'<div style="background:{cert_c}18;border-left:5px solid {cert_c};padding:16px 20px;border-radius:6px;">'
-                    f'<span style="font-size:1.25em;font-weight:bold;color:{cert_c};">{cert_verdict}</span><br>'
-                    f'<span style="font-size:1.8em;color:{cert_c};font-weight:bold;">{cert_prob*100:.1f}%</span>'
-                    f' <span style="color:#888;">probability of cert grant</span></div>', unsafe_allow_html=True)
-        st.markdown("")
-
-        col_cert1, col_cert2 = st.columns(2)
-        with col_cert1:
-            st.metric("Estimated Grant Probability", f"{cert_prob*100:.1f}%")
-            st.metric("Baseline (all petitions)", "1.5%")
-            st.metric("Circuit Multiplier", f"{mult:.1f}×")
-        with col_cert2:
-            fig_cert = go.Figure(go.Indicator(
-                mode="gauge+number", value=round(cert_prob * 100, 1),
-                number={"suffix": "%"},
-                title={"text": "Cert Grant Probability"},
-                gauge={"axis": {"range": [0, 85]},
-                       "bar": {"color": cert_c},
-                       "steps": [{"range": [0, 5], "color": "#FADBD8"},
-                                  {"range": [5, 15], "color": "#FDEBD0"},
-                                  {"range": [15, 85], "color": "#D5F5E3"}],
-                       "threshold": {"line": {"color": "#E74C3C", "width": 2}, "thickness": 0.75, "value": 5}}))
-            fig_cert.update_layout(height=230, margin=dict(l=20, r=20, t=40, b=20))
-            st.plotly_chart(fig_cert, use_container_width=True)
+        # Per-justice performance
+        j_results = meta.get("justice_results", {})
+        if j_results:
+            st.subheader("Per-Justice Model Accuracy")
+            j_rows = [{"Justice": j, "Accuracy": v.get("accuracy"), "Training Votes": v.get("n",0)}
+                      for j, v in j_results.items() if v.get("accuracy") is not None]
+            j_perf_df = pd.DataFrame(j_rows).sort_values("Accuracy", ascending=False)
+            if not j_perf_df.empty:
+                fig_jp = go.Figure(go.Bar(
+                    x=j_perf_df["Justice"],
+                    y=(j_perf_df["Accuracy"]*100).round(1),
+                    marker_color=["#27AE60" if a>0.65 else "#F39C12" if a>0.55 else "#E74C3C"
+                                  for a in j_perf_df["Accuracy"]],
+                    text=(j_perf_df["Accuracy"]*100).round(1).astype(str)+"%",
+                    textposition="outside",
+                    customdata=j_perf_df["Training Votes"],
+                    hovertemplate="<b>%{x}</b><br>Accuracy: %{y:.1f}%<br>Training votes: %{customdata}<extra></extra>"))
+                fig_jp.add_hline(y=50, line_dash="dot", line_color="#BDC3C7", annotation_text="Coin flip")
+                fig_jp.update_layout(
+                    title="Per-Justice Classifier Accuracy (hold-out set)",
+                    yaxis=dict(title="Accuracy %", range=[0,100]),
+                    height=360, plot_bgcolor="white", paper_bgcolor="white")
+                st.plotly_chart(fig_jp, use_container_width=True)
+                st.dataframe(j_perf_df.reset_index(drop=True)
+                             .style.format({"Accuracy":"{:.1%}","Training Votes":"{:,}"})
+                             .background_gradient(subset=["Accuracy"],cmap="RdYlGn"),
+                             use_container_width=True, height=300, hide_index=True)
 
         st.divider()
-        st.subheader("Cert Grant Rates by Issue Area")
-        issue_df_c = pd.DataFrame(list(ISSUE_CERT_RATES.items()), columns=["Issue Area","Base Rate"])
-        issue_df_c["Highlighted"] = issue_df_c["Issue Area"] == cert_issue
-        fig_c2 = go.Figure(go.Bar(
-            x=issue_df_c["Issue Area"],
-            y=(issue_df_c["Base Rate"] * 100).round(2),
-            marker_color=["#E67E22" if h else "#BDC3C7" for h in issue_df_c["Highlighted"]],
-            text=(issue_df_c["Base Rate"] * 100).apply(lambda v: f"{v:.1f}%"),
-            textposition="outside"))
-        fig_c2.update_layout(title="Baseline Cert Grant Rate by Issue Area (before modifiers)",
-                              xaxis_tickangle=-30, height=340,
-                              yaxis=dict(title="Base Grant Rate (%)"),
-                              plot_bgcolor="white", paper_bgcolor="white")
-        st.plotly_chart(fig_c2, use_container_width=True)
-        st.caption("These rates reflect historical cert grants. Circuit splits, SG support, and CVSG can multiply probability 2–5×.")
+        # Feature importances
+        fi = meta.get("feature_importances", {})
+        if fi:
+            st.subheader("Feature Importances — Outcome Model")
+            fi_df = pd.DataFrame(list(fi.items()), columns=["Feature","Importance"])
+            fi_df = fi_df.sort_values("Importance", ascending=False).head(20)
+            # Shorten one-hot names
+            fi_df["Feature"] = fi_df["Feature"].str.replace("cat__","").str.replace("num__","")
+            fig_fi = go.Figure(go.Bar(
+                y=fi_df["Feature"], x=fi_df["Importance"],
+                orientation="h", marker_color="#3498DB",
+                text=fi_df["Importance"].apply(lambda v: f"{v:.3f}"),
+                textposition="outside"))
+            fig_fi.update_layout(
+                title="Top 20 Feature Importances (Gradient Boosting)",
+                height=500, plot_bgcolor="white", paper_bgcolor="white",
+                margin=dict(l=200,r=60,t=40,b=40),
+                xaxis_title="Importance")
+            st.plotly_chart(fig_fi, use_container_width=True)
 
-    else:
-        st.subheader("📊 Reference: Historical Cert Grant Rates")
-        st.markdown("**Factors that dramatically increase cert probability:**")
-        factors_df = pd.DataFrame(list(CERT_FACTORS.items()), columns=["Factor","Probability Boost"])
-        factors_df["Boost %"] = (factors_df["Probability Boost"] * 100).round(1)
-        factors_df = factors_df.sort_values("Boost %", ascending=False)
-        fig_factors = go.Figure(go.Bar(
-            x=factors_df["Boost %"], y=factors_df["Factor"], orientation="h",
-            marker_color="#E67E22", text=factors_df["Boost %"].apply(lambda v: f"+{v:.1f}%"),
-            textposition="outside"))
-        fig_factors.update_layout(title="Cert Grant Probability Boost by Factor",
-                                   height=350, xaxis_title="Probability Added",
-                                   yaxis=dict(autorange="reversed"),
-                                   plot_bgcolor="white", paper_bgcolor="white",
-                                   margin=dict(l=250, r=60, t=40, b=40))
-        st.plotly_chart(fig_factors, use_container_width=True)
-        col_d1, col_d2, col_d3, col_d4 = st.columns(4)
-        col_d1.metric("Annual Petitions", "~10,000")
-        col_d2.metric("Granted", "~70–80")
-        col_d3.metric("Grant Rate", "~1.5%")
-        col_d4.metric("Chance with Circuit Split", "~4–8%")
+        st.divider()
+        # Outcome classification report
+        oc_report = meta.get("outcome_report", {})
+        if oc_report:
+            st.subheader("Outcome Model — Classification Report (hold-out)")
+            report_rows = []
+            for cls_key in ["0","1"]:
+                if cls_key in oc_report:
+                    r = oc_report[cls_key]
+                    report_rows.append({
+                        "Class": "Affirmed (0)" if cls_key=="0" else "Reversed (1)",
+                        "Precision": round(r.get("precision",0)*100,1),
+                        "Recall": round(r.get("recall",0)*100,1),
+                        "F1-Score": round(r.get("f1-score",0)*100,1),
+                        "Support": int(r.get("support",0)),
+                    })
+            if report_rows:
+                rep_df = pd.DataFrame(report_rows)
+                st.dataframe(rep_df.style.format({"Precision":"{:.1f}%","Recall":"{:.1f}%","F1-Score":"{:.1f}%"})
+                             .background_gradient(subset=["F1-Score"],cmap="RdYlGn"),
+                             use_container_width=True, hide_index=True)
 
-# ──────────────────────────────────────────────────────────────────────────────
-# TAB 3: DOCKET WATCH — Live Current Term Tracker
-# ──────────────────────────────────────────────────────────────────────────────
+        st.divider()
+        # Training data stats
+        st.subheader("Training Data")
+        terms_list = meta.get("terms_in_data", [])
+        col_td1, col_td2, col_td3, col_td4 = st.columns(4)
+        col_td1.metric("Terms covered", len(terms_list))
+        col_td2.metric("Term range", f"{min(terms_list)}–{max(terms_list)}" if terms_list else "—")
+        col_td3.metric("Total votes", f"{meta.get('total_votes',0):,}")
+        col_td4.metric("Trained at", meta.get("trained_at","?")[:10])
+
+        if CACHE_CSV.exists():
+            if st.button("Show training data sample"):
+                try:
+                    sample = pd.read_csv(CACHE_CSV).head(100)
+                    st.dataframe(sample, use_container_width=True, height=300)
+                except Exception as e:
+                    st.error(str(e))
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB 3: MODEL TRAINING
+# ══════════════════════════════════════════════════════════════════════════════
+with tab_training:
+    st.markdown(
+        "Train the ML prediction model on historical SCOTUS data from the Oyez API. "
+        "Data is cached locally after the first fetch — retraining is fast."
+    )
+
+    avail_terms = list(range(2023, 1999, -1))
+
+    col_t1, col_t2 = st.columns(2)
+    with col_t1:
+        train_terms = st.multiselect(
+            "Terms to include in training data",
+            avail_terms,
+            default=avail_terms[:18],
+            format_func=lambda t: f"{t}–{t+1}",
+            help="More terms = more data = better accuracy, but slower fetch. 15–20 terms is a good starting point.",
+            key="train_terms_sel",
+        )
+        st.caption(f"Selected: {len(train_terms)} terms. "
+                   f"Estimated cases: ~{len(train_terms)*70:,}. "
+                   f"Fetch time (first run): ~{len(train_terms)*50//60+1} min.")
+    with col_t2:
+        cached_terms_info = ""
+        if CACHE_CSV.exists():
+            try:
+                cached_df = pd.read_csv(CACHE_CSV)
+                cached_ts = sorted(cached_df["term"].unique().astype(int))
+                cached_terms_info = (f"**{len(cached_ts)} terms already cached** "
+                                     f"({min(cached_ts)}–{max(cached_ts)}, "
+                                     f"{len(cached_df):,} rows). "
+                                     f"Only missing terms will be fetched.")
+            except Exception:
+                pass
+        if cached_terms_info:
+            st.info(cached_terms_info)
+        else:
+            st.info("No cached data yet. First run will fetch from Oyez API.")
+
+        clear_cache = st.checkbox("Clear cached data and re-fetch everything", value=False)
+
+    col_btn1, col_btn2 = st.columns(2)
+    with col_btn1:
+        fetch_btn = st.button("Step 1: Collect Training Data", type="primary",
+                              disabled=not train_terms)
+    with col_btn2:
+        train_btn = st.button("Step 2: Train Models",
+                              disabled=not (CACHE_CSV.exists() or "training_df" in st.session_state))
+
+    # ── Data collection ───────────────────────────────────────────────────────
+    if fetch_btn:
+        if clear_cache and CACHE_CSV.exists():
+            CACHE_CSV.unlink()
+            st.toast("Cache cleared.")
+
+        progress_bar  = st.progress(0.0, text="Starting data collection…")
+        status_text   = st.empty()
+        rows_count    = st.empty()
+
+        def _progress(done, total, msg):
+            pct = done / total if total else 0
+            progress_bar.progress(pct, text=msg)
+            status_text.markdown(f"*{msg}*")
+
+        with st.spinner("Fetching SCOTUS case data from Oyez…"):
+            try:
+                df_train = collect_training_data(
+                    terms=sorted(train_terms, reverse=True),
+                    progress_cb=_progress,
+                )
+                st.session_state["training_df"] = df_train
+                progress_bar.progress(1.0, text="Data collection complete!")
+                n_cases  = df_train["docket"].nunique() if not df_train.empty else 0
+                n_votes  = len(df_train)
+                n_terms  = df_train["term"].nunique() if not df_train.empty else 0
+                st.success(
+                    f"✅ Collected **{n_cases:,} cases**, **{n_votes:,} justice votes** "
+                    f"across **{n_terms}** terms."
+                )
+                rows_count.dataframe(
+                    df_train.groupby("term").agg(
+                        cases=("docket","nunique"),
+                        votes=("justice","count"),
+                    ).reset_index().sort_values("term",ascending=False).head(10),
+                    use_container_width=True, height=250,
+                )
+            except Exception as e:
+                st.error(f"Data collection failed: {e}")
+
+    # ── Model training ────────────────────────────────────────────────────────
+    if train_btn:
+        df_for_train = st.session_state.get("training_df", None)
+        if df_for_train is None and CACHE_CSV.exists():
+            try:
+                df_for_train = pd.read_csv(CACHE_CSV)
+            except Exception:
+                df_for_train = None
+
+        if df_for_train is None or df_for_train.empty:
+            st.error("No training data found. Run Step 1 first.")
+        else:
+            st.info(f"Training on {len(df_for_train):,} vote rows from {df_for_train['term'].nunique()} terms…")
+            train_progress = st.progress(0.0)
+            train_status   = st.empty()
+
+            def _train_progress(done, total, msg):
+                pct = (done+1) / (total+1)
+                train_progress.progress(pct, text=msg)
+                train_status.markdown(f"*{msg}*")
+
+            with st.spinner("Training ML models — this takes ~30–60 seconds…"):
+                try:
+                    results = train_models(df_for_train, progress_cb=_train_progress)
+                    train_progress.progress(1.0, text="Training complete!")
+                    train_status.empty()
+
+                    out_cv   = results.get("outcome_accuracy_cv5", 0)
+                    out_hold = results.get("outcome_accuracy_holdout", 0)
+                    spl_hold = results.get("split_accuracy_holdout", 0)
+                    j_res    = results.get("justice_results", {})
+                    j_with_acc = [(j,v["accuracy"]) for j,v in j_res.items() if v.get("accuracy")]
+
+                    st.success(
+                        f"✅ **Models trained successfully!**  "
+                        f"Outcome CV accuracy: **{out_cv*100:.1f}%** | "
+                        f"Hold-out: **{out_hold*100:.1f}%** | "
+                        f"Split hold-out: **{spl_hold*100:.1f}%** | "
+                        f"Per-justice models: **{len(j_with_acc)}** justices"
+                    )
+                    st.balloons()
+
+                    # Summary table
+                    sum_rows = [
+                        {"Model":"Outcome (Affirm/Reverse)","Type":"GradientBoosting + Calibration",
+                         "CV Accuracy":f"{out_cv*100:.1f}%","Hold-out Accuracy":f"{out_hold*100:.1f}%","Classes":"2"},
+                        {"Model":"Vote Split","Type":"GradientBoosting + Calibration",
+                         "CV Accuracy":"—","Hold-out Accuracy":f"{spl_hold*100:.1f}%","Classes":"5"},
+                    ]
+                    for j, acc in sorted(j_with_acc, key=lambda x: -x[1]):
+                        sum_rows.append({
+                            "Model":f"Justice: {j}","Type":"LogisticRegression + Calibration",
+                            "CV Accuracy":"—","Hold-out Accuracy":f"{acc*100:.1f}%","Classes":"2",
+                        })
+                    st.dataframe(pd.DataFrame(sum_rows), use_container_width=True, hide_index=True)
+                    st.markdown("**Reload the page to activate the trained model.**")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Training failed: {e}")
+                    import traceback; st.code(traceback.format_exc())
+
+    # ── Architecture description ──────────────────────────────────────────────
+    with st.expander("📐 Model Architecture Details"):
+        st.markdown("""
+**Data pipeline**
+- Source: Oyez API (`/cases?filter=term:YYYY`) — free, no API key
+- Features extracted per case: circuit of origin, issue area, term year, conservative bench count
+- Labels: binary outcome (0=Affirm, 1=Reverse), vote split (5-4/6-3/7-2/8-1/9-0), per-justice majority indicator
+- Temporal train/test split: held-out last 2 terms to prevent leakage
+
+**Feature engineering**
+| Feature | Type | Encoding |
+|---|---|---|
+| `circuit` | Categorical (15) | OneHotEncoder |
+| `issue_area` | Categorical (14) | OneHotEncoder |
+| `n_conservative` | Numeric | StandardScaler |
+| `term_year_norm` | Numeric (centered on 2005) | StandardScaler |
+
+**Models**
+| Model | Algorithm | Notes |
+|---|---|---|
+| Outcome | `GradientBoostingClassifier` (150 trees, depth 3) | Calibrated with Platt scaling |
+| Vote Split | `GradientBoostingClassifier` (150 trees, depth 3) | 5-class multiclass |
+| Per-Justice (×9) | `LogisticRegression` (C=0.8) | One per current justice |
+
+**Calibration**: `CalibratedClassifierCV(method="sigmoid", cv="prefit")` ensures probabilities are reliable.
+
+**Post-hoc adjustments** (not in features, applied after model):
+- SG support: +7pp reversal probability
+- Circuit split: +5pp reversal probability
+        """)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB 4: CERT GRANT PREDICTOR
+# ══════════════════════════════════════════════════════════════════════════════
+with tab_cert:
+    st.markdown(
+        "The Supreme Court grants cert in about **1–2%** of ~10,000 annual petitions. "
+        "Estimate whether a petition will be accepted based on key factors."
+    )
+    with st.form("cert_form"):
+        c1_cf, c2_cf = st.columns(2)
+        with c1_cf:
+            cert_circuit = st.selectbox("Circuit of Origin", CIRCUIT_OPTIONS, key="cert_circuit")
+            cert_issue   = st.selectbox("Issue Area", ISSUE_OPTIONS, key="cert_issue")
+        with c2_cf:
+            cert_sg     = st.checkbox("Solicitor General is Petitioner or Supports Grant")
+            cert_split  = st.checkbox("Circuit Split Exists")
+            cert_cvsg   = st.checkbox("CVSG (Court invited SG view)")
+            cert_flaw   = st.checkbox("Lower Court Struck Down Federal Law")
+        extra_factors = st.multiselect("Additional Favorable Factors", list(CERT_FACTORS.keys()))
+        cert_sub = st.form_submit_button("Estimate Cert Probability", type="primary")
+
+    if cert_sub:
+        base  = ISSUE_CERT_RATES.get(cert_issue, 0.015)
+        mult  = CIRCUIT_CERT_MULT.get(cert_circuit, 1.0)
+        if cert_sg:    base += 0.038
+        if cert_split: base += 0.045
+        if cert_cvsg:  base += 0.060
+        if cert_flaw:  base += 0.040
+        for f in extra_factors: base += CERT_FACTORS.get(f, 0)
+        cp = max(0.005, min(0.85, base * mult))
+
+        if   cp < 0.05: cv, cc = "🔴 Very Unlikely", "#E74C3C"
+        elif cp < 0.10: cv, cc = "🟠 Unlikely",       "#E67E22"
+        elif cp < 0.20: cv, cc = "🟡 Possible",        "#F39C12"
+        elif cp < 0.40: cv, cc = "🟢 Likely",          "#27AE60"
+        else:           cv, cc = "🟢 Very Likely",     "#1ABC9C"
+
+        st.markdown(
+            f'<div style="background:{cc}18;border-left:5px solid {cc};padding:16px 20px;border-radius:6px;">'
+            f'<span style="font-size:1.2em;font-weight:bold;color:{cc};">{cv}</span><br>'
+            f'<span style="font-size:2em;color:{cc};font-weight:bold;">{cp*100:.1f}%</span>'
+            f' <span style="color:#888;">cert grant probability</span></div>',
+            unsafe_allow_html=True)
+
+        c1_cm, c2_cm = st.columns(2)
+        with c1_cm:
+            st.metric("Estimated Probability", f"{cp*100:.1f}%")
+            st.metric("Base rate (all petitions)", "1.5%")
+            st.metric("Circuit multiplier", f"{mult:.1f}×")
+        with c2_cm:
+            fig_cg = go.Figure(go.Indicator(
+                mode="gauge+number", value=round(cp*100,1),
+                number={"suffix":"%"},
+                title={"text":"Cert Grant Probability"},
+                gauge={"axis":{"range":[0,85]},
+                       "bar":{"color":cc},
+                       "steps":[{"range":[0,5],"color":"#FADBD8"},
+                                 {"range":[5,15],"color":"#FDEBD0"},
+                                 {"range":[15,85],"color":"#D5F5E3"}],
+                       "threshold":{"line":{"color":"#E74C3C","width":2},"thickness":0.75,"value":5}}))
+            fig_cg.update_layout(height=220,margin=dict(l=20,r=20,t=40,b=20))
+            st.plotly_chart(fig_cg, use_container_width=True)
+
+        st.divider()
+        issue_cert_df = pd.DataFrame(list(ISSUE_CERT_RATES.items()), columns=["Issue","Rate"])
+        fig_ir = go.Figure(go.Bar(
+            x=issue_cert_df["Issue"],
+            y=(issue_cert_df["Rate"]*100).round(2),
+            marker_color=["#E67E22" if i==cert_issue else "#BDC3C7" for i in issue_cert_df["Issue"]],
+            text=(issue_cert_df["Rate"]*100).apply(lambda v: f"{v:.1f}%"),
+            textposition="outside"))
+        fig_ir.update_layout(title="Baseline Cert Rate by Issue Area",xaxis_tickangle=-30,
+                              height=320,yaxis_title="Base Rate (%)",
+                              plot_bgcolor="white",paper_bgcolor="white")
+        st.plotly_chart(fig_ir, use_container_width=True)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB 5: DOCKET WATCH
+# ══════════════════════════════════════════════════════════════════════════════
 with tab_docket:
-    st.markdown(f"**Live tracker** for the **{CURRENT_TERM}–{CURRENT_TERM+1} SCOTUS Term.** Auto-refreshes on demand.")
+    st.markdown(f"**Live tracker** for the **{CURRENT_TERM}–{CURRENT_TERM+1} SCOTUS Term.**")
+    col_rf, col_inf = st.columns([1,3])
+    with col_rf:
+        if st.button("🔄 Refresh", type="primary"):
+            st.cache_data.clear(); st.rerun()
+    with col_inf:
+        st.caption(f"Last checked: {datetime.datetime.now().strftime('%B %d, %Y %H:%M')}")
 
-    col_refresh, col_info = st.columns([1, 3])
-    with col_refresh:
-        if st.button("🔄 Refresh Docket", type="primary"):
-            st.cache_data.clear()
-            st.rerun()
-    with col_info:
-        st.caption(f"Data source: Oyez API. Last checked: {datetime.datetime.now().strftime('%B %d, %Y %H:%M')}")
-
-    with st.spinner(f"Loading {CURRENT_TERM}–{CURRENT_TERM+1} term docket…"):
+    with st.spinner("Loading current term docket…"):
         docket_cases = _pred_fetch_term(CURRENT_TERM)
 
     if not docket_cases:
-        st.error(f"Could not load {CURRENT_TERM}–{CURRENT_TERM+1} term from Oyez. Try refreshing.")
+        st.error("Could not load term from Oyez.")
     else:
-        # Status bar
-        m1, m2, m3, m4 = st.columns(4)
-        decided  = sum(1 for c in docket_cases if c.get("decided_on"))
-        total    = len(docket_cases)
+        decided = sum(1 for c in docket_cases if c.get("decided_on"))
+        total   = len(docket_cases)
+        m1,m2,m3,m4 = st.columns(4)
         m1.metric("Total Cases", total)
         m2.metric("✅ Decided", decided)
-        m3.metric("⏳ Pending", total - decided)
-        m4.metric("📅 Term Progress", f"{decided/total*100:.0f}%" if total else "0%")
-
-        st.markdown(f"**Term completion:** {decided}/{total} cases decided")
-        progress_pct = decided / total if total else 0
-        st.progress(progress_pct)
+        m3.metric("⏳ Pending", total-decided)
+        m4.metric("Term Progress", f"{decided/total*100:.0f}%" if total else "0%")
+        st.progress(decided/total if total else 0)
         st.divider()
 
-        # Filters
-        col_f1, col_f2 = st.columns(2)
-        with col_f1:
-            status_filter_dw = st.selectbox("Filter by Status", ["All","Decided","Pending"], key="dw_status")
-        with col_f2:
-            search_dw = st.text_input("Search case name", placeholder="e.g. Trump, EPA, gun", key="dw_search")
+        col_f1,col_f2 = st.columns(2)
+        with col_f1: status_f = st.selectbox("Status", ["All","Decided","Pending"], key="dw_sf")
+        with col_f2: search_f = st.text_input("Search", placeholder="EPA, gun, Trump…", key="dw_ss")
 
-        # Build display rows
         dw_rows = []
         for c in docket_cases:
             ia = c.get("issue_area") or {}
             issue = ia.get("label","Unknown") if isinstance(ia,dict) else str(ia or "Unknown")
-            decided_ts = c.get("decided_on")
-            decided_date = _parse_date(decided_ts)
-            status = "Decided" if decided_date else "Pending"
-            dw_rows.append({
-                "name": c.get("name",""),
-                "docket": c.get("docket_number",""),
-                "issue": issue,
-                "status": status,
-                "decided_date": decided_date,
-                "href": c.get("href",""),
-            })
+            dd = _parse_date(c.get("decided_on"))
+            status = "Decided" if dd else "Pending"
+            href   = c.get("href","")
+            oyez_url = href.replace("api.oyez.org/cases","www.oyez.org/cases") if href else ""
+            dw_rows.append({"name":c.get("name",""),"issue":issue,"status":status,
+                             "decided":dd,"oyez_url":oyez_url})
 
-        # Apply filters
-        display_rows = dw_rows
-        if status_filter_dw == "Decided":   display_rows = [r for r in dw_rows if r["status"]=="Decided"]
-        elif status_filter_dw == "Pending": display_rows = [r for r in dw_rows if r["status"]=="Pending"]
-        if search_dw: display_rows = [r for r in display_rows if search_dw.lower() in r["name"].lower()]
+        disp = dw_rows
+        if status_f == "Decided":   disp = [r for r in disp if r["status"]=="Decided"]
+        elif status_f == "Pending": disp = [r for r in disp if r["status"]=="Pending"]
+        if search_f: disp = [r for r in disp if search_f.lower() in r["name"].lower()]
+        disp = sorted(disp, key=lambda x: (x["status"]=="Pending", x["name"]))
 
-        # Case cards in grid
-        st.markdown(f"**{len(display_rows)} cases shown**")
+        STATUS_COLORS = {"Decided":"#27AE60","Pending":"#E67E22"}
         cols_dw = st.columns(2)
-        for i, row in enumerate(sorted(display_rows, key=lambda x: (x["status"]=="Pending", x["name"]))):
+        for i, row in enumerate(disp):
+            sc = STATUS_COLORS.get(row["status"],"#95A5A6")
             icon = "✅" if row["status"]=="Decided" else "⏳"
-            status_color = STATUS_COLORS.get(row["status"],"#95A5A6")
-            oyez_url = row["href"].replace("api.oyez.org/cases","www.oyez.org/cases") if row["href"] else ""
-            with cols_dw[i % 2]:
+            link = f' · <a href="{row["oyez_url"]}" target="_blank">Oyez ↗</a>' if row["oyez_url"] else ""
+            with cols_dw[i%2]:
                 st.markdown(
-                    f'<div style="border:1px solid #E8E8E8;border-left:4px solid {status_color};'
+                    f'<div style="border:1px solid #E8E8E8;border-left:4px solid {sc};'
                     f'border-radius:6px;padding:10px 14px;margin:4px 0;">'
-                    f'<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
-                    f'<span style="font-weight:bold;font-size:0.92em;">{icon} {row["name"][:55]}{"…" if len(row["name"])>55 else ""}</span>'
-                    f'<span style="background:{status_color};color:white;padding:1px 7px;border-radius:3px;font-size:0.75em;white-space:nowrap;margin-left:6px;">'
-                    f'{row["status"]}</span></div>'
-                    f'<div style="font-size:0.82em;color:#666;margin-top:4px;">'
-                    f'<span>📁 {row["issue"]}</span>'
-                    f'{" · " + str(row["decided_date"]) if row["decided_date"] else ""}'
-                    f'{"  · <a href=" + oyez_url + " target=_blank>Oyez ↗</a>" if oyez_url else ""}'
-                    f'</div></div>',
+                    f'<div style="display:flex;justify-content:space-between;">'
+                    f'<span style="font-weight:bold;font-size:0.9em;">{icon} {row["name"][:55]}{"…" if len(row["name"])>55 else ""}</span>'
+                    f'<span style="background:{sc};color:white;padding:1px 6px;border-radius:3px;font-size:0.75em;">{row["status"]}</span></div>'
+                    f'<div style="font-size:0.8em;color:#666;margin-top:3px;">📁 {row["issue"]}'
+                    f'{" · " + str(row["decided"]) if row["decided"] else ""}{link}</div></div>',
                     unsafe_allow_html=True)
 
-        # Issue area breakdown
         st.divider()
-        st.subheader("Issue Area Distribution — Current Term")
-        issue_counts_dw = defaultdict(int)
-        for r in dw_rows: issue_counts_dw[r["issue"]] += 1
-        issue_df_dw = pd.DataFrame(list(issue_counts_dw.items()), columns=["Issue Area","Cases"])
-        issue_df_dw = issue_df_dw.sort_values("Cases", ascending=False)
-        fig_issue_dw = go.Figure(go.Bar(
-            x=issue_df_dw["Issue Area"], y=issue_df_dw["Cases"],
-            marker_color="#3498DB", text=issue_df_dw["Cases"], textposition="outside"))
-        fig_issue_dw.update_layout(title=f"{CURRENT_TERM}–{CURRENT_TERM+1} Term — Cases by Issue Area",
-                                    xaxis_tickangle=-30, height=340,
-                                    plot_bgcolor="white", paper_bgcolor="white")
-        st.plotly_chart(fig_issue_dw, use_container_width=True)
-
-        # Upcoming decisions
-        pending_cases = [r for r in dw_rows if r["status"]=="Pending"]
-        if pending_cases:
-            st.subheader(f"⏳ {len(pending_cases)} Pending Cases")
-            for row in sorted(pending_cases, key=lambda x: x["name"]):
-                oyez_url = row["href"].replace("api.oyez.org/cases","www.oyez.org/cases") if row["href"] else ""
-                link = f" [→ Oyez]({oyez_url})" if oyez_url else ""
-                st.markdown(f"- **{row['name']}** · {row['issue']}{link}")
+        st.subheader("Issue Area Breakdown — Current Term")
+        ic = defaultdict(int)
+        for r in dw_rows: ic[r["issue"]] += 1
+        ic_df = pd.DataFrame(list(ic.items()), columns=["Issue","Count"]).sort_values("Count",ascending=False)
+        fig_ic = go.Figure(go.Bar(x=ic_df["Issue"],y=ic_df["Count"],marker_color="#3498DB",
+                                   text=ic_df["Count"],textposition="outside"))
+        fig_ic.update_layout(title=f"{CURRENT_TERM}–{CURRENT_TERM+1} Term Cases by Issue Area",
+                              xaxis_tickangle=-30,height=320,plot_bgcolor="white",paper_bgcolor="white")
+        st.plotly_chart(fig_ic, use_container_width=True)
