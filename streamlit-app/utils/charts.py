@@ -8,60 +8,111 @@ LEVEL_COLORS = {
     "Supreme Court": "#C0392B",
 }
 
+LEVEL_LABELS = {
+    "Lower Court": "Trial\nCourt",
+    "Appeals Court": "Appeals\nCourt",
+    "Supreme Court": "SCOTUS",
+}
+
 def build_journey_diagram(steps: list[dict], case_name: str) -> go.Figure:
     """Build a vertical flowchart of the case journey through courts."""
     if not steps:
         return None
 
     n = len(steps)
+    # Spread nodes evenly between 0.15 and 0.85 on the y axis
+    if n == 1:
+        node_y = [0.5]
+    else:
+        node_y = [0.85 - i * (0.70 / (n - 1)) for i in range(n)]
     node_x = [0.5] * n
-    node_y = [1 - i / max(n - 1, 1) for i in range(n)]
 
-    # Edge traces (arrows between nodes)
+    # Edge traces with arrowhead effect
     edge_traces = []
     for i in range(n - 1):
         edge_traces.append(go.Scatter(
             x=[node_x[i], node_x[i + 1]],
             y=[node_y[i], node_y[i + 1]],
             mode="lines",
-            line=dict(width=3, color="#7F8C8D"),
+            line=dict(width=4, color="#B0BEC5"),
             hoverinfo="none",
             showlegend=False,
         ))
 
-    # Node trace
-    node_text = []
+    # Short label inside the circle
+    node_inner = []
     node_colors = []
     hover_texts = []
     for step in steps:
         level = step.get("level", "Court")
         decision = step.get("decision", "")
-        node_text.append(f"<b>{step['court']}</b><br><i>{level}</i>")
+        node_inner.append(LEVEL_LABELS.get(level, level))
         node_colors.append(LEVEL_COLORS.get(level, "#95A5A6"))
         hover = f"<b>{step['court']}</b><br>Level: {level}"
         if decision:
-            hover += f"<br>Decision: {decision}"
+            hover += f"<br>Outcome: {decision}"
         hover_texts.append(hover)
 
     node_trace = go.Scatter(
         x=node_x,
         y=node_y,
         mode="markers+text",
-        marker=dict(size=60, color=node_colors, line=dict(width=2, color="white")),
-        text=node_text,
+        marker=dict(
+            size=120,
+            color=node_colors,
+            line=dict(width=4, color="white"),
+            opacity=0.95,
+        ),
+        text=node_inner,
         textposition="middle center",
-        textfont=dict(size=11, color="white"),
+        textfont=dict(size=13, color="white", family="Arial Black, Arial, sans-serif"),
         hovertext=hover_texts,
         hoverinfo="text",
         showlegend=False,
     )
 
+    # Build annotations: court name to the right, decision below
+    annotations = []
+    for i, step in enumerate(steps):
+        court = step.get("court", "")
+        decision = step.get("decision", "")
+        level = step.get("level", "")
+
+        # Court name label to the right of the circle
+        annotations.append(dict(
+            x=0.62,
+            y=node_y[i],
+            xref="paper",
+            yref="paper",
+            text=f"<b>{court}</b>",
+            showarrow=False,
+            font=dict(size=14, color="#2C3E50"),
+            align="left",
+            xanchor="left",
+            yanchor="middle",
+        ))
+        # Decision sub-label
+        if decision:
+            annotations.append(dict(
+                x=0.62,
+                y=node_y[i] - 0.04,
+                xref="paper",
+                yref="paper",
+                text=f"<i>Outcome: {decision}</i>",
+                showarrow=False,
+                font=dict(size=11, color="#7F8C8D"),
+                align="left",
+                xanchor="left",
+                yanchor="top",
+            ))
+
     fig = go.Figure(data=edge_traces + [node_trace])
     fig.update_layout(
         title=dict(text=f"Case Journey: {case_name}", font=dict(size=16)),
+        annotations=annotations,
         xaxis=dict(showgrid=False, zeroline=False, showticklabels=False, range=[0, 1]),
-        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, range=[-0.2, 1.2]),
-        height=max(300, 150 * n),
+        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, range=[0, 1]),
+        height=max(350, 220 * n),
         margin=dict(l=20, r=20, t=60, b=20),
         plot_bgcolor="white",
         paper_bgcolor="white",
