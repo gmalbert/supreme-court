@@ -2,7 +2,7 @@
 
 ## Overview
 
-pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.
+pnpm workspace monorepo using TypeScript, plus a Streamlit Python app for SCOTUS case visualization.
 
 ## Stack
 
@@ -15,6 +15,8 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **Validation**: Zod (`zod/v4`), `drizzle-zod`
 - **API codegen**: Orval (from OpenAPI spec)
 - **Build**: esbuild (CJS bundle)
+- **Python version**: 3.11
+- **Streamlit app**: SCOTUS Case Visualizer (entry: `streamlit-app/cases.py`)
 
 ## Key Commands
 
@@ -23,5 +25,25 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - `pnpm --filter @workspace/api-server run dev` — run API server locally
+- `streamlit run streamlit-app/cases.py --server.port 5000` — run the SCOTUS visualizer
 
 See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
+
+## Streamlit App Structure
+
+```
+streamlit-app/
+├── cases.py                  # Main entry — case journey diagram + justice votes
+├── .streamlit/config.toml    # Server config (port 5000, headless)
+├── utils/
+│   ├── oyez_api.py           # Oyez API client (free, no key required)
+│   └── charts.py             # Plotly chart builders
+└── pages/
+    ├── 1_Search_Cases.py     # Search by case name across terms
+    ├── 2_Justice_Voting.py   # Justice voting patterns per case
+    ├── 3_Timeline_Browser.py # Multi-term timeline + issue area charts
+    └── 4_Statistics.py       # Dispositions, issue areas, case listing
+```
+
+### Data Source
+- **Oyez API** (https://api.oyez.org) — free, no API key, covers cases from ~1792 onward with rich metadata, lower court info, justice votes, and oral argument audio links.
