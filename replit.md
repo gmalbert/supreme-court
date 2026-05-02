@@ -46,9 +46,18 @@ streamlit-app/
     ├── 5_Justice_Career.py       # Full career overview: votes, dissent rate, issue areas
     ├── 6_Court_Comparison.py     # Side-by-side circuit court reversal/affirmance analysis
     ├── 7_Issue_Area_Decisions.py # Browse all decisions in a legal domain with drilldown
-    ├── 8_Chief_Justice_Eras.py   # Warren/Burger/Rehnquist/Roberts court era comparisons
-    └── 9_Landmark_Cases.py       # Curated landmark cases with journey + votes
+    ├── 8_Presidential_Legacy.py  # Presidential appointment impact and legacy
+    ├── 9_Predictions.py          # ML outcome predictor (GradientBoosting + per-justice models)
+    ├── 10_Research.py            # Research tools: citation network, opinion search
+    ├── 11_Advocates.py           # Advocate/attorney performance stats
+    ├── 12_Geography.py           # Geographic distribution of SCOTUS cases
+    └── 13_Historical_Data.py     # Full history 1790–present: cases, outcomes, era comparison
 ```
+
+### ML Prediction System
+- `utils/ml_predictor.py` — trains GradientBoosting outcome + vote-split models and per-justice LogisticRegression models on Oyez data; persists with joblib to `data/models/`
+- Models: outcome (Affirm/Reverse), vote split (5-4/6-3/7-2/8-1/9-0), 9× per-justice binary classifiers
+- Training data cached to `data/scotus_training_data.csv`; only missing terms re-fetched on retrain
 
 ### Data Source
 - **Oyez API** (https://api.oyez.org) — free, no API key, covers cases from ~1792 onward with rich metadata, lower court info, justice votes, and oral argument audio links.
