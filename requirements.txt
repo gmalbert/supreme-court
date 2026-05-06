@@ -1,0 +1,9 @@
+streamlit>=1.57.0
+pandas>=3.0.2
+plotly>=6.7.0
+requests>=2.33.1
+networkx>=3.6.1
+numpy>=2.0.0
+scikit-learn>=1.6.0
+joblib>=1.4.0
+matplotlib>=3.7.0

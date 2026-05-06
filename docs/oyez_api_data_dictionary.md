@@ -1,3 +1,5 @@
+[← Back to README](../README.md)
+
 # Oyez API — Data Dictionary
 
 **Base URL:** `https://api.oyez.org`  
