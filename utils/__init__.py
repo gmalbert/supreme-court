@@ -1,11 +1,10 @@
 import base64
 import os
 
-import streamlit as st
-
 
 def add_sidebar_logo():
     """Inject the site logo at the bottom-center of the sidebar."""
+    import streamlit as st
     logo_path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "data_files", "logo.png")
     )
