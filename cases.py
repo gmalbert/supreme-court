@@ -160,10 +160,12 @@ def home_page():
             break
 
     if not justices:
-        # Pull directly from detail
+        # Pull from primary (most-contested, last-in-list-on-tie) decision
         decisions = detail.get("decisions") or []
-        for dec in decisions:
-            for vote in dec.get("votes", []):
+        if decisions:
+            def _dc(d): return sum(1 for v in (d.get("votes") or []) if (v.get("vote") or "").lower() in ("dissent", "minority"))
+            _, primary = max(enumerate(decisions), key=lambda x: (_dc(x[1]), len(x[1].get("votes") or []), x[0]))
+            for vote in primary.get("votes") or []:
                 member = vote.get("member", {}) or {}
                 justices.append({
                     "name": member.get("name", "Unknown"),

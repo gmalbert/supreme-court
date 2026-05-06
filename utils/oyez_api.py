@@ -140,19 +140,43 @@ def _summarize_decision(detail: dict) -> str:
         return disposition.get("label", "")
     return str(disposition) if disposition else ""
 
-def _extract_justices(detail: dict) -> list[dict]:
-    """Extract justice votes from case detail."""
-    votes = []
-    decisions = detail.get("decisions", [])
+def _pick_primary_decision(decisions: list) -> dict | None:
+    """Return the most meaningful decision from a case's decision list.
+
+    Preference order:
+    1. Most dissent/minority votes  (the contested merits decision).
+    2. Tie-break: most total votes.
+    3. Final tie-break: last in list (Oyez stores decisions chronologically;
+       for re-argued cases the final ruling comes last).
+    """
     if not decisions:
-        return votes
-    for decision in decisions:
-        winning_party = decision.get("winning_party", "")
-        for vote in decision.get("votes", []):
-            member = vote.get("member", {}) or {}
-            votes.append({
-                "name": member.get("name", "Unknown"),
-                "vote": vote.get("vote", ""),
-                "winning_party": winning_party,
-            })
-    return votes
+        return None
+
+    def _dissent_count(d: dict) -> int:
+        return sum(
+            1 for v in (d.get("votes") or [])
+            if (v.get("vote") or "").lower() in ("dissent", "minority")
+        )
+
+    _, decision = max(
+        enumerate(decisions),
+        key=lambda x: (_dissent_count(x[1]), len(x[1].get("votes") or []), x[0]),
+    )
+    return decision
+
+
+def _extract_justices(detail: dict) -> list[dict]:
+    """Extract justice votes from the primary merits decision."""
+    decisions = detail.get("decisions") or []
+    primary = _pick_primary_decision(decisions)
+    if not primary:
+        return []
+    winning_party = primary.get("winning_party", "")
+    return [
+        {
+            "name": (vote.get("member", {}) or {}).get("name", "Unknown"),
+            "vote": vote.get("vote", ""),
+            "winning_party": winning_party,
+        }
+        for vote in (primary.get("votes") or [])
+    ]

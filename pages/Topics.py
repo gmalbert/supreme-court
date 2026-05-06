@@ -1372,9 +1372,12 @@ def _page_legal_topics():
 
             st.divider(); st.subheader("⚖️ Justice Votes")
             justices_lt = []
-            for dec in (detail_lt.get("decisions") or []):
-                winning_party_lt = dec.get("winning_party","")
-                for vote in (dec.get("votes") or []):
+            _decs_lt = detail_lt.get("decisions") or []
+            if _decs_lt:
+                def _dc_lt(d): return sum(1 for v in (d.get("votes") or []) if (v.get("vote") or "").lower() in ("dissent", "minority"))
+                _, _primary_lt = max(enumerate(_decs_lt), key=lambda x: (_dc_lt(x[1]), len(x[1].get("votes") or []), x[0]))
+                winning_party_lt = _primary_lt.get("winning_party","")
+                for vote in (_primary_lt.get("votes") or []):
                     member = vote.get("member",{}) or {}
                     justices_lt.append({"name":member.get("name","Unknown"),"vote":vote.get("vote",""),"winning_party":winning_party_lt})
             if justices_lt:

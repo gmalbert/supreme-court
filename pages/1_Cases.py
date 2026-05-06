@@ -113,8 +113,11 @@ with tab_search:
 
                     st.subheader("⚖️ Justice Votes")
                     justices = []
-                    for dec in (detail.get("decisions") or []):
-                        for vote in (dec.get("votes") or []):
+                    _decs = detail.get("decisions") or []
+                    if _decs:
+                        def _dc(d): return sum(1 for v in (d.get("votes") or []) if (v.get("vote") or "").lower() in ("dissent", "minority"))
+                        _, _primary = max(enumerate(_decs), key=lambda x: (_dc(x[1]), len(x[1].get("votes") or []), x[0]))
+                        for vote in (_primary.get("votes") or []):
                             member = vote.get("member", {}) or {}
                             justices.append({"name": member.get("name", "Unknown"), "vote": vote.get("vote", "")})
                     if justices:
