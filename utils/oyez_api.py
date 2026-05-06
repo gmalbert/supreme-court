@@ -48,7 +48,7 @@ def get_cases_by_term(term: int) -> list:
     3. Live Oyez API
     """
     if _CASES_DF is not None:
-        rows = _CASES_DF[_CASES_DF["term"] == int(term)]
+        rows = _CASES_DF[_CASES_DF["term"] == str(term)]
         if not rows.empty:
             return rows.to_dict(orient="records")
 
