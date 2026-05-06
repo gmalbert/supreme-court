@@ -197,7 +197,7 @@ def _find_local(url: str) -> str | None:
 
 def _log_miss(url: str) -> None:
     """Append a timestamped miss entry to the fallback log."""
-    logging.warning("[oyez cache MISS] %s", url)
+    logging.debug("[oyez cache MISS] %s", url)
     try:
         os.makedirs(DATA_DIR, exist_ok=True)
         with open(_LOG_FILE, "a", encoding="utf-8") as fh:
