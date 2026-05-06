@@ -47,3 +47,20 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+*__pycache__*
+
+# Python
+venv/
+*.pyc
+*.pyo
+.env
+
+# Oyez API cache (large, auto-downloaded at runtime)
+data_files/oyez_data/
+data/
+
+# Streamlit cache
+.streamlit/secrets.toml
+
+scripts/merge_pages.py
+old/*

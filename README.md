@@ -1,4 +1,8 @@
-# SCOTUS Case Visualizer
+<p align="center">
+  <img src="data_files/logo.png" width="330" alt="Supreme Scrutiny Logo">
+</p>
+
+# Supreme Scrutiny
 
 An interactive web application for exploring the full history of the United States Supreme Court — its cases, justices, voting patterns, legal topics, and predicted outcomes — powered entirely by the free [Oyez API](https://api.oyez.org).
 
@@ -18,6 +22,7 @@ Whether you are a student, a legal researcher, a journalist, or simply a curious
 8. [Insights — Presidential Legacy & Predictions](#insights--presidential-legacy--predictions)
 9. [Data Source](#data-source)
 10. [Running the App](#running-the-app)
+11. [Oyez API Data Dictionary](docs/oyez_api_data_dictionary.md)
 
 ---
 
