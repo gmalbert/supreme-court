@@ -566,15 +566,24 @@ with tab_training:
         train_btn = st.button("Step 2: Train Models",
                               disabled=not (CACHE_CSV.exists() or "training_df" in st.session_state))
 
+    # ── Show previous collection result (persists across reruns) ──────────────
+    if "collection_result" in st.session_state:
+        cr = st.session_state["collection_result"]
+        st.success(
+            f"✅ Collected **{cr['n_cases']:,} cases**, **{cr['n_votes']:,} justice votes** "
+            f"across **{cr['n_terms']}** terms."
+        )
+        st.dataframe(cr["df_summary"], height=250)
+
     # ── Data collection ───────────────────────────────────────────────────────
     if fetch_btn:
         if clear_cache and CACHE_CSV.exists():
             CACHE_CSV.unlink()
+            st.session_state.pop("collection_result", None)
             st.toast("Cache cleared.")
 
-        progress_bar  = st.progress(0.0, text="Starting data collection…")
-        status_text   = st.empty()
-        rows_count    = st.empty()
+        progress_bar = st.progress(0.0, text="Starting data collection…")
+        status_text  = st.empty()
 
         def _progress(done, total, msg):
             pct = done / total if total else 0
@@ -588,23 +597,24 @@ with tab_training:
                     progress_cb=_progress,
                 )
                 st.session_state["training_df"] = df_train
-                progress_bar.progress(1.0, text="Data collection complete!")
-                status_text.empty()
-                n_cases  = df_train["docket"].nunique() if not df_train.empty else 0
-                n_votes  = len(df_train)
-                n_terms  = df_train["term"].nunique() if not df_train.empty else 0
-                st.success(
-                    f"✅ Collected **{n_cases:,} cases**, **{n_votes:,} justice votes** "
-                    f"across **{n_terms}** terms."
+                n_cases = df_train["docket"].nunique() if not df_train.empty else 0
+                n_votes = len(df_train)
+                n_terms = df_train["term"].nunique() if not df_train.empty else 0
+                df_summary = (
+                    df_train.groupby("term")
+                    .agg(Cases=("docket", "nunique"), Votes=("justice", "count"))
+                    .reset_index()
+                    .rename(columns={"term": "Term"})
+                    .sort_values("Term", ascending=False)
+                    .head(10)
+                    if not df_train.empty
+                    else pd.DataFrame(columns=["Term", "Cases", "Votes"])
                 )
-                rows_count.dataframe(
-                    df_train.groupby("term").agg(
-                        cases=("docket","nunique"),
-                        votes=("justice","count"),
-                    ).reset_index().sort_values("term",ascending=False).head(10)
-                    if not df_train.empty else pd.DataFrame(columns=["term","cases","votes"]),
-                    height=250,
-                )
+                st.session_state["collection_result"] = {
+                    "n_cases": n_cases, "n_votes": n_votes,
+                    "n_terms": n_terms, "df_summary": df_summary,
+                }
+                st.rerun()
             except Exception as e:
                 st.error(f"Data collection failed: {e}")
 
