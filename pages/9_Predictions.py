@@ -520,8 +520,8 @@ with tab_performance:
 # ══════════════════════════════════════════════════════════════════════════════
 with tab_training:
     st.markdown(
-        "Train the ML prediction model on historical SCOTUS data from the Oyez API. "
-        "Data is cached locally after the first fetch — retraining is fast."
+        "Train the ML prediction model on historical SCOTUS data from local cached files. "
+        "Data is loaded from local files — training is fast."
     )
 
     avail_terms = list(range(2023, 1999, -1))
@@ -581,7 +581,7 @@ with tab_training:
             progress_bar.progress(pct, text=msg)
             status_text.markdown(f"*{msg}*")
 
-        with st.spinner("Fetching SCOTUS case data from Oyez…"):
+        with st.spinner("Loading SCOTUS case data from local files…"):
             try:
                 df_train = collect_training_data(
                     terms=sorted(train_terms, reverse=True),
@@ -589,6 +589,7 @@ with tab_training:
                 )
                 st.session_state["training_df"] = df_train
                 progress_bar.progress(1.0, text="Data collection complete!")
+                status_text.empty()
                 n_cases  = df_train["docket"].nunique() if not df_train.empty else 0
                 n_votes  = len(df_train)
                 n_terms  = df_train["term"].nunique() if not df_train.empty else 0
@@ -672,7 +673,7 @@ with tab_training:
     with st.expander("📐 Model Architecture Details"):
         st.markdown("""
 **Data pipeline**
-- Source: Oyez API (`/cases?filter=term:YYYY`) — free, no API key
+- Source: Local database / JSON cache (no network calls required)
 - Features extracted per case: circuit of origin, issue area, term year, conservative bench count
 - Labels: binary outcome (0=Affirm, 1=Reverse), vote split (5-4/6-3/7-2/8-1/9-0), per-justice majority indicator
 - Temporal train/test split: held-out last 2 terms to prevent leakage
@@ -1018,7 +1019,7 @@ with tab_modelcard:
 |---|---|
 | **Model type** | Gradient Boosting Classifier (scikit-learn) |
 | **Task** | Binary classification — Affirm (0) or Reverse (1) |
-| **Data source** | Oyez API (free, no API key required) |
+| **Data source** | Local database / JSON cache (offline, no API key required) |
 | **Training terms** | 2000–2023 (configurable in Model Training tab) |
 | **Hold-out test set** | Last 2 terms |
 | **Baseline accuracy** | ~62% (always predicting Reverse) |
