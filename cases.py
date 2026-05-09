@@ -4,14 +4,9 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 import streamlit as st
 from utils import add_sidebar_logo
-from utils.oyez_api import (
-    get_cases_by_term,
-    get_case_detail,
-    get_recent_terms,
-    extract_court_journey,
-)
-from utils.charts import build_journey_diagram, build_voting_chart
-from utils.local_data import strip_html, safe_md
+from utils.today_in_history import get_today_in_history, index_exists
+
+_REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # ── App-wide config — called ONCE here; sub-pages must NOT call set_page_config ──
 st.set_page_config(
@@ -23,229 +18,170 @@ st.set_page_config(
 
 
 def home_page():
-    add_sidebar_logo()
-    st.title("🏛️ Supreme Scrutiny")
-    st.markdown(
-        "Explore how Supreme Court cases traveled through the judicial system — "
-        "from the originating court all the way to the nation's highest bench."
-    )
-    st.markdown("---")
+    _logo_path = os.path.join(_REPO_ROOT, "data_files", "logo.png")
+    add_sidebar_logo(hide_sidebar_logo=True)
 
-    # Sidebar controls
-    with st.sidebar:
-        st.header("Find a Case")
-        term = st.selectbox("Select Term", get_recent_terms(25), index=0)
-        st.markdown("*Data provided by [Oyez](https://www.oyez.org)*")
-
-    with st.spinner(f"Loading {term} term cases..."):
-        cases = get_cases_by_term(term)
-
-    if not cases:
-        st.error("Could not load cases for this term. Please try another year.")
-        st.stop()
-
-    case_names = sorted([c.get("name", "Unknown") for c in cases])
-    selected_name = st.selectbox(
-        f"Select a Case ({len(cases)} cases in {term} term)",
-        case_names,
-        key="main_case_select",
-    )
-
-    selected_case = next((c for c in cases if c.get("name") == selected_name), None)
-    if not selected_case:
-        st.stop()
-
-    href = selected_case.get("href", "")
-    with st.spinner("Loading case details from Oyez..."):
-        detail = get_case_detail(href) if href else None
-
-    if not detail:
-        st.warning("Could not load full case details. Try another case.")
-        st.stop()
-
-    # ── Case header ──────────────────────────────────────────────────────────────
-    col_info, col_meta = st.columns([2, 1])
-
-    with col_info:
-        st.subheader(detail.get("name", selected_name))
-        description = detail.get("description") or detail.get("facts_of_the_case", "")
-        if description:
-            with st.expander("Background & Facts", expanded=False):
-                st.write(safe_md(description))
-
-        question = detail.get("question", "")
-        if question:
-            with st.expander("Legal Question Before the Court", expanded=False):
-                st.write(safe_md(question))
-
-    with col_meta:
-        st.markdown("**Case Metadata**")
-        docket = detail.get("docket_number", "N/A")
-        st.markdown(f"- **Docket:** {docket}")
-        argued = detail.get("argued_on", [])
-        if argued:
-            st.markdown(f"- **Argued:** {argued[0].get('date', 'N/A') if isinstance(argued[0], dict) else argued[0]}")
-        decided = detail.get("decided_on", [])
-        if decided:
-            st.markdown(f"- **Decided:** {decided[0].get('date', 'N/A') if isinstance(decided[0], dict) else decided[0]}")
-        decided_by = detail.get("decided_by") or {}
-        if decided_by:
-            st.markdown(f"- **Court:** {decided_by.get('name', 'N/A')}")
-        disposition = detail.get("disposition") or {}
-        if isinstance(disposition, dict) and disposition.get("label"):
-            st.markdown(f"- **Disposition:** {disposition['label']}")
-
-    st.markdown("---")
-
-    # ── Journey Diagram ───────────────────────────────────────────────────────────
-    st.subheader("⬆️ Case Journey Through the Courts")
-
-    steps = extract_court_journey(detail)
-
-    if len(steps) < 2:
-        # Try to surface whatever lower court info is available
-        lower = detail.get("lower_court") or {}
-        lc_name = lower.get("name", "") if isinstance(lower, dict) else str(lower)
-        if lc_name:
-            lc_lower = lc_name.lower()
-            if any(kw in lc_lower for kw in ("court of appeals", "circuit", "appellate",
-                                              "supreme court of", "state supreme", "court of last resort")):
-                lc_level = "Appellate Court"
-            else:
-                lc_level = "Lower Court"
-            steps = [
-                {"court": lc_name, "level": lc_level, "decision": ""},
-                {"court": "U.S. Supreme Court", "level": "Supreme Court", "decision": ""},
-            ]
+    # ── Hero ──────────────────────────────────────────────────────────────────
+    _hero_img, _hero_text = st.columns([2, 6], vertical_alignment="center")
+    with _hero_img:
+        if os.path.exists(_logo_path):
+            st.image(_logo_path, width=220)
         else:
-            st.info(
-                "Court journey data is not available for this case in the Oyez API. "
-                "Try a more recent case (2015 onward usually has richer data)."
-            )
+            st.markdown("### 🏛️")
+    with _hero_text:
+        st.title("Supreme Scrutiny")
+        # st.markdown(
+        #     "The complete guide to U.S. Supreme Court decisions — "
+        #     "**8,251 cases spanning 71 terms**, fully searchable and locally cached."
+        # )
 
-    if steps:
-        # Annotate with disposition at SCOTUS level
-        disposition_label = ""
-        if isinstance(detail.get("disposition"), dict):
-            disposition_label = detail["disposition"].get("label", "")
-        if disposition_label and steps:
-            steps[-1]["decision"] = disposition_label
+    # ── Today in SCOTUS History ───────────────────────────────────────────────
+    if index_exists():
+        from datetime import date as _date
+        _img_path = os.path.join(_REPO_ROOT, "data_files", "on_this_day.png")
+        today_case = get_today_in_history()
+        if today_case:
+            event_type = "decided" if today_case.get("date_field") == "decided_on" else "argued"
+            with st.container(border=True):
+                col_img, col_text, col_btn = st.columns([1, 5, 1])
+                with col_img:
+                    if os.path.exists(_img_path):
+                        st.image(_img_path, width=90)
+                    else:
+                        st.markdown("📅")
+                with col_text:
+                    st.markdown("#### On This Day in SCOTUS History")
+                    st.markdown(
+                        f"**{_date.today().strftime('%B')} {_date.today().day}** &nbsp;·&nbsp; "
+                        f"*{today_case['name']}* was **{event_type}** "
+                        f"({today_case['term']} term)"
+                    )
+                with col_btn:
+                    st.markdown("&nbsp;")
+                    if st.button(
+                        "Explore →",
+                        key="today_btn",
+                        type="primary",
+                        width="stretch",
+                    ):
+                        st.session_state["_today_case_query"] = today_case["name"]
+                        st.switch_page("pages/1_Cases.py")
 
-        fig = build_journey_diagram(steps, detail.get("name", selected_name))
-        if fig:
-            col_diag, col_legend = st.columns([3, 1])
-            with col_diag:
-                st.plotly_chart(fig)
-            with col_legend:
-                st.markdown("**Court Levels**")
-                st.markdown("🔵 &nbsp; Lower Court (District/State)")
-                st.markdown("🟠 &nbsp; Intermediate Appeals Court")
-                st.markdown("🔴 &nbsp; U.S. Supreme Court")
-                st.markdown("")
-                st.markdown("**How to read this chart:**")
-                st.markdown(
-                    "Each node is a court that heard the case. "
-                    "The arrow shows the direction of appeal — upward toward SCOTUS."
-                )
+    # ── Case Search ───────────────────────────────────────────────────────────
+    st.markdown("---")
+    with st.container(border=True):
+        st.markdown("#### 🔍 Find Cases by Description")
+        st.caption("Describe a legal situation in plain language and find the most relevant Supreme Court cases.")
+        _home_query = st.text_area(
+            "Describe a legal situation",
+            label_visibility="collapsed",
+            placeholder=(
+                "e.g. police searched a suspect's cell phone without a warrant\n"
+                "e.g. government required a license to display a religious symbol\n"
+                "e.g. employer fired a worker for union organizing activity"
+            ),
+            height=100,
+            key="_home_desc_input",
+        )
+        _home_col1, _home_col2 = st.columns([1, 5])
+        with _home_col1:
+            _home_n = st.slider("Results", 3, 20, 15, key="_home_desc_n")
+        with _home_col2:
+            _home_btn = st.button("🔍 Find Cases", type="primary", key="_home_desc_btn", width="content")
+        if _home_btn and _home_query and len(_home_query.strip()) >= 10:
+            st.session_state["desc_query"] = _home_query
+            st.session_state["_home_desc_n_val"] = _home_n
+            st.session_state["_home_trigger_search"] = True
+            st.switch_page("pages/1_Cases.py")
+        elif _home_btn and _home_query:
+            st.warning("Please enter at least 10 characters.")
 
     st.markdown("---")
 
-    # ── Justice Votes ────────────────────────────────────────────────────────────
-    st.subheader("⚖️ Justice Votes")
+    # ── Navigation Cards ──────────────────────────────────────────────────────
+    st.markdown("### Explore the Court")
 
-    justices = []
-    for step in steps:
-        if step.get("justices"):
-            justices = step["justices"]
-            break
+    _NAV = [
+        (
+            "⚖️", "Cases",
+            "Search and browse 8,000+ cases by name, term, keyword, or plain-language description.",
+            "pages/1_Cases.py",
+        ),
+        (
+            "👥", "Justices & Advocates",
+            "Voting records, ideology drift over time, agreement matrices, and advocate win rates.",
+            "pages/People.py",
+        ),
+        (
+            "🔮", "Predictions",
+            "ML-powered outcome predictions, cert grant estimator, model card, and docket watch.",
+            "pages/9_Predictions.py",
+        ),
+        (
+            "📊", "Analytics",
+            "Term-by-term statistics, issue-area breakdowns, reversal rates, and voting trends.",
+            "pages/Analysis.py",
+        ),
 
-    if not justices:
-        # Pull from primary (most-contested, last-in-list-on-tie) decision
-        decisions = detail.get("decisions") or []
-        if decisions:
-            def _dc(d): return sum(1 for v in (d.get("votes") or []) if (v.get("vote") or "").lower() in ("dissent", "minority"))
-            _, primary = max(enumerate(decisions), key=lambda x: (_dc(x[1]), len(x[1].get("votes") or []), x[0]))
-            for vote in primary.get("votes") or []:
-                member = vote.get("member", {}) or {}
-                justices.append({
-                    "name": member.get("name", "Unknown"),
-                    "vote": vote.get("vote", ""),
-                })
+    ]
 
-    if justices:
-        vote_fig = build_voting_chart(justices)
-        if vote_fig:
-            st.plotly_chart(vote_fig)
+    for row_start in range(0, len(_NAV), 2):
+        row_items = _NAV[row_start : row_start + 2]
+        cols = st.columns(2)
+        for col, (icon, title, desc, page_path) in zip(cols, row_items):
+            with col:
+                with st.container(border=True):
+                    st.markdown(f"#### {icon} {title}")
+                    st.caption(desc)
+                    if st.button(
+                        f"Open {title} →",
+                        key=f"nav_{title.replace(' ', '_').replace('&', 'and')}",
+                        width="stretch",
+                    ):
+                        st.switch_page(page_path)
 
-        vote_cols = st.columns(3)
-        majority = [j for j in justices if (j.get("vote") or "").lower() in ("majority", "concurrence")]
-        dissent = [j for j in justices if (j.get("vote") or "").lower() == "dissent"]
-        recusal = [j for j in justices if (j.get("vote") or "").lower() == "recusal"]
-
-        with vote_cols[0]:
-            st.markdown("**✅ Majority / Concurrence**")
-            for j in majority:
-                st.markdown(f"- {j['name']}")
-        with vote_cols[1]:
-            st.markdown("**❌ Dissent**")
-            if dissent:
-                for j in dissent:
-                    st.markdown(f"- {j['name']}")
-            else:
-                st.markdown("_None_")
-        with vote_cols[2]:
-            st.markdown("**🚫 Recusal**")
-            if recusal:
-                for j in recusal:
-                    st.markdown(f"- {j['name']}")
-            else:
-                st.markdown("_None_")
-    else:
-        st.info("Voting data not available for this case.")
-
+    # ── About ─────────────────────────────────────────────────────────────────
     st.markdown("---")
+    with st.expander("ℹ️ About Supreme Scrutiny"):
+        st.markdown("""
+**Supreme Scrutiny** is an open-source data visualization and analysis tool for U.S. Supreme Court history.
 
-    # ── Oral Arguments link ──────────────────────────────────────────────────────
-    oral_args = detail.get("oral_argument_audio", [])
-    if oral_args:
-        docket = detail.get("docket_number", "")
-        oyez_case_url = f"https://www.oyez.org/cases/{term}/{docket}"
-        st.subheader("🎙️ Oral Arguments")
-        for arg in oral_args[:3]:
-            if isinstance(arg, dict):
-                title = arg.get("title", "Listen on Oyez")
-                st.markdown(f"[🎧 {title}]({oyez_case_url})")
+**Data sources and Coverage:**
+- [Oyez](https://www.oyez.org) — case metadata, oral argument audio, and justice records
+- **Terms:** 1955 – 2025 (71 terms)
+- **Cases:** 8,251 with complete metadata; 8,238 with full case details
+- **Voting data:** Included for cases with recorded decisions
 
-    # ── Footer ───────────────────────────────────────────────────────────────────
-    st.markdown("---")
-    st.caption(
-        "Data sourced from [Oyez](https://www.oyez.org) — a free, multimedia archive of the U.S. Supreme Court. "
-        "Use the sidebar pages to explore justice voting patterns, case timelines, and statistics."
-    )
-
+        """)
 
 # ── Navigation ───────────────────────────────────────────────────────────────
 pg = st.navigation(
     {
         "": [
-            st.Page(home_page, title="Case Journey", icon="🏛️", default=True),
+            st.Page(home_page,                     title="Home",              icon="🏠", default=True),
         ],
         "Cases": [
-            st.Page("pages/1_Cases.py",      title="Cases",            icon="⚖️"),
+            st.Page("pages/1_Cases.py",            title="Cases",             icon="⚖️"),
         ],
         "People": [
-            st.Page("pages/People.py",       title="People",           icon="👥"),
+            st.Page("pages/People.py",             title="Justices & Advocates", icon="👥"),
         ],
         "History & Courts": [
-            st.Page("pages/History.py",      title="History & Courts", icon="🏛️"),
+            st.Page("pages/History.py",            title="Court History",     icon="🏛️"),
+            st.Page("pages/13_Historical_Data.py", title="Full Timeline",     icon="📜"),
+            st.Page("pages/5_Circuit_Courts.py",   title="Circuit Courts",    icon="🗺️"),
+            st.Page("pages/12_Geography.py",       title="Geography",         icon="🌎"),
         ],
         "Analysis": [
-            st.Page("pages/Analysis.py",     title="Analysis",         icon="📊"),
-            st.Page("pages/Topics.py",       title="Topics & Networks",icon="📚"),
+            st.Page("pages/Analysis.py",           title="Analytics",         icon="📊"),
+            st.Page("pages/Topics.py",             title="Topics & Networks", icon="📚"),
+            st.Page("pages/8_Presidential_Legacy.py", title="Presidential Legacy", icon="🏅"),
+            st.Page("pages/10_Research.py",        title="Research",          icon="🔬"),
         ],
-        "Insights": [
-            st.Page("pages/Insights.py",     title="Insights",         icon="🎖️"),
+        "Predictions": [
+            st.Page("pages/9_Predictions.py",      title="Predictions",       icon="🔮"),
         ],
     }
 )
 pg.run()
+

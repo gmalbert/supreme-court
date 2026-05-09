@@ -15,10 +15,10 @@ import requests
 from urllib.parse import urlparse, parse_qs
 
 
-def strip_html(text: str) -> str:
+def strip_html(text) -> str:
     """Remove HTML tags and normalise whitespace from an Oyez text field."""
-    if not text:
-        return text
+    if not text or not isinstance(text, str):
+        return ""
     text = re.sub(r"<[^>]+>", " ", text)
     text = re.sub(r"\s{2,}", " ", text).strip()
     return text
@@ -101,12 +101,25 @@ _ISSUE_KEYWORDS: list[tuple[str, list[str]]] = [
 ]
 
 
+def _safe_str(val) -> str:
+    """Return val as str, treating None/NaN/non-str as empty string."""
+    if val is None:
+        return ""
+    try:
+        import math
+        if isinstance(val, float) and math.isnan(val):
+            return ""
+    except Exception:
+        pass
+    return str(val) if not isinstance(val, str) else val
+
+
 def infer_issue_area(detail: dict) -> str:
     """Infer issue area from case question/description text (Oyez does not expose it directly)."""
     text = " ".join([
-        detail.get("question") or "",
-        detail.get("description") or "",
-        detail.get("facts_of_the_case") or "",
+        _safe_str(detail.get("question")),
+        _safe_str(detail.get("description")),
+        _safe_str(detail.get("facts_of_the_case")),
     ]).lower()
     if not text.strip():
         return "Unknown"
@@ -116,6 +129,47 @@ def infer_issue_area(detail: dict) -> str:
         if score > best_score:
             best_score, best_label = score, label
     return best_label
+
+
+def _normalize_party_name(value: str) -> str:
+    text = _safe_str(value).lower()
+    return " ".join(w for w in re.split(r"\W+", text) if len(w) > 2)
+
+
+def _party_matches(candidate: str, target: str) -> bool:
+    if not candidate or not target:
+        return False
+    candidate_words = candidate.split()
+    target_words = target.split()
+    return any(w in target for w in candidate_words) or any(w in candidate for w in target_words)
+
+
+def infer_disposition(detail: dict) -> str:
+    """Infer a rough disposition label from Oyez case detail data."""
+    if not isinstance(detail, dict):
+        return "Unknown"
+
+    decs = detail.get("decisions") or []
+    if decs and isinstance(decs, list):
+        dec = decs[0] if decs else {}
+        winner = _safe_str(dec.get("winning_party")).strip()
+        case_name = _safe_str(detail.get("name")).strip()
+        if winner and case_name:
+            parts = re.split(r"\s+v\.?\s+", case_name, maxsplit=1, flags=re.IGNORECASE)
+            if len(parts) == 2:
+                petitioner = _normalize_party_name(parts[0])
+                respondent = _normalize_party_name(parts[1])
+                winner_norm = _normalize_party_name(winner)
+                if _party_matches(winner_norm, petitioner) and not _party_matches(winner_norm, respondent):
+                    return "Reversed"
+                if _party_matches(winner_norm, respondent) and not _party_matches(winner_norm, petitioner):
+                    return "Affirmed"
+
+        decision_type = _safe_str(dec.get("decision_type")).strip()
+        if decision_type:
+            return decision_type.title()
+
+    return "Unknown"
 
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
@@ -209,14 +263,24 @@ def _log_miss(url: str) -> None:
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
+# Set to True to never make live API calls — serve only from local cache /
+# parquet files.  The app's parquet data covers SCOTUS terms 1955–2025 which
+# is sufficient for all current functionality.
+LOCAL_ONLY: bool = True
+
+
 def fetch_oyez(url: str) -> dict | list | None:
     """
     Return the parsed JSON for *url*.
 
-    1. Checks DATA_DIR for a locally cached file first.
-    2. On a miss, calls the live Oyez API, logs the miss, saves the
-       response to DATA_DIR/raw/ for future runs, and returns the data.
-    3. Returns None if both local lookup and live request fail.
+    When LOCAL_ONLY is True (default):
+      1. Checks DATA_DIR for a locally cached file.
+      2. Returns None on a cache miss (no network call).
+
+    When LOCAL_ONLY is False:
+      1. Checks DATA_DIR first.
+      2. On a miss, calls the live Oyez API, logs the miss, and caches
+         the response to DATA_DIR/raw/ for future runs.
     """
     # ── Local hit ─────────────────────────────────────────────────────────────
     local_path = _find_local(url)
@@ -225,7 +289,10 @@ def fetch_oyez(url: str) -> dict | list | None:
             with open(local_path, "r", encoding="utf-8") as fh:
                 return json.load(fh)
         except (OSError, json.JSONDecodeError):
-            pass  # corrupt file → fall through to live API
+            pass  # corrupt file → fall through
+
+    if LOCAL_ONLY:
+        return None
 
     # ── Cache miss: log and call live API ─────────────────────────────────────
     _log_miss(url)

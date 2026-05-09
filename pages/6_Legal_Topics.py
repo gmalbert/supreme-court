@@ -12,7 +12,8 @@ import datetime
 import json
 from collections import defaultdict
 from utils.charts import build_journey_diagram, build_voting_chart
-from utils.oyez_api import extract_court_journey
+from utils.oyez_api import extract_court_journey, get_cases_by_term, get_case_detail
+from utils.local_data import infer_issue_area, infer_disposition
 
 
 from utils import add_sidebar_logo
@@ -33,27 +34,17 @@ def _oyez_web_url(api_href: str) -> str:
 
 @st.cache_data(show_spinner=False)
 def _lt_fetch_cases_term(term: int) -> list[dict]:
-    try:
-        r = requests.get(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0",headers=HEADERS,timeout=10)
-        r.raise_for_status(); return r.json()
-    except Exception: return []
+    return get_cases_by_term(term)
 
 @st.cache_data(show_spinner=False)
 def _lt_fetch_case(href: str) -> dict | None:
-    try:
-        r = requests.get(href, headers=HEADERS, timeout=10)
-        r.raise_for_status(); return r.json()
-    except Exception: return None
+    return get_case_detail(href)
 
 def _lt_issue_label(c: dict) -> str:
-    ia = c.get("issue_area")
-    if isinstance(ia, dict): return ia.get("label","Unknown")
-    return str(ia) if ia else "Unknown"
+    return infer_issue_area(c)
 
 def _lt_disp_label(c: dict) -> str:
-    d = c.get("disposition")
-    if isinstance(d, dict): return d.get("label","Unknown")
-    return str(d) if d else "Unknown"
+    return infer_disposition(c)
 
 # ── Page ─────────────────────────────────────────────────────────────────────
 st.title("📚 Legal Topics")
@@ -88,7 +79,7 @@ with tab_issue:
                 if issue_ia.lower() in label.lower():
                     rows_ia.append({"Term":term,"Case":c.get("name",""),"Disposition":_lt_disp_label(c),
                                     "Issue Area":label,"href":c.get("href","")})
-            progress_ia.progress((idx+1)/len(terms_ia)); time.sleep(0.02)
+            progress_ia.progress((idx+1)/len(terms_ia))
         progress_ia.empty()
         st.session_state["ia_rows"] = rows_ia; st.session_state["ia_area"] = issue_ia
 

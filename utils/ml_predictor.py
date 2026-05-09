@@ -11,7 +11,7 @@ Pipeline:
   4. Persist with joblib; load on subsequent calls
 """
 
-import os, time, json, re, glob
+import os, time, json, re, glob, functools
 import numpy as np
 import pandas as pd
 import requests
@@ -282,19 +282,62 @@ def collect_training_data(
     return df
 
 # ── Feature engineering ───────────────────────────────────────────────────────
-CAT_FEATURES = ["circuit", "issue_area"]
-NUM_FEATURES = ["n_conservative", "term_year_norm"]
+CAT_FEATURES  = ["circuit", "issue_area"]
+NUM_FEATURES  = ["n_conservative", "term_year_norm"]
+OA_FEATURES   = ["q_count_petitioner", "q_count_respondent", "q_ratio"]  # optional
 
 def _make_feature_df(df: pd.DataFrame) -> pd.DataFrame:
     out = df[["circuit", "issue_area", "n_conservative", "term"]].copy()
     out["term_year_norm"] = (out["term"] - 2005) / 10.0   # scale around Roberts Court
     return out[CAT_FEATURES + NUM_FEATURES]
 
-def _build_preprocessor() -> ColumnTransformer:
+
+def _build_preprocessor(use_oa_features: bool = False) -> ColumnTransformer:
+    num_cols = NUM_FEATURES + (OA_FEATURES if use_oa_features else [])
     return ColumnTransformer([
         ("cat", OneHotEncoder(handle_unknown="ignore", sparse_output=False), CAT_FEATURES),
-        ("num", StandardScaler(), NUM_FEATURES),
+        ("num", StandardScaler(), num_cols),
     ])
+
+
+@functools.lru_cache(maxsize=1)
+def _load_oa_question_counts() -> dict[str, dict]:
+    """
+    Build a map {case_href: {q_count_petitioner, q_count_respondent, q_ratio}}
+    from case_detail.parquet using the transcript parser.
+    Cached in memory; returns empty dict if unavailable.
+    """
+    try:
+        from utils.transcript_parser import parse_case_transcript, compute_question_counts
+        pq_path = DATA_DIR / "case_detail.parquet"
+        if not pq_path.exists():
+            return {}
+        df = pd.read_parquet(pq_path, columns=["href", "oral_argument_audio"])
+        result: dict[str, dict] = {}
+        for _, row in df.iterrows():
+            href = row.get("href") or ""
+            oa_data = row.get("oral_argument_audio")
+            if not href or oa_data is None:
+                continue
+            # oral_argument_audio may be a list of dicts or a JSON string
+            if isinstance(oa_data, str):
+                try:
+                    oa_data = json.loads(oa_data)
+                except (ValueError, TypeError):
+                    continue
+            if not isinstance(oa_data, list) or not oa_data:
+                continue
+            fake_detail = {"oral_argument_audio": oa_data, "advocates": []}
+            turns = parse_case_transcript(fake_detail)
+            counts = compute_question_counts(turns)
+            result[href] = {
+                "q_count_petitioner": counts.get("petitioner", 0),
+                "q_count_respondent": counts.get("respondent", 0),
+                "q_ratio":            counts.get("q_ratio", 1.0),
+            }
+        return result
+    except Exception:
+        return {}
 
 # ── Model training ─────────────────────────────────────────────────────────────
 def train_models(
@@ -469,12 +512,28 @@ def predict(
     term_year: int = 2024,
     sg_support: bool = False,       # used as post-hoc adjustment only
     circuit_split: bool = False,    # used as post-hoc adjustment only
+    case_href: str = "",            # optional: used to look up oral-arg features
+    q_count_petitioner: int | None = None,  # override oral-arg features
+    q_count_respondent: int | None = None,
 ) -> dict:
     """
     Run inference using trained models.
     Returns dict with p_reverse, p_affirm, split_probs, justice_probs.
+
+    If case_href is provided (or q_count_* overrides are given), oral-argument
+    question-count features are included if the model supports them.
     """
     outcome_model, split_model, justice_models = load_models()
+
+    # Try to load oral argument features
+    _q_pet = q_count_petitioner
+    _q_res = q_count_respondent
+    if case_href and (_q_pet is None or _q_res is None):
+        oa_map = _load_oa_question_counts()
+        if case_href in oa_map:
+            oa = oa_map[case_href]
+            _q_pet = oa["q_count_petitioner"]
+            _q_res = oa["q_count_respondent"]
 
     X = pd.DataFrame([{
         "circuit":       circuit,
@@ -492,6 +551,19 @@ def predict(
     # Post-hoc adjustments (not in training data but known influential)
     if sg_support:    p_reverse = min(0.93, p_reverse + 0.07)
     if circuit_split: p_reverse = min(0.93, p_reverse + 0.05)
+
+    # Oral argument adjustment: if more questions went to petitioner,
+    # historically that correlates with a higher reversal rate
+    oa_features_used = False
+    if _q_pet is not None and _q_res is not None:
+        total_q = _q_pet + _q_res
+        if total_q > 0:
+            q_ratio = _q_pet / total_q   # fraction of questions to petitioner
+            # Adjustment: center around 0.5 (equal questions), scale ±0.04 max
+            delta = (q_ratio - 0.5) * 0.08
+            p_reverse = min(0.93, max(0.07, p_reverse + delta))
+            oa_features_used = True
+
     p_affirm = 1.0 - p_reverse
 
     # Split probability
@@ -518,4 +590,91 @@ def predict(
         "split_probs":  split_probs,
         "split_label":  split_label,
         "justice_probs": justice_probs,
+        "oa_features_used": oa_features_used,
+        "q_count_petitioner": _q_pet,
+        "q_count_respondent": _q_res,
     }
+
+
+def explain_prediction(
+    circuit: str,
+    issue_area: str,
+    n_conservative: int = 6,
+    term_year: int = 2024,
+) -> dict | None:
+    """
+    Compute SHAP values for a single prediction using the outcome model.
+
+    Returns a dict with keys:
+      - feature_names: list[str]   (human-readable)
+      - shap_values: list[float]   (contribution to log-odds of Reverse)
+      - expected_value: float      (base log-odds)
+      - prediction_value: float    (transformed probability)
+    or None if shap is not available or model is not trained.
+    """
+    if not is_trained():
+        return None
+    try:
+        import shap  # optional dependency
+    except ImportError:
+        return None
+
+    outcome_model, _, _ = load_models()
+
+    # Build the single-row input DataFrame
+    X = pd.DataFrame([{
+        "circuit":        circuit,
+        "issue_area":     issue_area,
+        "n_conservative": n_conservative,
+        "term_year_norm": (term_year - 2005) / 10.0,
+    }])
+
+    # Extract the inner GradientBoostingClassifier from the first calibrated fold
+    try:
+        inner_pipeline = outcome_model.calibrated_classifiers_[0].estimator
+        prep_fitted    = inner_pipeline.named_steps["prep"]
+        clf_fitted     = inner_pipeline.named_steps["clf"]
+    except (AttributeError, IndexError, KeyError):
+        return None
+
+    # Transform the input row
+    X_transformed = prep_fitted.transform(X)
+    feature_names_raw = list(prep_fitted.get_feature_names_out())
+
+    # Shorten feature names for display
+    def _shorten(name: str) -> str:
+        name = name.replace("cat__circuit_", "Circuit: ")
+        name = name.replace("cat__issue_area_", "Issue: ")
+        name = name.replace("num__n_conservative", "Conservative Justices")
+        name = name.replace("num__term_year_norm", "Term (recency)")
+        return name
+
+    feature_names = [_shorten(n) for n in feature_names_raw]
+
+    # SHAP TreeExplainer — GBM uses log-odds internally; class_names[1] = Reverse
+    try:
+        explainer   = shap.TreeExplainer(clf_fitted)
+        shap_output = explainer.shap_values(X_transformed)
+
+        # GBC binary: shap_values is ndarray (1, n_features); expected_value is 1-element array
+        if isinstance(shap_output, list):
+            sv = shap_output[1][0]           # class 1 (Reverse)
+            ev_raw = explainer.expected_value
+            ev = float(ev_raw[1]) if hasattr(ev_raw, "__len__") else float(ev_raw)
+        else:
+            sv = shap_output[0]
+            ev_raw = explainer.expected_value
+            ev = float(ev_raw[0]) if hasattr(ev_raw, "__len__") else float(ev_raw)
+
+        # Filter to non-zero + top-10 for display
+        pairs = sorted(zip(feature_names, sv.tolist()), key=lambda x: abs(x[1]), reverse=True)
+        pairs = [(n, v) for n, v in pairs if abs(v) > 1e-6][:10]
+
+        return {
+            "feature_names":   [p[0] for p in pairs],
+            "shap_values":     [p[1] for p in pairs],
+            "expected_value":  ev,
+            "prediction_value": float(outcome_model.predict_proba(X)[0][1]),
+        }
+    except Exception:
+        return None

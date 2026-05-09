@@ -12,6 +12,7 @@ from collections import defaultdict
 from utils.oyez_api import get_cases_by_term, get_case_detail, get_recent_terms
 from utils.charts import build_voting_chart
 from utils.local_data import fetch_oyez, infer_issue_area
+from utils.export import csv_download_button
 
 
 from utils import add_sidebar_logo
@@ -19,6 +20,48 @@ add_sidebar_logo()
 
 OYEZ_BASE = "https://api.oyez.org"
 CURRENT_YEAR = datetime.date.today().year
+
+# ── Pre-built parquet for ideology drift ─────────────────────────────────────
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_DETAIL_PARQUET = os.path.join(_REPO_ROOT, "data", "case_detail.parquet")
+
+@st.cache_data(show_spinner=False)
+def _load_ideology_df() -> pd.DataFrame:
+    """Extract per-justice per-term ideology scores from local case_detail parquet."""
+    try:
+        df = pd.read_parquet(_DETAIL_PARQUET, columns=["term", "decisions"])
+    except Exception:
+        return pd.DataFrame()
+
+    rows = []
+    for _, row in df.iterrows():
+        term = row["term"]
+        decisions = row["decisions"]
+        if not isinstance(decisions, str):
+            continue
+        try:
+            import json as _json
+            decs = _json.loads(decisions)
+        except Exception:
+            continue
+        for dec in (decs or []):
+            for vote in (dec.get("votes") or []):
+                member = vote.get("member") or {}
+                name = member.get("name", "") if isinstance(member, dict) else ""
+                ideo = vote.get("ideology")
+                if name and ideo is not None:
+                    rows.append({"term": int(term), "justice": name, "ideology": float(ideo)})
+
+    if not rows:
+        return pd.DataFrame()
+
+    out = (
+        pd.DataFrame(rows)
+        .groupby(["term", "justice"])["ideology"]
+        .mean()
+        .reset_index()
+    )
+    return out
 
 # ── Shared fetch helpers ──────────────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
@@ -33,26 +76,22 @@ def _jh_fetch_justice_detail(href: str) -> dict | None:
 
 @st.cache_data(show_spinner=False)
 def _jh_fetch_cases_term(term: int) -> list[dict]:
-    data = fetch_oyez(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0")
-    return data if isinstance(data, list) else []
+    return get_cases_by_term(term)
 
 @st.cache_data(show_spinner=False)
 def _jh_fetch_case_detail(href: str) -> dict | None:
-    data = fetch_oyez(href)
-    return data if isinstance(data, dict) else None
+    return get_case_detail(href)
 
 @st.cache_data(show_spinner=False, ttl=3600)
 def _jh_load_votes_for_terms(terms: tuple) -> list[dict]:
     rows = []
     for term in terms:
-        cases = fetch_oyez(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0")
-        if not isinstance(cases, list):
-            continue
+        cases = get_cases_by_term(term)
         for c in cases:
-            href = c.get("href",""); 
+            href = c.get("href","")
             if not href: continue
-            detail = fetch_oyez(href)
-            if not isinstance(detail, dict): continue
+            detail = get_case_detail(href)
+            if not detail: continue
             case_name = detail.get("name","")
             for decision in (detail.get("decisions") or []):
                 for vote in (decision.get("votes") or []):
@@ -84,7 +123,6 @@ def _get_justice_votes(justice_name: str, terms: list[int]) -> pd.DataFrame:
                             "Vote": vote.get("vote",""),
                             "Issue Area": infer_issue_area(detail),
                         })
-            time.sleep(0.02)
         progress.progress((idx+1)/len(terms))
     progress.empty()
     return pd.DataFrame(rows)
@@ -200,13 +238,11 @@ CURRENT_YEAR = datetime.date.today().year
 # ── Fetch helpers ─────────────────────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
 def _adv_fetch_term(term: int) -> list[dict]:
-    data = fetch_oyez(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0")
-    return data if isinstance(data, list) else []
+    return get_cases_by_term(term)
 
 @st.cache_data(show_spinner=False)
 def _adv_fetch_detail(href: str) -> dict | None:
-    data = fetch_oyez(href)
-    return data if isinstance(data, dict) else None
+    return get_case_detail(href)
 
 # ── Issue area inference (shared from utils.local_data) ──────────────────────
 # infer_issue_area(detail) imported above
@@ -393,8 +429,8 @@ a party's argument, they probe it more aggressively with questions.
 # ── Page ─────────────────────────────────────────────────────────────────────
 
 def _page_justices():
-    tab_voting, tab_career, tab_matrix = st.tabs([
-        "⚖️ Voting Patterns", "📊 Justice Career", "🤝 Agreement Matrix"
+    tab_voting, tab_career, tab_matrix, tab_ideology = st.tabs([
+        "⚖️ Voting Patterns", "📊 Justice Career", "🤝 Agreement Matrix", "📈 Ideology Drift"
     ])
 
     # ──────────────────────────────────────────────────────────────────────────────
@@ -593,9 +629,12 @@ def _page_justices():
                         st.subheader("Dissenting Votes")
                         dissents_df = jc_df[jc_df["Vote"].str.lower().isin(["dissent","minority"])][["Term","Case","Issue Area"]].drop_duplicates()
                         if dissents_df.empty: st.info("No dissenting votes found in the selected terms.")
-                        else: st.dataframe(dissents_df.sort_values("Term",ascending=False),height=300, hide_index=True)
+                        else:
+                            st.dataframe(dissents_df.sort_values("Term",ascending=False),height=300, hide_index=True)
+                            csv_download_button(dissents_df.sort_values("Term",ascending=False), filename=f"{jc_selected_name.replace(' ','_')}_dissents.csv", key="csv_dissents")
                         with st.expander("Full Voting Record"):
                             st.dataframe(jc_df.sort_values(["Term","Case"],ascending=[False,True]),height=400, hide_index=True)
+                            csv_download_button(jc_df.sort_values(["Term","Case"],ascending=[False,True]), filename=f"{jc_selected_name.replace(' ','_')}_votes.csv", key="csv_full_votes")
 
     # ──────────────────────────────────────────────────────────────────────────────
     # TAB 3: JUSTICE AGREEMENT MATRIX
@@ -704,14 +743,127 @@ def _page_justices():
                                               xaxis_tickangle=-30, plot_bgcolor="white", paper_bgcolor="white")
                         st.plotly_chart(fig_avg)
 
+    # TAB 4: IDEOLOGY DRIFT
+    # ──────────────────────────────────────────────────────────────────────────────
+    with tab_ideology:
+        st.markdown(
+            "Track how each justice's ideological position has shifted over time, "
+            "based on Martin–Quinn-style scores embedded in the Oyez vote data. "
+            "**Negative = more liberal, Positive = more conservative.** "
+            "Hover over any point to see the term and score."
+        )
+
+        ideo_df = _load_ideology_df()
+        if ideo_df.empty:
+            st.warning("Ideology data not available. Ensure `data/case_detail.parquet` is present.")
+        else:
+            all_justices = sorted(ideo_df["justice"].unique())
+            # Default to the current 9 justices if they appear in the data
+            _current_short_names = [
+                "John G. Roberts", "Clarence Thomas", "Samuel A. Alito, Jr.",
+                "Sonia Sotomayor", "Elena Kagan", "Neil M. Gorsuch",
+                "Brett M. Kavanaugh", "Amy Coney Barrett", "Ketanji Brown Jackson",
+            ]
+            _defaults = [j for j in all_justices if any(s in j for s in ["Roberts","Thomas","Alito","Sotomayor","Kagan","Gorsuch","Kavanaugh","Barrett","Jackson"])][:9]
+            if not _defaults:
+                _defaults = all_justices[:9]
+
+            col_sel, col_opts = st.columns([3, 1])
+            with col_sel:
+                selected_justices = st.multiselect(
+                    "Select justices to display",
+                    all_justices,
+                    default=_defaults,
+                    key="ideo_justices",
+                )
+            with col_opts:
+                show_rolling = st.checkbox("Show 3-term rolling avg", value=True, key="ideo_rolling")
+                show_zero = st.checkbox("Show neutral line", value=True, key="ideo_zero")
+
+            if not selected_justices:
+                st.info("Select at least one justice.")
+            else:
+                filtered = ideo_df[ideo_df["justice"].isin(selected_justices)].copy()
+                filtered = filtered.sort_values(["justice", "term"])
+
+                # Compute 3-term rolling average per justice
+                filtered["rolling_avg"] = (
+                    filtered.groupby("justice")["ideology"]
+                    .transform(lambda s: s.rolling(3, min_periods=1).mean())
+                )
+
+                _JUSTICE_COLORS = px.colors.qualitative.D3 + px.colors.qualitative.Plotly
+                color_map = {j: _JUSTICE_COLORS[i % len(_JUSTICE_COLORS)] for i, j in enumerate(all_justices)}
+
+                fig_drift = go.Figure()
+
+                for justice in selected_justices:
+                    jdf = filtered[filtered["justice"] == justice]
+                    col = color_map[justice]
+
+                    # Raw per-term dots
+                    fig_drift.add_trace(go.Scatter(
+                        x=jdf["term"], y=jdf["ideology"],
+                        mode="markers",
+                        marker=dict(color=col, size=5, opacity=0.4),
+                        showlegend=False,
+                        hovertemplate=f"<b>{justice}</b><br>Term: %{{x}}<br>Score: %{{y:.3f}}<extra></extra>",
+                    ))
+
+                    if show_rolling:
+                        fig_drift.add_trace(go.Scatter(
+                            x=jdf["term"], y=jdf["rolling_avg"],
+                            mode="lines+markers",
+                            name=justice,
+                            line=dict(color=col, width=2),
+                            marker=dict(size=7),
+                            hovertemplate=f"<b>{justice}</b><br>Term: %{{x}}<br>3-term avg: %{{y:.3f}}<extra></extra>",
+                        ))
+                    else:
+                        fig_drift.add_trace(go.Scatter(
+                            x=jdf["term"], y=jdf["ideology"],
+                            mode="lines+markers",
+                            name=justice,
+                            line=dict(color=col, width=2),
+                            marker=dict(size=7),
+                            hovertemplate=f"<b>{justice}</b><br>Term: %{{x}}<br>Score: %{{y:.3f}}<extra></extra>",
+                        ))
+
+                if show_zero:
+                    fig_drift.add_hline(y=0, line_dash="dash", line_color="#95A5A6",
+                                        annotation_text="Neutral", annotation_position="right")
+
+                # Add shaded regions
+                fig_drift.add_hrect(y0=-6, y1=0, fillcolor="rgba(52,152,219,0.05)", line_width=0)
+                fig_drift.add_hrect(y0=0, y1=6, fillcolor="rgba(231,76,60,0.05)", line_width=0)
+                fig_drift.add_annotation(x=filtered["term"].min(), y=3.5, text="Conservative →",
+                                          showarrow=False, font=dict(color="#E74C3C", size=10), xanchor="left")
+                fig_drift.add_annotation(x=filtered["term"].min(), y=-3.5, text="← Liberal",
+                                          showarrow=False, font=dict(color="#3498DB", size=10), xanchor="left")
+
+                fig_drift.update_layout(
+                    title="Justice Ideology Scores by Term (Oyez Martin–Quinn data)",
+                    xaxis_title="SCOTUS Term",
+                    yaxis_title="Ideology Score",
+                    height=500,
+                    plot_bgcolor="white",
+                    paper_bgcolor="white",
+                    legend=dict(orientation="v", x=1.01, y=0.5),
+                    hovermode="x unified" if len(selected_justices) <= 4 else "closest",
+                )
+                st.plotly_chart(fig_drift)
+                st.caption(
+                    "Scores are Martin–Quinn-style ideology estimates from Oyez vote data. "
+                    "Negative values indicate a justice voted more often with the liberal bloc; "
+                    "positive values with the conservative bloc. "
+                    "Data covers terms where vote-level ideology data is available in the Oyez API."
+                )
+
+
 def _page_advocates():
     tab_advocates, tab_amicus, tab_oral = st.tabs([
         "🎓 Advocate Win Rates", "📄 Amicus Brief Tracker", "🎙️ Oral Argument Analytics"
     ])
-
-    # ──────────────────────────────────────────────────────────────────────────────
-    # TAB 1: ADVOCATE WIN RATES
-    # ──────────────────────────────────────────────────────────────────────────────
     with tab_advocates:
         st.markdown(
             "Track individual Supreme Court advocates — which attorneys win most often, "
@@ -802,6 +954,8 @@ def _page_advocates():
                     st.dataframe(adv_df.head(25)[["Advocate","Total Appearances","Wins","Losses","Undecided","Win Rate %","Issue Specialization","First Term"]]
                                  .reset_index(drop=True).style.background_gradient(subset=["Win Rate %"],cmap="RdYlGn"),
                                  height=380, hide_index=True)
+                    csv_download_button(adv_df[["Advocate","Total Appearances","Wins","Losses","Undecided","Win Rate %","Issue Specialization","First Term"]].reset_index(drop=True), filename="scotus_advocate_win_rates.csv", key="csv_advocates")
+                    csv_download_button(adv_df[["Advocate","Total Appearances","Wins","Losses","Undecided","Win Rate %","Issue Specialization","First Term"]].reset_index(drop=True), filename="scotus_advocate_win_rates.csv", key="csv_advocates")
 
                 with sub_issue:
                     issue_adv_rows = []
@@ -1069,7 +1223,7 @@ def _page_advocates():
                                     fig_turns.update_layout(title="Speaking Turns per Participant",height=360,plot_bgcolor="white",paper_bgcolor="white",
                                                             margin=dict(l=150,r=60,t=40,b=40),
                                                             xaxis=dict(range=[0, turns_max * 1.25]))
-                                    st.plotly_chart(fig_turns, use_container_width=True)
+                                    st.plotly_chart(fig_turns)
                                 with col_words:
                                     words_df = pd.DataFrame(list(speaker_words.items()),columns=["Speaker","Words"]).sort_values("Words",ascending=False)
                                     fig_words = go.Figure(go.Bar(y=words_df["Speaker"],x=words_df["Words"],orientation="h",marker_color="#E67E22",text=words_df["Words"],textposition="outside"))
@@ -1077,7 +1231,7 @@ def _page_advocates():
                                     fig_words.update_layout(title="Word Count per Participant",height=360,plot_bgcolor="white",paper_bgcolor="white",
                                                             margin=dict(l=150,r=80,t=40,b=40),
                                                             xaxis=dict(range=[0, words_max * 1.35]))
-                                    st.plotly_chart(fig_words, use_container_width=True)
+                                    st.plotly_chart(fig_words)
                                 if justice_questions:
                                     st.subheader("Questions Asked by Each Justice")
                                     jq_df = pd.DataFrame(list(justice_questions.items()),columns=["Justice","Questions"]).sort_values("Questions",ascending=False)
@@ -1087,7 +1241,7 @@ def _page_advocates():
                                                          yaxis=dict(title="Question Count", range=[0, jq_max * 1.25]),
                                                          margin=dict(t=50,b=80,l=20,r=20),
                                                          plot_bgcolor="white",paper_bgcolor="white")
-                                    st.plotly_chart(fig_jq, use_container_width=True)
+                                    st.plotly_chart(fig_jq)
                                     st.info("Higher question counts toward a party often predict a vote against that party (Jacobi & Schweers, 2017).")
 
         with sub_research:
@@ -1122,3 +1276,5 @@ with _tab_0:
     _page_justices()
 with _tab_1:
     _page_advocates()
+
+

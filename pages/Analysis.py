@@ -10,8 +10,9 @@ import requests
 import time
 import datetime
 from collections import defaultdict
-from utils.oyez_api import get_cases_by_term, get_recent_terms
-from utils.local_data import fetch_oyez, infer_issue_area
+from utils.oyez_api import get_cases_by_term, get_case_detail, get_recent_terms
+from utils.local_data import fetch_oyez, infer_issue_area, infer_disposition
+from utils.export import csv_download_button
 
 
 from utils import add_sidebar_logo
@@ -62,78 +63,78 @@ def _last_name(full: str) -> str:
     parts = full.strip().split(); return parts[-1] if parts else full
 
 # ── Cached loaders ─────────────────────────────────────────────────────────────
-@st.cache_data(show_spinner=False, ttl=3600)
+@st.cache_data(show_spinner=False)
 def _an_load_close_decisions(terms: tuple) -> list[dict]:
     cases_out = []
     for term in terms:
-        try:
-            r = requests.get(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0",
-                             headers=HEADERS, timeout=10)
-            r.raise_for_status(); cases = r.json()
-        except Exception: continue
+        cases = get_cases_by_term(term)
         for c in cases:
-            href = c.get("href","")
-            if not href: continue
-            try:
-                dr = requests.get(href, headers=HEADERS, timeout=8)
-                dr.raise_for_status(); detail = dr.json()
-            except Exception: continue
+            href = c.get("href", "")
+            if not href:
+                continue
+            detail = get_case_detail(href)
+            if not detail:
+                continue
             for decision in (detail.get("decisions") or []):
                 votes = decision.get("votes") or []
-                if not votes: continue
-                maj_votes = [v for v in votes if (v.get("vote") or "").lower() in ("majority","concurrence","concurring")]
-                dis_votes  = [v for v in votes if (v.get("vote") or "").lower() in ("dissent","minority")]
-                maj_count = len(maj_votes); dis_count = len(dis_votes); total = maj_count+dis_count
-                if total < 7: continue
+                if not votes:
+                    continue
+                maj_votes = [v for v in votes if (v.get("vote") or "").lower() in ("majority", "concurrence", "concurring")]
+                dis_votes = [v for v in votes if (v.get("vote") or "").lower() in ("dissent", "minority")]
+                maj_count = len(maj_votes)
+                dis_count = len(dis_votes)
+                total = maj_count + dis_count
+                if total < 7:
+                    continue
                 split = f"{maj_count}-{dis_count}"
-                is_close = (maj_count-dis_count) <= 1; is_near = (maj_count-dis_count) == 2
-                if not (is_close or is_near): continue
+                is_close = (maj_count - dis_count) <= 1
+                is_near = (maj_count - dis_count) == 2
+                if not (is_close or is_near):
+                    continue
                 issue = infer_issue_area(detail)
-                dec = (detail.get("decisions") or [{}])[0]
-                disp_label = (dec.get("decision_type") or "").strip().title()
-                maj_names = [_last_name((v.get("member") or {}).get("name","")) for v in maj_votes if isinstance(v.get("member"),dict)]
-                dis_names  = [_last_name((v.get("member") or {}).get("name","")) for v in dis_votes  if isinstance(v.get("member"),dict)]
-                cases_out.append({"term":term,"case":detail.get("name",""),"split":split,
-                                   "majority_count":maj_count,"dissent_count":dis_count,
-                                   "majority":maj_names,"dissent":dis_names,"issue_area":issue,
-                                   "disposition":disp_label,"is_close":is_close,"href":href})
-            time.sleep(0.02)
+                disp_label = (decision.get("decision_type") or "").strip().title()
+                maj_names = [_last_name((v.get("member") or {}).get("name", "")) for v in maj_votes if isinstance(v.get("member"), dict)]
+                dis_names = [_last_name((v.get("member") or {}).get("name", "")) for v in dis_votes if isinstance(v.get("member"), dict)]
+                cases_out.append({
+                    "term": term, "case": detail.get("name", ""), "split": split,
+                    "majority_count": maj_count, "dissent_count": dis_count,
+                    "majority": maj_names, "dissent": dis_names,
+                    "issue_area": issue, "disposition": disp_label,
+                    "is_close": is_close, "href": href,
+                })
     return cases_out
 
-@st.cache_data(show_spinner=False, ttl=3600)
+@st.cache_data(show_spinner=False)
 def _an_load_win_data(terms: tuple) -> list[dict]:
     rows = []
     for term in terms:
-        try:
-            r = requests.get(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0",
-                             headers=HEADERS, timeout=10)
-            r.raise_for_status(); cases = r.json()
-        except Exception: continue
+        cases = get_cases_by_term(term)
         for c in cases:
-            href = c.get("href","")
-            if not href: continue
-            try:
-                dr = requests.get(href, headers=HEADERS, timeout=8)
-                dr.raise_for_status(); detail = dr.json()
-            except Exception: continue
-            petitioner = detail.get("petitioner","") or ""
-            respondent = detail.get("respondent","") or ""
-            if not petitioner and not respondent:
-                name_parts = detail.get("name","").split(" v. ")
-                petitioner = name_parts[0].strip() if len(name_parts)>=2 else ""
-                respondent = name_parts[1].strip() if len(name_parts)>=2 else ""
-            disp = detail.get("disposition") or {}
-            disp_label = disp.get("label","") if isinstance(disp,dict) else str(disp)
+            href = c.get("href", "")
+            if not href:
+                continue
+            detail = get_case_detail(href)
+            if not detail:
+                continue
+            name = detail.get("name", "")
+            name_parts = name.split(" v. ")
+            petitioner = detail.get("first_party") or (name_parts[0].strip() if len(name_parts) >= 2 else "")
+            respondent = detail.get("second_party") or (name_parts[1].strip() if len(name_parts) >= 2 else "")
+            disp_label = infer_disposition(detail)
             winner_side = _disposition_winner(disp_label)
-            if not winner_side: continue
-            pet_type = _classify_party(petitioner); res_type = _classify_party(respondent)
-            winner_type = pet_type if winner_side=="petitioner" else res_type
+            if not winner_side:
+                continue
+            pet_type = _classify_party(petitioner)
+            res_type = _classify_party(respondent)
+            winner_type = pet_type if winner_side == "petitioner" else res_type
             issue = infer_issue_area(detail)
-            rows.append({"term":term,"case":detail.get("name","")[:60],
-                          "petitioner":petitioner[:60],"respondent":respondent[:60],
-                          "pet_type":pet_type,"res_type":res_type,"winner_side":winner_side,
-                          "winner_type":winner_type,"issue_area":issue,"disposition":disp_label})
-            time.sleep(0.02)
+            rows.append({
+                "term": term, "case": name[:60],
+                "petitioner": petitioner[:60], "respondent": respondent[:60],
+                "pet_type": pet_type, "res_type": res_type,
+                "winner_side": winner_side, "winner_type": winner_type,
+                "issue_area": issue, "disposition": disp_label,
+            })
     return rows
 
 # ── SCOTUS vs Congress curated data ──────────────────────────────────────────
@@ -178,132 +179,6 @@ BASIS_COLORS = {
 
 # ── Page ─────────────────────────────────────────────────────────────────────
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
-import streamlit as st
-import pandas as pd
-import plotly.graph_objects as go
-import plotly.express as px
-import requests
-import time
-import datetime
-from collections import defaultdict
-from utils.local_data import fetch_oyez, infer_issue_area
-
-
-HEADERS      = {"Accept": "application/json", "User-Agent": "SCOTUS-Visualizer/1.0"}
-OYEZ_BASE    = "https://api.oyez.org"
-CURRENT_YEAR = datetime.date.today().year
-
-# ── State mapping helpers ──────────────────────────────────────────────────────
-STATE_ABBREV = {
-    "Alabama":"AL","Alaska":"AK","Arizona":"AZ","Arkansas":"AR","California":"CA",
-    "Colorado":"CO","Connecticut":"CT","Delaware":"DE","Florida":"FL","Georgia":"GA",
-    "Hawaii":"HI","Idaho":"ID","Illinois":"IL","Indiana":"IN","Iowa":"IA","Kansas":"KS",
-    "Kentucky":"KY","Louisiana":"LA","Maine":"ME","Maryland":"MD","Massachusetts":"MA",
-    "Michigan":"MI","Minnesota":"MN","Mississippi":"MS","Missouri":"MO","Montana":"MT",
-    "Nebraska":"NE","Nevada":"NV","New Hampshire":"NH","New Jersey":"NJ","New Mexico":"NM",
-    "New York":"NY","North Carolina":"NC","North Dakota":"ND","Ohio":"OH","Oklahoma":"OK",
-    "Oregon":"OR","Pennsylvania":"PA","Rhode Island":"RI","South Carolina":"SC",
-    "South Dakota":"SD","Tennessee":"TN","Texas":"TX","Utah":"UT","Vermont":"VT",
-    "Virginia":"VA","Washington":"WA","West Virginia":"WV","Wisconsin":"WI","Wyoming":"WY",
-    "District of Columbia":"DC",
-}
-STATE_NAMES = list(STATE_ABBREV.keys())
-
-def _extract_state(court_name: str) -> str | None:
-    if not court_name: return None
-    court_l = court_name.lower()
-    # Check for "state of X" or "commonwealth of X"
-    for state in STATE_NAMES:
-        if state.lower() in court_l:
-            return state
-    # Common abbreviations and patterns
-    if "d.c." in court_l or "district of columbia" in court_l: return "District of Columbia"
-    return None
-
-def _classify_disposition_geo(label: str) -> str:
-    label_l = label.lower()
-    if "affirm" in label_l: return "Affirmed"
-    if any(w in label_l for w in ["revers","vacate"]): return "Reversed/Vacated"
-    if "remand" in label_l: return "Remanded"
-    return "Other"
-
-@st.cache_data(show_spinner=False)
-def _geo_fetch_term(term: int) -> list[dict]:
-    try:
-        r = requests.get(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0",
-                         headers=HEADERS, timeout=10)
-        r.raise_for_status(); return r.json()
-    except Exception: return []
-
-@st.cache_data(show_spinner=False)
-def _geo_fetch_detail(href: str) -> dict | None:
-    try:
-        r = requests.get(href, headers=HEADERS, timeout=10)
-        r.raise_for_status(); return r.json()
-    except Exception: return None
-
-@st.cache_data(show_spinner=False, ttl=3600)
-def _geo_load_state_data(terms: tuple) -> list[dict]:
-    rows = []
-    for term in terms:
-        cases = _geo_fetch_term(term)
-        for c in cases:
-            href = c.get("href","")
-            if not href: continue
-            detail = _geo_fetch_detail(href)
-            if not detail: continue
-            lower = detail.get("lower_court") or {}
-            lc_name = lower.get("name","") if isinstance(lower,dict) else str(lower)
-            state = _extract_state(lc_name)
-            if not state: continue
-            dec = (detail.get("decisions") or [{}])[0]
-            disp_label = (dec.get("decision_type") or "").strip().title()
-            issue = infer_issue_area(detail)
-            rows.append({
-                "term": term, "state": state, "abbrev": STATE_ABBREV.get(state,state),
-                "case": detail.get("name",""), "lower_court": lc_name,
-                "disposition": disp_label, "outcome": _classify_disposition_geo(disp_label),
-                "issue_area": issue,
-            })
-        time.sleep(0.03)
-    return rows
-
-@st.cache_data(show_spinner=False, ttl=1800)
-def _geo_load_term_data(term: int) -> list[dict]:
-    rows = []
-    cases = _geo_fetch_term(term)
-    for c in cases:
-        href = c.get("href","")
-        if not href: continue
-        detail = _geo_fetch_detail(href)
-        if not detail: continue
-        issue = infer_issue_area(detail)
-        dec0 = (detail.get("decisions") or [{}])[0]
-        disp_label = (dec0.get("decision_type") or "").strip().title()
-        decisions = detail.get("decisions") or []
-        vote_splits = []
-        for dec in decisions:
-            votes = dec.get("votes") or []
-            maj = sum(1 for v in votes if (v.get("vote") or "").lower() in ("majority","concurrence"))
-            dis = sum(1 for v in votes if (v.get("vote") or "").lower() == "dissent")
-            if maj + dis >= 7: vote_splits.append(f"{maj}-{dis}")
-        split = vote_splits[0] if vote_splits else ""
-        margin = int(split.split("-")[0]) - int(split.split("-")[1]) if split and "-" in split else None
-        rows.append({
-            "case": detail.get("name",""),
-            "issue_area": issue, "disposition": disp_label,
-            "vote_split": split, "margin": margin,
-            "decided_on": detail.get("decided_on",""),
-        })
-        time.sleep(0.02)
-    return rows
-
-# ── Page ─────────────────────────────────────────────────────────────────────
-
 def _page_analytics():
     tab_stats, tab_close, tab_win, tab_congress = st.tabs([
         "📊 Term Statistics", "⚖️ Close Decisions", "🏆 Win Rates", "🏛️ SCOTUS vs. Congress"
@@ -323,12 +198,11 @@ def _page_analytics():
             st.metric("Total Cases", len(stats_cases))
             rows_s = []
             for c in stats_cases:
-                ia = c.get("issue_area",{})
-                d  = c.get("disposition",{})
+                detail_s = get_case_detail(c.get("href", "")) or c
                 rows_s.append({
-                    "Case Name": c.get("name",""),
-                    "Issue Area": ia.get("label","Unknown") if isinstance(ia,dict) else str(ia or "Unknown"),
-                    "Disposition": d.get("label","Unknown") if isinstance(d,dict) else str(d or "Unknown"),
+                    "Case Name": c.get("name", ""),
+                    "Issue Area": infer_issue_area(detail_s),
+                    "Disposition": infer_disposition(detail_s),
                 })
             df_s = pd.DataFrame(rows_s)
             col1_s, col2_s = st.columns(2)
@@ -348,7 +222,8 @@ def _page_analytics():
             st.subheader("Case Listing")
             search_s = st.text_input("Filter by name", key="stats_search")
             filtered_s = df_s[df_s["Case Name"].str.contains(search_s,case=False)] if search_s else df_s
-            st.dataframe(filtered_s, height=350)
+            st.dataframe(filtered_s, height=350, hide_index=True)
+            csv_download_button(filtered_s, filename=f"scotus_term_{stats_term}.csv", key="csv_term_stats")
 
     # ──────────────────────────────────────────────────────────────────────────────
     # TAB 2: CLOSE DECISIONS
@@ -472,6 +347,7 @@ def _page_analytics():
                                          .sort_values("Majority %").reset_index(drop=True)
                                          .style.background_gradient(subset=["Majority %"],cmap="RdYlGn"),
                                          height=320,hide_index=True)
+                            csv_download_button(dec_df_cd[["Justice","Majority","Dissent","Total 5-4 Cases","Majority %"]].sort_values("Majority %").reset_index(drop=True), filename="scotus_close_decisions_justices.csv", key="csv_close_dec")
 
                 with sub_issue_cd:
                     issue_split_cd: dict[str,dict[str,int]] = defaultdict(lambda: defaultdict(int))
@@ -1114,8 +990,4 @@ def _page_geography():
                 unsafe_allow_html=True)
 
 # ── Page ─────────────────────────────────────────────────────────────────────
-_tab_0, _tab_1 = st.tabs(["📊 Analytics", "🗺️ Geography"])
-with _tab_0:
-    _page_analytics()
-with _tab_1:
-    _page_geography()
+_page_analytics()

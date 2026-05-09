@@ -10,7 +10,8 @@ import requests
 import time
 import datetime
 from collections import defaultdict
-
+from utils.oyez_api import get_cases_by_term, get_case_detail
+from utils.local_data import fetch_oyez, infer_issue_area, infer_disposition
 
 from utils import add_sidebar_logo
 add_sidebar_logo()
@@ -19,21 +20,14 @@ HEADERS      = {"Accept": "application/json", "User-Agent": "SCOTUS-Visualizer/1
 OYEZ_BASE    = "https://api.oyez.org"
 CURRENT_YEAR = datetime.date.today().year
 
-# ── Fetch helpers ─────────────────────────────────────────────────────────────
+# ── Fetch helpers (local parquet) ─────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
 def _adv_fetch_term(term: int) -> list[dict]:
-    try:
-        r = requests.get(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0",
-                         headers=HEADERS, timeout=10)
-        r.raise_for_status(); return r.json()
-    except Exception: return []
+    return get_cases_by_term(term)
 
 @st.cache_data(show_spinner=False)
 def _adv_fetch_detail(href: str) -> dict | None:
-    try:
-        r = requests.get(href, headers=HEADERS, timeout=10)
-        r.raise_for_status(); return r.json()
-    except Exception: return None
+    return get_case_detail(href)
 
 def _advocate_role(description: str) -> str:
     d = (description or "").lower()
@@ -57,13 +51,10 @@ def _adv_load_advocate_data(terms: tuple) -> list[dict]:
             if not href: continue
             detail = _adv_fetch_detail(href)
             if not detail: continue
-            disp  = detail.get("disposition") or {}
-            disp_label = disp.get("label","") if isinstance(disp,dict) else str(disp)
-            winner_side = _winner_side(disp_label)
+            winner_side = _winner_side(infer_disposition(detail))
             if not winner_side: continue
             advocates = detail.get("advocates") or []
-            ia = detail.get("issue_area") or {}
-            issue = ia.get("label","Unknown") if isinstance(ia,dict) else str(ia or "Unknown")
+            issue = infer_issue_area(detail)
             for adv_entry in advocates:
                 if not isinstance(adv_entry, dict): continue
                 adv = adv_entry.get("advocate") or {}
@@ -77,16 +68,13 @@ def _adv_load_advocate_data(terms: tuple) -> list[dict]:
                     "advocate": adv_name, "role": role, "won": won,
                     "issue_area": issue, "description": description,
                 })
-            time.sleep(0.02)
     return rows
 
 # ── Oral Argument Analysis helpers ────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
 def _adv_load_transcript(arg_href: str) -> dict | None:
-    try:
-        r = requests.get(arg_href, headers=HEADERS, timeout=12)
-        r.raise_for_status(); return r.json()
-    except Exception: return None
+    data = fetch_oyez(arg_href)
+    return data if isinstance(data, dict) else None
 
 # ── Amicus brief curated data ──────────────────────────────────────────────────
 AMICUS_ORGS = [

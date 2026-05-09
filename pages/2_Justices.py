@@ -11,6 +11,7 @@ import time
 import datetime
 from collections import defaultdict
 from utils.oyez_api import get_cases_by_term, get_case_detail, get_recent_terms
+from utils.local_data import fetch_oyez, infer_issue_area
 from utils.charts import build_voting_chart
 
 
@@ -24,49 +25,32 @@ CURRENT_YEAR = datetime.date.today().year
 # ── Shared fetch helpers ──────────────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
 def _jh_fetch_justices() -> list[dict]:
-    try:
-        r = requests.get(f"{OYEZ_BASE}/justices", headers=HEADERS, timeout=10)
-        r.raise_for_status(); return r.json()
-    except Exception: return []
+    data = fetch_oyez(f"{OYEZ_BASE}/justices")
+    return data if isinstance(data, list) else []
 
 @st.cache_data(show_spinner=False)
 def _jh_fetch_justice_detail(href: str) -> dict | None:
-    try:
-        r = requests.get(href, headers=HEADERS, timeout=10)
-        r.raise_for_status(); return r.json()
-    except Exception: return None
+    data = fetch_oyez(href)
+    return data if isinstance(data, dict) else None
 
 @st.cache_data(show_spinner=False)
 def _jh_fetch_cases_term(term: int) -> list[dict]:
-    try:
-        r = requests.get(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0",
-                         headers=HEADERS, timeout=10)
-        r.raise_for_status(); return r.json()
-    except Exception: return []
+    return get_cases_by_term(term)
 
 @st.cache_data(show_spinner=False)
 def _jh_fetch_case_detail(href: str) -> dict | None:
-    try:
-        r = requests.get(href, headers=HEADERS, timeout=10)
-        r.raise_for_status(); return r.json()
-    except Exception: return None
+    return get_case_detail(href)
 
 @st.cache_data(show_spinner=False, ttl=3600)
 def _jh_load_votes_for_terms(terms: tuple) -> list[dict]:
     rows = []
     for term in terms:
-        try:
-            r = requests.get(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0",
-                             headers=HEADERS, timeout=10)
-            r.raise_for_status(); cases = r.json()
-        except Exception: continue
+        cases = get_cases_by_term(term)
         for c in cases:
-            href = c.get("href",""); 
+            href = c.get("href","")
             if not href: continue
-            try:
-                dr = requests.get(href, headers=HEADERS, timeout=8)
-                dr.raise_for_status(); detail = dr.json()
-            except Exception: continue
+            detail = get_case_detail(href)
+            if not detail: continue
             case_name = detail.get("name","")
             for decision in (detail.get("decisions") or []):
                 for vote in (decision.get("votes") or []):
@@ -75,7 +59,6 @@ def _jh_load_votes_for_terms(terms: tuple) -> list[dict]:
                     v = (vote.get("vote") or "").lower().strip()
                     if justice and v:
                         rows.append({"term":term,"case":case_name,"justice":justice,"vote":v})
-            time.sleep(0.02)
     return rows
 
 # ── Justice career helpers ─────────────────────────────────────────────────────
@@ -94,13 +77,11 @@ def _get_justice_votes(justice_name: str, terms: list[int]) -> pd.DataFrame:
                     member = vote.get("member",{}) or {}
                     name = member.get("name","")
                     if justice_name.lower() in name.lower():
-                        ia = detail.get("issue_area",{})
                         rows.append({
                             "Term": term, "Case": detail.get("name",""),
                             "Vote": vote.get("vote",""),
-                            "Issue Area": ia.get("label","Unknown") if isinstance(ia,dict) else str(ia or "Unknown"),
+                            "Issue Area": infer_issue_area(detail),
                         })
-            time.sleep(0.02)
         progress.progress((idx+1)/len(terms))
     progress.empty()
     return pd.DataFrame(rows)

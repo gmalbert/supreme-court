@@ -12,6 +12,8 @@ import datetime
 from collections import defaultdict
 
 
+from utils.oyez_api import get_cases_by_term, get_case_detail
+
 from utils import add_sidebar_logo
 add_sidebar_logo()
 
@@ -137,21 +139,14 @@ PRE_OYEZ_RAW = [
     (1952, 141, 128, 60, 68, 0),
 ]
 
-# ── Live Oyez fetch helpers ────────────────────────────────────────────────────
+# ── Oyez fetch helpers (local parquet) ───────────────────────────────────────
 @st.cache_data(show_spinner=False, ttl=3600)
 def _hist_fetch_term(term: int) -> list[dict]:
-    try:
-        r = requests.get(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=150&page=0",
-                         headers=HEADERS, timeout=12)
-        r.raise_for_status(); return r.json()
-    except Exception: return []
+    return get_cases_by_term(term)
 
 @st.cache_data(show_spinner=False, ttl=3600)
 def _hist_fetch_detail(href: str) -> dict | None:
-    try:
-        r = requests.get(href, headers=HEADERS, timeout=10)
-        r.raise_for_status(); return r.json()
-    except Exception: return None
+    return get_case_detail(href)
 
 def _classify_disp(label: str) -> str:
     d = (label or "").lower()
@@ -193,8 +188,6 @@ def _hist_load_oyez_term(term: int) -> dict:
             votes = dec.get("votes") or []
             dis = sum(1 for v in votes if (v.get("vote") or "").lower() == "dissent")
             if dis == 0 and len(votes) >= 6: unanimous_ += 1
-
-        time.sleep(0.02)
 
     denom_rev = max(reversed_ + affirmed_, 1)
     return {
@@ -383,7 +376,16 @@ with tab_timeline:
         fig_tl.add_trace(go.Scatter(
             x=df_range["term"], y=df_range[col_key], mode="lines",
             name=metric_sel, line=dict(color=line_color, width=1.8),
-            fill="tozeroy", fillcolor=line_color.replace(")", ",0.08)").replace("rgb","rgba") if line_color.startswith("rgb") else line_color+"20",
+            fill="tozeroy",
+            fillcolor=(
+                line_color.replace(")", ",0.08").replace("rgb", "rgba")
+                if line_color.startswith("rgb")
+                else (
+                    f"rgba({int(line_color[1:3],16)},{int(line_color[3:5],16)},{int(line_color[5:7],16)},0.08)"
+                    if line_color.startswith("#") and len(line_color) == 7
+                    else line_color
+                )
+            ),
             hovertemplate=f"<b>%{{x}}–%{{x+1}}</b><br>{metric_sel}: %{{y:,.1f}}<extra></extra>"))
 
     # Rolling average

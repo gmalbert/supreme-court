@@ -13,6 +13,7 @@ from collections import defaultdict
 
 
 from utils import add_sidebar_logo
+from utils.oyez_api import get_cases_by_term, get_case_detail
 add_sidebar_logo()
 
 HEADERS      = {"Accept": "application/json", "User-Agent": "SCOTUS-Visualizer/1.0"}
@@ -44,35 +45,20 @@ JUSTICES_RECENT = [
 ]
 
 # Conservative bloc reference for alignment scoring
-CONSERVATIVE_BLOC = {"Thomas","Scalia","Rehnquist","Alito","Gorsuch","Barrett"}
-
-@st.cache_data(show_spinner=False)
-def _rs_fetch_cases_term(term: int) -> list[dict]:
-    try:
-        r = requests.get(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0",
-                         headers=HEADERS, timeout=10)
-        r.raise_for_status(); return r.json()
-    except Exception: return []
-
-@st.cache_data(show_spinner=False)
-def _rs_fetch_detail(href: str) -> dict | None:
-    try:
-        r = requests.get(href, headers=HEADERS, timeout=10)
-        r.raise_for_status(); return r.json()
-    except Exception: return None
+CONSERVATIVE_BLOC = {"Thomas","Scalia","Rehnquist","Alito","Barrett"}
 
 def _last_name(full: str) -> str:
     return (full.strip().split()[-1]) if full.strip() else full
 
-@st.cache_data(show_spinner=False, ttl=3600)
+@st.cache_data(show_spinner=False)
 def _rs_load_drift_data(terms: tuple) -> list[dict]:
     rows = []
     for term in terms:
-        cases = _rs_fetch_cases_term(term)
+        cases = get_cases_by_term(term)
         for c in cases:
             href = c.get("href","")
             if not href: continue
-            detail = _rs_fetch_detail(href)
+            detail = get_case_detail(href)
             if not detail: continue
             for decision in (detail.get("decisions") or []):
                 votes = decision.get("votes") or []
@@ -102,7 +88,6 @@ def _rs_load_drift_data(terms: tuple) -> list[dict]:
                               (v == "dissent" and cons_majority_vote == "dissent")
                     rows.append({"term": term, "justice": j_name, "justice_full": j_full,
                                   "aligned_with_cons": aligned, "vote": v})
-        time.sleep(0.02)
     return rows
 
 # ── Doctrine Evolution data ────────────────────────────────────────────────────
@@ -350,7 +335,7 @@ with tab_drift:
         "Track how each justice's voting alignment with the conservative bloc shifts over their tenure. "
         "High alignment = votes frequently with Thomas/Scalia/Alito. Low = diverges from conservative bloc."
     )
-    st.info("Alignment is computed from live Oyez vote data vs. the Thomas-Scalia-Alito bloc. "
+    st.info("Alignment is computed from local case vote data vs. the Thomas-Scalia-Alito bloc. "
             "Justices in the bloc are excluded from the chart.")
 
     available_terms_d = list(range(CURRENT_YEAR, CURRENT_YEAR-30,-1))
@@ -361,9 +346,12 @@ with tab_drift:
         terms_sel_d = st.multiselect("Terms to include", available_terms_d, default=available_terms_d[:12],
                                       max_selections=15, key="drift_terms")
     with col2_d:
-        justices_sel_d = st.multiselect("Justices to show", [j.split()[-1] for j in all_justice_names],
-                                         default=["Stevens","O'Connor","Kennedy","Souter","Roberts",
-                                                  "Sotomayor","Kagan","Gorsuch","Kavanaugh","Jackson"],
+        _opts_d = [j.split()[-1] for j in all_justice_names]
+        _default_d = [j for j in ["Stevens","O'Connor","Kennedy","Souter","Roberts",
+                                   "Sotomayor","Kagan","Gorsuch","Kavanaugh","Jackson"]
+                      if j in _opts_d]
+        justices_sel_d = st.multiselect("Justices to show", _opts_d,
+                                         default=_default_d,
                                          key="drift_justices")
 
     if st.button("Load Drift Data", type="primary", key="drift_btn"):
@@ -407,7 +395,7 @@ with tab_drift:
                                          yaxis=dict(range=[0,105], title="Conservative Alignment %"),
                                          legend=dict(x=1.01, y=1))
                 st.plotly_chart(fig_drift)
-                st.caption("Values above 50% = tends to agree with conservatives. Below 50% = disagrees more often. Based on Thomas/Scalia/Rehnquist/Alito/Gorsuch/Barrett as reference bloc.")
+                st.caption("Values above 50% = tends to agree with conservatives. Below 50% = disagrees more often. Based on Thomas/Scalia/Rehnquist/Alito/Barrett as reference bloc.")
 
             # Drift summary
             st.subheader("Ideological Drift Summary")

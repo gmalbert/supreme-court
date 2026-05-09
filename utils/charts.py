@@ -153,11 +153,10 @@ def build_voting_chart(justices: list[dict]) -> go.Figure:
         hoverinfo="text",
     ))
     fig.update_layout(
-        title="Justice Votes",
         xaxis_title="Justice",
         yaxis=dict(showgrid=False, showticklabels=False),
         height=280,
-        margin=dict(l=20, r=20, t=50, b=80),
+        margin=dict(l=20, r=20, t=20, b=80),
         plot_bgcolor="white",
         paper_bgcolor="white",
         xaxis_tickangle=-30,
