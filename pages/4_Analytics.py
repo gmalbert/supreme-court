@@ -1,4 +1,4 @@
-﻿import sys
+import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
@@ -10,8 +10,8 @@ import requests
 import time
 import datetime
 from collections import defaultdict
-from utils.oyez_api import get_cases_by_term, get_recent_terms
-
+from utils.oyez_api import get_cases_by_term, get_recent_terms, get_case_detail
+from utils.local_data import infer_issue_area, infer_disposition
 
 from utils import add_sidebar_logo
 add_sidebar_logo()
@@ -65,18 +65,12 @@ def _last_name(full: str) -> str:
 def _an_load_close_decisions(terms: tuple) -> list[dict]:
     cases_out = []
     for term in terms:
-        try:
-            r = requests.get(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0",
-                             headers=HEADERS, timeout=10)
-            r.raise_for_status(); cases = r.json()
-        except Exception: continue
+        cases = get_cases_by_term(term)
         for c in cases:
             href = c.get("href","")
             if not href: continue
-            try:
-                dr = requests.get(href, headers=HEADERS, timeout=8)
-                dr.raise_for_status(); detail = dr.json()
-            except Exception: continue
+            detail = get_case_detail(href)
+            if not detail: continue
             for decision in (detail.get("decisions") or []):
                 votes = decision.get("votes") or []
                 if not votes: continue
@@ -87,54 +81,42 @@ def _an_load_close_decisions(terms: tuple) -> list[dict]:
                 split = f"{maj_count}-{dis_count}"
                 is_close = (maj_count-dis_count) <= 1; is_near = (maj_count-dis_count) == 2
                 if not (is_close or is_near): continue
-                ia = detail.get("issue_area") or {}
-                issue = ia.get("label","Unknown") if isinstance(ia,dict) else str(ia)
-                disp = detail.get("disposition") or {}
-                disp_label = disp.get("label","") if isinstance(disp,dict) else str(disp)
+                issue = infer_issue_area(detail)
+                disp_label = infer_disposition(detail)
                 maj_names = [_last_name((v.get("member") or {}).get("name","")) for v in maj_votes if isinstance(v.get("member"),dict)]
                 dis_names  = [_last_name((v.get("member") or {}).get("name","")) for v in dis_votes  if isinstance(v.get("member"),dict)]
                 cases_out.append({"term":term,"case":detail.get("name",""),"split":split,
                                    "majority_count":maj_count,"dissent_count":dis_count,
                                    "majority":maj_names,"dissent":dis_names,"issue_area":issue,
                                    "disposition":disp_label,"is_close":is_close,"href":href})
-            time.sleep(0.02)
     return cases_out
 
 @st.cache_data(show_spinner=False, ttl=3600)
 def _an_load_win_data(terms: tuple) -> list[dict]:
     rows = []
     for term in terms:
-        try:
-            r = requests.get(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0",
-                             headers=HEADERS, timeout=10)
-            r.raise_for_status(); cases = r.json()
-        except Exception: continue
+        cases = get_cases_by_term(term)
         for c in cases:
             href = c.get("href","")
             if not href: continue
-            try:
-                dr = requests.get(href, headers=HEADERS, timeout=8)
-                dr.raise_for_status(); detail = dr.json()
-            except Exception: continue
+            detail = get_case_detail(href)
+            if not detail: continue
             petitioner = detail.get("petitioner","") or ""
             respondent = detail.get("respondent","") or ""
             if not petitioner and not respondent:
                 name_parts = detail.get("name","").split(" v. ")
                 petitioner = name_parts[0].strip() if len(name_parts)>=2 else ""
                 respondent = name_parts[1].strip() if len(name_parts)>=2 else ""
-            disp = detail.get("disposition") or {}
-            disp_label = disp.get("label","") if isinstance(disp,dict) else str(disp)
+            disp_label = infer_disposition(detail)
             winner_side = _disposition_winner(disp_label)
             if not winner_side: continue
             pet_type = _classify_party(petitioner); res_type = _classify_party(respondent)
             winner_type = pet_type if winner_side=="petitioner" else res_type
-            ia = detail.get("issue_area") or {}
-            issue = ia.get("label","Unknown") if isinstance(ia,dict) else str(ia)
+            issue = infer_issue_area(detail)
             rows.append({"term":term,"case":detail.get("name","")[:60],
                           "petitioner":petitioner[:60],"respondent":respondent[:60],
                           "pet_type":pet_type,"res_type":res_type,"winner_side":winner_side,
                           "winner_type":winner_type,"issue_area":issue,"disposition":disp_label})
-            time.sleep(0.02)
     return rows
 
 # ── SCOTUS vs Congress curated data ──────────────────────────────────────────
@@ -179,8 +161,8 @@ BASIS_COLORS = {
 
 # ── Page ─────────────────────────────────────────────────────────────────────
 st.title("📊 Analytics")
-tab_stats, tab_close, tab_win, tab_congress = st.tabs([
-    "📊 Term Statistics", "⚖️ Close Decisions", "🏆 Win Rates", "🏛️ SCOTUS vs. Congress"
+tab_stats, tab_close, tab_win, tab_congress, tab_text = st.tabs([
+    "📊 Term Statistics", "⚖️ Close Decisions", "🏆 Win Rates", "🏛️ SCOTUS vs. Congress", "📝 Opinion Text"
 ])
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -649,3 +631,194 @@ with tab_congress:
                                 unsafe_allow_html=True)
                     st.markdown(f"**Issue Area:** {row['area']}")
                     st.markdown(f"**Era:** {row['era']}")
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB 5: OPINION TEXT ANALYTICS
+# ══════════════════════════════════════════════════════════════════════════════
+with tab_text:
+    st.markdown("Analyze length and readability of Supreme Court opinion texts over time.")
+
+    import re as _re, math as _math
+    from pathlib import Path as _Path
+
+    _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    @st.cache_data(show_spinner=False)
+    def _load_opinion_text_stats() -> pd.DataFrame:
+        """
+        Compute per-case text metrics from case_detail.parquet.
+        Returns DataFrame with columns: term, name, facts_len, conclusion_len,
+        facts_sentences, conclusion_sentences, fk_grade_facts, fk_grade_conclusion
+        """
+        _pq = _Path(_REPO_ROOT) / "data" / "case_detail.parquet"
+        if not _pq.exists():
+            return pd.DataFrame()
+        df = pd.read_parquet(_pq, columns=["name", "term", "facts_of_the_case", "conclusion"])
+        df = df[df["term"].notna() & (df["term"] >= 1955)].copy()
+
+        def _sentences(text: str) -> int:
+            if not text:
+                return 0
+            return max(1, len(_re.split(r'[.!?]+', text.strip())))
+
+        def _syllables(word: str) -> int:
+            word = word.lower().strip(".,;:!?\"'")
+            if not word:
+                return 0
+            count = len(_re.findall(r'[aeiou]+', word))
+            if word.endswith("e") and count > 1:
+                count -= 1
+            return max(1, count)
+
+        def _fk_grade(text: str) -> float | None:
+            if not text or len(text) < 30:
+                return None
+            words = _re.findall(r'\b[a-zA-Z]+\b', text)
+            if not words:
+                return None
+            sents = _sentences(text)
+            sylls = sum(_syllables(w) for w in words)
+            # Flesch-Kincaid Grade Level
+            return round(0.39 * (len(words) / sents) + 11.8 * (sylls / len(words)) - 15.59, 1)
+
+        rows = []
+        for _, row in df.iterrows():
+            facts = row.get("facts_of_the_case") or ""
+            conc  = row.get("conclusion") or ""
+            rows.append({
+                "term":               int(row["term"]),
+                "name":               row["name"],
+                "facts_len":          len(facts),
+                "conclusion_len":     len(conc),
+                "facts_words":        len(facts.split()) if facts else 0,
+                "conclusion_words":   len(conc.split()) if conc else 0,
+                "fk_grade_facts":     _fk_grade(facts),
+                "fk_grade_conclusion":_fk_grade(conc),
+            })
+        return pd.DataFrame(rows)
+
+    with st.spinner("Computing text analytics…"):
+        txt_df = _load_opinion_text_stats()
+
+    if txt_df.empty:
+        st.warning("No case detail data available.")
+    else:
+        # Filter controls
+        col_era1, col_era2 = st.columns(2)
+        with col_era1:
+            min_term_t = int(txt_df["term"].min())
+            max_term_t = int(txt_df["term"].max())
+            term_range_t = st.slider(
+                "Term range", min_term_t, max_term_t,
+                (max(min_term_t, max_term_t - 40), max_term_t),
+                key="text_term_range"
+            )
+        with col_era2:
+            text_field = st.selectbox(
+                "Text field", ["Facts of the Case", "Conclusion", "Combined"],
+                key="text_field_sel"
+            )
+
+        mask_t = txt_df["term"].between(*term_range_t)
+        filt_t = txt_df[mask_t].copy()
+
+        # Choose column based on selection
+        if text_field == "Facts of the Case":
+            len_col, wc_col, fk_col = "facts_len", "facts_words", "fk_grade_facts"
+        elif text_field == "Conclusion":
+            len_col, wc_col, fk_col = "conclusion_len", "conclusion_words", "fk_grade_conclusion"
+        else:
+            filt_t["combined_len"]   = filt_t["facts_len"] + filt_t["conclusion_len"]
+            filt_t["combined_words"] = filt_t["facts_words"] + filt_t["conclusion_words"]
+            filt_t["combined_fk"] = filt_t[["fk_grade_facts","fk_grade_conclusion"]].mean(axis=1)
+            len_col, wc_col, fk_col = "combined_len", "combined_words", "combined_fk"
+
+        # Annual aggregation
+        agg_t = filt_t.groupby("term").agg(
+            avg_words=(wc_col, "mean"),
+            avg_fk=(fk_col, "mean"),
+            case_count=("name", "count"),
+        ).reset_index()
+        agg_t = agg_t[agg_t["case_count"] >= 3]   # skip sparse terms
+
+        # Summary metrics
+        cm1, cm2, cm3, cm4 = st.columns(4)
+        cm1.metric("Cases analyzed", f"{filt_t['name'].count():,}")
+        cm2.metric("Avg word count", f"{filt_t[wc_col].mean():.0f}")
+        cm3.metric("Avg FK grade", f"{filt_t[fk_col].mean():.1f}" if filt_t[fk_col].notna().any() else "N/A")
+        cm4.metric("Term range", f"{term_range_t[0]}–{term_range_t[1]}")
+        st.caption("FK Grade = Flesch-Kincaid Grade Level (higher = harder to read; college ≈ 13+)")
+
+        st.divider()
+        sub_wc, sub_fk, sub_dist = st.tabs(["📏 Length Trend", "📖 Readability Trend", "📊 Distribution"])
+
+        with sub_wc:
+            fig_wc = go.Figure()
+            fig_wc.add_trace(go.Scatter(
+                x=agg_t["term"], y=agg_t["avg_words"].round(0),
+                mode="lines+markers", name="Avg word count",
+                line=dict(color="#3498DB", width=2),
+                marker=dict(size=5),
+                hovertemplate="Term %{x}: %{y:.0f} words<extra></extra>",
+            ))
+            # Trend line
+            if len(agg_t) >= 4:
+                import numpy as _np
+                z = _np.polyfit(agg_t["term"], agg_t["avg_words"], 1)
+                trend = _np.poly1d(z)(agg_t["term"])
+                fig_wc.add_trace(go.Scatter(
+                    x=agg_t["term"], y=trend.round(0),
+                    mode="lines", name="Trend",
+                    line=dict(color="#E74C3C", dash="dash", width=1.5),
+                ))
+            fig_wc.update_layout(
+                title=f"Average Word Count per Case — {text_field}",
+                xaxis_title="Term", yaxis_title="Words",
+                height=360, plot_bgcolor="white", paper_bgcolor="white",
+                legend=dict(orientation="h", y=1.08),
+            )
+            st.plotly_chart(fig_wc, )
+            st.caption("Based on Oyez case detail summaries (not full opinions).")
+
+        with sub_fk:
+            fk_agg = agg_t[agg_t["avg_fk"].notna()]
+            if fk_agg.empty:
+                st.info("Not enough data for readability trend.")
+            else:
+                fig_fk = go.Figure()
+                fig_fk.add_trace(go.Scatter(
+                    x=fk_agg["term"], y=fk_agg["avg_fk"].round(2),
+                    mode="lines+markers", name="Avg FK Grade",
+                    line=dict(color="#9B59B6", width=2),
+                    marker=dict(size=5),
+                    hovertemplate="Term %{x}: FK %{y:.1f}<extra></extra>",
+                ))
+                # Grade bands
+                fig_fk.add_hrect(y0=13, y1=20, fillcolor="#FDE8D8", opacity=0.3,
+                                  annotation_text="College+", annotation_position="right")
+                fig_fk.add_hrect(y0=10, y1=13, fillcolor="#D5F5E3", opacity=0.3,
+                                  annotation_text="High School", annotation_position="right")
+                fig_fk.update_layout(
+                    title=f"Average Flesch-Kincaid Grade Level — {text_field}",
+                    xaxis_title="Term", yaxis_title="FK Grade Level",
+                    height=360, plot_bgcolor="white", paper_bgcolor="white",
+                )
+                st.plotly_chart(fig_fk, )
+                st.caption("Higher FK grade = more complex text. College-level ≈ grade 13+.")
+
+        with sub_dist:
+            notnull_wc = filt_t[wc_col][filt_t[wc_col] > 0]
+            fig_dist = go.Figure()
+            fig_dist.add_trace(go.Histogram(
+                x=notnull_wc,
+                nbinsx=40,
+                marker_color="#3498DB", opacity=0.75,
+                name="Word count",
+            ))
+            fig_dist.update_layout(
+                title=f"Distribution of Case Text Length — {text_field}",
+                xaxis_title="Words", yaxis_title="Cases",
+                height=320, plot_bgcolor="white", paper_bgcolor="white",
+            )
+            st.plotly_chart(fig_dist, )
+

@@ -10,7 +10,8 @@ import requests
 import time
 import datetime
 from collections import defaultdict
-
+from utils.local_data import infer_issue_area, infer_disposition
+from utils.oyez_api import get_case_detail, get_cases_by_term
 
 from utils import add_sidebar_logo
 add_sidebar_logo()
@@ -22,11 +23,7 @@ CURRENT_YEAR = datetime.date.today().year
 # ── Shared fetch ──────────────────────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
 def _ch_fetch_cases_term(term: int) -> list[dict]:
-    try:
-        r = requests.get(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0",
-                         headers=HEADERS, timeout=10)
-        r.raise_for_status(); return r.json()
-    except Exception: return []
+    return get_cases_by_term(term)
 
 # ── Court Composition data ────────────────────────────────────────────────────
 JUSTICES = [
@@ -138,13 +135,16 @@ def _ch_load_era_data(start: int, end: int) -> pd.DataFrame:
     for term in range(start, end+1):
         cases = _ch_fetch_cases_term(term)
         for c in cases:
-            ia = c.get("issue_area"); d = c.get("disposition")
+            href = c.get("href") or ""
+            detail = get_case_detail(href) if href else None
+            issue_area = infer_issue_area(detail or c)
+            disposition = infer_disposition(detail or c)
             rows.append({
-                "Term": term, "Case": c.get("name",""),
-                "Issue Area": ia.get("label","Unknown") if isinstance(ia,dict) else str(ia or "Unknown"),
-                "Disposition": d.get("label","Unknown") if isinstance(d,dict) else str(d or "Unknown"),
+                "Term": term,
+                "Case": c.get("name", ""),
+                "Issue Area": issue_area,
+                "Disposition": disposition,
             })
-        time.sleep(0.03)
     return pd.DataFrame(rows)
 
 # ── Confirmation data ──────────────────────────────────────────────────────────

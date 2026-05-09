@@ -11,6 +11,7 @@ import time
 import datetime
 from collections import defaultdict
 from utils.local_data import fetch_oyez
+from utils.oyez_api import get_cases_by_term, get_case_detail
 
 
 from utils import add_sidebar_logo
@@ -95,13 +96,11 @@ def _normalize_justice_name(name: str) -> str:
 # ── Fetch helpers ─────────────────────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
 def _pl_fetch_cases_term(term: int) -> list[dict]:
-    data = fetch_oyez(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=300&page=0")
-    return data if isinstance(data, list) else []
+    return get_cases_by_term(term)
 
 @st.cache_data(show_spinner=False)
 def _pl_fetch_detail(href: str) -> dict | None:
-    data = fetch_oyez(href)
-    return data if isinstance(data, dict) else None
+    return get_case_detail(href)
 
 @st.cache_data(show_spinner=False)
 def _pl_load_term_details(term: int) -> dict:

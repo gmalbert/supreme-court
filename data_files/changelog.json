@@ -1,0 +1,19 @@
+{
+  "last_updated": "2026-05-06",
+  "files": {
+    "cases_by_term.parquet": {
+      "rows": 8251,
+      "terms": 71,
+      "updated": "2026-05-06"
+    },
+    "case_detail.parquet": {
+      "rows": 8238,
+      "updated": "2026-05-06"
+    },
+    "date_index.json": {
+      "date_keys": 226,
+      "total_entries": 5638,
+      "updated": "2026-05-06"
+    }
+  }
+}

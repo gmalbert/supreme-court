@@ -1,4 +1,4 @@
-﻿import sys
+import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
@@ -14,9 +14,11 @@ from collections import defaultdict
 from utils.oyez_api import search_cases, get_case_detail, get_cases_by_term, get_recent_terms, extract_court_journey
 from utils.charts import build_journey_diagram, build_voting_chart, build_issue_area_chart, build_decision_trend_chart
 from utils.local_data import strip_html, safe_md, fetch_oyez, infer_issue_area
+from utils.export import csv_download_button
+from utils.text_search import search as text_search, is_available as text_search_available
 
 
-from utils import add_sidebar_logo
+from utils import add_sidebar_logo, watchlist_button
 add_sidebar_logo()
 
 HEADERS   = {"Accept": "application/json", "User-Agent": "SCOTUS-Visualizer/1.0"}
@@ -28,28 +30,78 @@ CURRENT_TERM = TODAY.year if TODAY.month >= 10 else TODAY.year - 1
 # ── Shared fetch helpers ──────────────────────────────────────────────────────
 @st.cache_data(show_spinner=False, ttl=3600)
 def _fetch_cases_term(term: int) -> list[dict]:
-    data = fetch_oyez(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=300&page=0")
-    return data if isinstance(data, list) else []
+    return get_cases_by_term(term)
 
 @st.cache_data(show_spinner=False, ttl=3600)
 def _fetch_detail(href: str) -> dict | None:
-    data = fetch_oyez(href)
-    return data if isinstance(data, dict) else None
+    from utils.oyez_api import get_case_detail
+    return get_case_detail(href)
+
+@st.cache_data(show_spinner=False)
+def _build_issue_area_index() -> dict[str, list[dict]]:
+    """Build {issue_area: [{name, href, term, docket_number}]} from cases_by_term parquet."""
+    try:
+        _df = pd.read_parquet(
+            os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "cases_by_term.parquet"),
+            columns=["name", "href", "term", "docket_number", "question", "description"],
+        )
+    except Exception:
+        return {}
+    index: dict[str, list[dict]] = {}
+    for row in _df.itertuples(index=False):
+        _q = row.question if isinstance(row.question, str) else ""
+        _d = row.description if isinstance(row.description, str) else ""
+        area = infer_issue_area({"question": _q, "description": _d})
+        entry = {"name": row.name, "href": row.href, "term": row.term, "docket_number": row.docket_number}
+        index.setdefault(area, []).append(entry)
+    return index
 
 # ── Page ─────────────────────────────────────────────────────────────────────
 st.title("⚖️ Cases")
-tab_search, tab_timeline, tab_oral, tab_calendar = st.tabs([
-    "🔍 Search Cases", "📅 Timeline Browser", "🎙️ Oral Arguments", "🗓️ Term Calendar"
-])
+
+# If navigated from home search box, auto-run the search before rendering tabs
+if st.session_state.get("_home_trigger_search") and st.session_state.get("desc_query"):
+    _auto_query = st.session_state["desc_query"]
+    _auto_n     = st.session_state.pop("_home_desc_n_val", 8) or 8
+    st.session_state.pop("_home_trigger_search", None)
+    with st.spinner("Searching 8,000+ cases…"):
+        _auto_results = text_search(_auto_query, top_k=_auto_n)
+    st.session_state["desc_results"] = _auto_results
+    st.session_state.pop("desc_selected_href", None)
+
+# If there are description search results in session state, lead with that tab
+# so it stays active across reruns (e.g. when clicking View on a result).
+_show_desc_first = bool(st.session_state.get("desc_results"))
+
+if _show_desc_first:
+    tab_describe, tab_search, tab_timeline, tab_oral, tab_calendar = st.tabs([
+        "💬 Find by Description", "🔍 Search Cases", "📅 Timeline Browser", "🎙️ Oral Arguments", "🗓️ Term Calendar"
+    ])
+else:
+    tab_search, tab_describe, tab_timeline, tab_oral, tab_calendar = st.tabs([
+        "🔍 Search Cases", "💬 Find by Description", "📅 Timeline Browser", "🎙️ Oral Arguments", "🗓️ Term Calendar"
+    ])
 
 # ──────────────────────────────────────────────────────────────────────────────
 # TAB 1: SEARCH CASES
 # ──────────────────────────────────────────────────────────────────────────────
 with tab_search:
     st.markdown("Search by case name across recent terms (2000–present).")
+    # ── URL deep-link: read ?q= and ?case= on first load ─────────────────────
+    _qp = st.query_params
+    if "q" in _qp and "search_query" not in st.session_state:
+        st.session_state["search_query"] = _qp["q"]
+    # Pre-populate from Today-in-History "Explore" button (uses session state handoff)
+    if "_today_case_query" in st.session_state:
+        st.session_state["search_query"] = st.session_state.pop("_today_case_query")
     query = st.text_input("Enter case name or keyword",
                           placeholder="e.g. Roe, Citizens United, Obergefell",
                           key="search_query")
+    # Keep ?q= in sync with the current query
+    if query:
+        st.query_params["q"] = query
+    else:
+        st.query_params.clear()
 
     if query and len(query) >= 3:
         with st.spinner(f'Searching for "{query}"...'):
@@ -60,7 +112,10 @@ with tab_search:
         else:
             st.success(f"Found {len(results)} matching case(s).")
             case_names = sorted([c.get("name", "Unknown") for c in results])
-            selected = st.selectbox("Select a case to view", case_names, key="search_sel")
+            # Pre-select from ?case= URL param if present
+            _case_param = _qp.get("case", "")
+            _default_idx = case_names.index(_case_param) if _case_param in case_names else 0
+            selected = st.selectbox("Select a case to view", case_names, index=_default_idx, key="search_sel")
             selected_case = next((c for c in results if c.get("name") == selected), None)
 
             if selected_case:
@@ -72,6 +127,14 @@ with tab_search:
                     st.warning("Could not load case details.")
                 else:
                     st.subheader(detail.get("name", selected))
+                    # Write ?case= so this exact case is shareable via URL
+                    st.query_params["case"] = selected
+                    _base_url = os.environ.get("STREAMLIT_SERVER_BASE_URL_PATH", "")
+                    st.caption(f"🔗 Shareable URL: `?q={query.replace(' ', '+')}&case={selected.replace(' ', '+')}`")
+                    # Watchlist bookmark
+                    _api_href_ts = detail.get("href", "")
+                    _oyez_url_ts = _api_href_ts.replace("https://api.oyez.org/", "https://www.oyez.org/") if _api_href_ts else ""
+                    watchlist_button(selected, oyez_url=_oyez_url_ts, key_suffix="tab_search")
                     col1, col2 = st.columns([2, 1])
                     with col1:
                         desc = detail.get("description") or detail.get("facts_of_the_case", "")
@@ -82,6 +145,10 @@ with tab_search:
                         if q:
                             with st.expander("Legal Question"):
                                 st.write(safe_md(q))
+                        holding = strip_html(detail.get("conclusion") or "")
+                        if holding:
+                            with st.expander("⚖️ Holding"):
+                                st.write(safe_md(holding))
                     with col2:
                         st.markdown("**Metadata**")
                         st.markdown(f"- **Docket:** {detail.get('docket_number', 'N/A')}")
@@ -107,30 +174,206 @@ with tab_search:
                             steps[-1]["decision"] = detail["disposition"].get("label", "")
                         fig = build_journey_diagram(steps, detail.get("name", selected))
                         if fig:
-                            st.plotly_chart(fig)
+                            st.plotly_chart(fig, )
                     else:
                         st.info("Journey data not available for this case.")
 
-                    st.subheader("⚖️ Justice Votes")
-                    justices = []
                     _decs = detail.get("decisions") or []
-                    if _decs:
-                        def _dc(d): return sum(1 for v in (d.get("votes") or []) if (v.get("vote") or "").lower() in ("dissent", "minority"))
-                        _, _primary = max(enumerate(_decs), key=lambda x: (_dc(x[1]), len(x[1].get("votes") or []), x[0]))
-                        for vote in (_primary.get("votes") or []):
+                    _decs_with_votes = [d for d in _decs if d.get("votes")]
+                    if _decs_with_votes:
+                        _first_votes = _decs_with_votes[0].get("votes") or []
+                        _maj = sum(1 for v in _first_votes if (v.get("vote") or "").lower() in ("majority", "concurrence"))
+                        _dis = sum(1 for v in _first_votes if (v.get("vote") or "").lower() in ("dissent", "minority"))
+                        _vote_label = f" &mdash; {_maj}&ndash;{_dis}" if _maj + _dis > 0 else ""
+                        st.subheader(f"⚖️ Justice Votes{_vote_label}")
+                    else:
+                        st.subheader("⚖️ Justice Votes")
+                    if _decs_with_votes:
+                        if len(_decs_with_votes) > 1:
+                            _dec_labels = []
+                            for i, d in enumerate(_decs_with_votes):
+                                _desc = (d.get("description") or "").strip()
+                                _label = _desc if _desc else f"Question {i + 1}"
+                                _dec_labels.append(_label)
+                            _sel_label = st.selectbox(
+                                "Decision / Question",
+                                _dec_labels,
+                                key=f"dec_sel_{selected}",
+                            )
+                            _sel_dec = _decs_with_votes[_dec_labels.index(_sel_label)]
+                        else:
+                            _sel_dec = _decs_with_votes[0]
+                        justices = []
+                        for vote in (_sel_dec.get("votes") or []):
                             member = vote.get("member", {}) or {}
                             justices.append({"name": member.get("name", "Unknown"), "vote": vote.get("vote", "")})
-                    if justices:
                         fig2 = build_voting_chart(justices)
                         if fig2:
-                            st.plotly_chart(fig2)
+                            st.plotly_chart(fig2, )
                     else:
                         st.info("Voting data not available for this case.")
     elif query:
         st.info("Please enter at least 3 characters to search.")
 
 # ──────────────────────────────────────────────────────────────────────────────
-# TAB 2: TIMELINE BROWSER
+# TAB 2: FIND BY DESCRIPTION (TF-IDF semantic search)
+# ──────────────────────────────────────────────────────────────────────────────
+with tab_describe:
+    if not text_search_available():
+        st.warning("Semantic search is not available. Ensure `data/case_detail.parquet` exists and scikit-learn is installed.")
+    else:
+        # ── Search bar (full width) ───────────────────────────────────────────
+        desc_query = st.text_area(
+            "Describe a legal situation in plain language",
+            placeholder=(
+                "e.g. police searched a suspect's cell phone without a warrant\n"
+                "e.g. government required a license to display a religious symbol\n"
+                "e.g. employer fired a worker for union organizing activity"
+            ),
+            height=100,
+            key="desc_query",
+        )
+        col_ds1, col_ds2 = st.columns([1, 5])
+        with col_ds1:
+            n_results = st.slider("Results", 3, 20, 8, key="desc_n")
+        with col_ds2:
+            desc_btn = st.button("🔍 Find Cases", type="primary", key="desc_btn")
+
+        if desc_btn and desc_query and len(desc_query.strip()) >= 10:
+            with st.spinner("Searching 8,000+ cases…"):
+                desc_results = text_search(desc_query, top_k=n_results)
+            st.session_state["desc_results"] = desc_results
+            st.session_state.pop("desc_selected_href", None)
+
+        if "desc_results" in st.session_state:
+            desc_results = st.session_state["desc_results"]
+            if not desc_results:
+                st.warning("No matching cases found. Try rephrasing your description.")
+            else:
+                # ── Two-column layout: list left, detail right ────────────
+                col_list, col_detail = st.columns([2, 3], gap="large")
+
+                with col_list:
+                    st.markdown(f"**{len(desc_results)} result(s)** — click a case to read it")
+                    for rank, res in enumerate(desc_results, 1):
+                        sel_href = st.session_state.get("desc_selected_href", "")
+                        is_selected = sel_href == res.get("href", "")
+                        border_color = "#1f77b4" if is_selected else None
+                        with st.container(border=True):
+                            if is_selected:
+                                st.markdown(
+                                    "<div style='position:absolute;width:4px;background:#1f77b4;"
+                                    "top:0;left:0;bottom:0;border-radius:4px 0 0 4px'></div>",
+                                    unsafe_allow_html=True,
+                                )
+                            btn_label = "✅ Selected" if is_selected else "View →"
+                            btn_type = "primary" if is_selected else "secondary"
+                            st.markdown(f"**{rank}. {res['name']}**")
+                            st.caption(f"{res['term']} term · score {res['score']:.3f}")
+                            if st.button(btn_label, key=f"desc_view_{rank}", type=btn_type):
+                                st.session_state["desc_selected_href"] = res.get("href", "")
+                                st.rerun()
+
+                with col_detail:
+                    def _str(v):
+                        return v if isinstance(v, str) else ""
+
+                    sel_href = st.session_state.get("desc_selected_href", "")
+                    if not sel_href:
+                        st.markdown(
+                            "<div style='height:200px;display:flex;align-items:center;"
+                            "justify-content:center;border:2px dashed #ccc;border-radius:8px;"
+                            "color:#888;font-size:1.1em;'>← Select a case to read it</div>",
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        with st.spinner("Loading…"):
+                            detail = get_case_detail(sel_href)
+                        if not detail:
+                            st.warning("Could not load case details.")
+                        else:
+                            st.subheader(detail.get("name", ""))
+
+                            # Metadata pills row
+                            _dec_d = (detail.get("decisions") or [{}])[0]
+                            _disp_d = (_dec_d.get("decision_type") or "").strip().title()
+                            _wp = (_dec_d.get("winning_party") or "").strip()
+                            decided_by = detail.get("decided_by") or {}
+                            meta_parts = [f"📅 **{detail.get('term', 'N/A')} term**"]
+                            if detail.get("docket_number"):
+                                meta_parts.append(f"No. {detail['docket_number']}")
+                            if _disp_d:
+                                meta_parts.append(f"_{_disp_d}_")
+                            if _wp:
+                                meta_parts.append(f"Winner: **{_wp}**")
+                            st.markdown(" &nbsp;·&nbsp; ".join(meta_parts))
+                            if decided_by.get("name"):
+                                st.caption(f"Decided by: {decided_by['name']}")
+                            # Links
+                            _api_href = detail.get("href", "")
+                            _oyez_url = _api_href.replace("https://api.oyez.org/", "https://www.oyez.org/") if _api_href else ""
+                            _links = []
+                            if _oyez_url:
+                                _links.append(f"[Oyez case page ↗]({_oyez_url})")
+                            if detail.get("justia_url"):
+                                _links.append(f"[Justia opinion ↗]({detail['justia_url']})")
+                            if _links:
+                                st.markdown(" &nbsp;·&nbsp; ".join(_links))
+                            watchlist_button(detail.get("name", ""), oyez_url=_oyez_url, key_suffix="tab_describe")
+                            st.divider()
+
+                            desc_txt = _str(detail.get("description")) or _str(detail.get("facts_of_the_case"))
+                            if desc_txt:
+                                with st.expander("📋 Background & Facts", expanded=True):
+                                    st.write(safe_md(desc_txt))
+                            q_txt = _str(detail.get("question"))
+                            if q_txt:
+                                with st.expander("❓ Legal Question", expanded=True):
+                                    st.write(safe_md(q_txt))
+                            conc_txt = _str(detail.get("conclusion"))
+                            if conc_txt:
+                                with st.expander("⚖️ Conclusion"):
+                                    st.write(safe_md(conc_txt))
+
+                            # Voting chart
+                            _decs = detail.get("decisions") or []
+                            _decs_wv = [d for d in _decs if d.get("votes")]
+                            if _decs_wv:
+                                justices_d = [
+                                    {"name": (v.get("member") or {}).get("name", "Unknown"), "vote": v.get("vote", "")}
+                                    for v in (_decs_wv[0].get("votes") or [])
+                                ]
+                                fig_v = build_voting_chart(justices_d)
+                                if fig_v:
+                                    st.plotly_chart(fig_v)
+
+                            # Related cases panel
+                            _cur_issue = infer_issue_area({
+                                "question": _str(detail.get("question")),
+                                "description": _str(detail.get("description")),
+                            })
+                            _issue_idx = _build_issue_area_index()
+                            _related = [
+                                c for c in _issue_idx.get(_cur_issue, [])
+                                if c.get("href") != sel_href
+                            ]
+                            if _related:
+                                import random as _random
+                                _sample = _random.sample(_related, min(5, len(_related)))
+                                with st.expander(f"🔗 Related cases — {_cur_issue}"):
+                                    for _rc in _sample:
+                                        _rc_oyez = (_rc.get("href") or "").replace(
+                                            "https://api.oyez.org/", "https://www.oyez.org/"
+                                        )
+                                        _rc_label = f"{_rc['name']} ({_rc.get('term', '')})"
+                                        if _rc_oyez:
+                                            st.markdown(f"- [{_rc_label}]({_rc_oyez})")
+
+        elif desc_query and len(desc_query.strip()) < 10:
+            st.info("Enter at least 10 characters for a meaningful search.")
+
+# ──────────────────────────────────────────────────────────────────────────────
+# TAB 3: TIMELINE BROWSER
 # ──────────────────────────────────────────────────────────────────────────────
 with tab_timeline:
     st.markdown("Browse Supreme Court cases across terms and explore trends.")
@@ -181,6 +424,7 @@ with tab_timeline:
             if issue_filter:
                 df = df[df["Issue Area"].isin(issue_filter)]
             st.dataframe(df, height=400, hide_index=True)
+            csv_download_button(df, filename=f"scotus_timeline_{start_term}_{end_term}.csv", key="csv_timeline")
             st.caption(f"Showing {len(df)} cases across {len(cases_by_term)} term(s).")
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -223,6 +467,10 @@ with tab_oral:
                     if question:
                         with st.expander("Legal Question"):
                             st.write(safe_md(question))
+                    oa_holding = strip_html(oa_detail.get("conclusion") or "")
+                    if oa_holding:
+                        with st.expander("⚖️ Holding"):
+                            st.write(safe_md(oa_holding))
                 with col_side:
                     decided_by = oa_detail.get("decided_by") or {}
                     _dec_oa = (oa_detail.get("decisions") or [{}])[0]
@@ -313,17 +561,7 @@ with tab_calendar:
     cal_term = st.selectbox("Select Term", cal_terms, format_func=lambda t: f"{t}–{t+1} Term", key="cal_term")
 
     with st.spinner(f"Loading {cal_term}–{cal_term+1} term docket…"):
-        # Recent two terms: always fetch live for up-to-date statuses
-        if cal_term >= CURRENT_TERM - 1:
-            try:
-                _live = requests.get(
-                    f"{OYEZ_BASE}/cases?filter=term:{cal_term}&per_page=300&page=0",
-                    headers=HEADERS, timeout=15)
-                cal_summary = _live.json() if _live.ok and isinstance(_live.json(), list) else []
-            except Exception:
-                cal_summary = _fetch_cases_term(cal_term)
-        else:
-            cal_summary = _fetch_cases_term(cal_term)
+        cal_summary = _fetch_cases_term(cal_term)
 
     if not cal_summary:
         st.error("Could not load cases for this term.")
@@ -494,3 +732,5 @@ with tab_calendar:
                                         xaxis_tickangle=-35, height=400, plot_bgcolor="white", paper_bgcolor="white",
                                         legend=dict(x=1.01, y=1))
             st.plotly_chart(fig_issue_cal)
+
+

@@ -1,6 +1,3 @@
-[app]
-name = "Supreme Scrutiny"
-
 [server]
 
 enableCORS = false

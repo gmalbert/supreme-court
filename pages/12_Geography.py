@@ -6,18 +6,15 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
-import requests
-import time
 import datetime
+import json
 from collections import defaultdict
-
 
 from utils import add_sidebar_logo
 add_sidebar_logo()
 
-HEADERS      = {"Accept": "application/json", "User-Agent": "SCOTUS-Visualizer/1.0"}
-OYEZ_BASE    = "https://api.oyez.org"
 CURRENT_YEAR = datetime.date.today().year
+_REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # ── State mapping helpers ──────────────────────────────────────────────────────
 STATE_ABBREV = {
@@ -54,76 +51,88 @@ def _classify_disposition_geo(label: str) -> str:
     return "Other"
 
 @st.cache_data(show_spinner=False)
-def _geo_fetch_term(term: int) -> list[dict]:
-    try:
-        r = requests.get(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0",
-                         headers=HEADERS, timeout=10)
-        r.raise_for_status(); return r.json()
-    except Exception: return []
+def _load_circuit_stats() -> pd.DataFrame:
+    path = os.path.join(_REPO, "data_files", "circuit_stats.parquet")
+    return pd.read_parquet(path)
 
 @st.cache_data(show_spinner=False)
-def _geo_fetch_detail(href: str) -> dict | None:
-    try:
-        r = requests.get(href, headers=HEADERS, timeout=10)
-        r.raise_for_status(); return r.json()
-    except Exception: return None
+def _load_case_detail() -> pd.DataFrame:
+    path = os.path.join(_REPO, "data", "case_detail.parquet")
+    return pd.read_parquet(path, columns=["name", "term", "decisions"])
 
 @st.cache_data(show_spinner=False, ttl=3600)
 def _geo_load_state_data(terms: tuple) -> list[dict]:
+    """Return state-level SCOTUS data from local circuit_stats parquet — no API calls."""
+    df = _load_circuit_stats()
+    terms_str = [str(t) for t in terms]
+    df = df[df["term"].astype(str).isin(terms_str)]
+
     rows = []
-    for term in terms:
-        cases = _geo_fetch_term(term)
-        for c in cases:
-            href = c.get("href","")
-            if not href: continue
-            detail = _geo_fetch_detail(href)
-            if not detail: continue
-            lower = detail.get("lower_court") or {}
-            lc_name = lower.get("name","") if isinstance(lower,dict) else str(lower)
-            state = _extract_state(lc_name)
-            if not state: continue
-            disp  = detail.get("disposition") or {}
-            disp_label = disp.get("label","") if isinstance(disp,dict) else str(disp)
-            ia    = detail.get("issue_area") or {}
-            issue = ia.get("label","Unknown") if isinstance(ia,dict) else str(ia or "Unknown")
-            rows.append({
-                "term": term, "state": state, "abbrev": STATE_ABBREV.get(state,state),
-                "case": detail.get("name",""), "lower_court": lc_name,
-                "disposition": disp_label, "outcome": _classify_disposition_geo(disp_label),
-                "issue_area": issue,
-            })
-        time.sleep(0.03)
+    for _, row in df.iterrows():
+        lc = row.get("lower_court", "") or ""
+        state = _extract_state(lc)
+        if not state:
+            continue
+        rows.append({
+            "term": int(row["term"]) if str(row["term"]).isdigit() else row["term"],
+            "state": state,
+            "abbrev": STATE_ABBREV.get(state, state),
+            "case": row.get("name", ""),
+            "lower_court": lc,
+            "outcome": row.get("outcome", "Unknown"),
+            "issue_area": row.get("issue_area", "Unknown"),
+            "disposition": row.get("outcome", ""),
+        })
     return rows
 
 @st.cache_data(show_spinner=False, ttl=1800)
 def _geo_load_term_data(term: int) -> list[dict]:
+    """Load term data from local parquets — no API calls."""
+    cs = _load_circuit_stats()
+    term_str = str(term)
+    cs_term = cs[cs["term"].astype(str) == term_str]
+
+    # Build issue_area / disposition from circuit_stats
+    name_to_ia: dict[str, str] = {}
+    name_to_disp: dict[str, str] = {}
+    for _, r in cs_term.iterrows():
+        name_to_ia[r["name"]] = r.get("issue_area", "Unknown")
+        name_to_disp[r["name"]] = r.get("outcome", "")
+
+    # Get vote splits from case_detail
+    cd = _load_case_detail()
+    cd_term = cd[cd["term"].astype(str) == term_str]
+
     rows = []
-    cases = _geo_fetch_term(term)
-    for c in cases:
-        href = c.get("href","")
-        if not href: continue
-        detail = _geo_fetch_detail(href)
-        if not detail: continue
-        ia = detail.get("issue_area") or {}
-        issue = ia.get("label","Unknown") if isinstance(ia,dict) else str(ia or "Unknown")
-        disp  = detail.get("disposition") or {}
-        disp_label = disp.get("label","") if isinstance(disp,dict) else str(disp)
-        decisions = detail.get("decisions") or []
-        vote_splits = []
-        for dec in decisions:
+    for _, row in cd_term.iterrows():
+        case_name = row.get("name", "")
+        decs_raw = row.get("decisions")
+        split = ""
+        margin = None
+        if isinstance(decs_raw, str):
+            try:
+                decs_raw = json.loads(decs_raw)
+            except Exception:
+                decs_raw = []
+        for dec in (decs_raw if isinstance(decs_raw, list) else []):
             votes = dec.get("votes") or []
-            maj = sum(1 for v in votes if (v.get("vote") or "").lower() in ("majority","concurrence"))
+            maj = sum(1 for v in votes if (v.get("vote") or "").lower() in ("majority", "concurrence", "concurring in judgment"))
             dis = sum(1 for v in votes if (v.get("vote") or "").lower() == "dissent")
-            if maj + dis >= 7: vote_splits.append(f"{maj}-{dis}")
-        split = vote_splits[0] if vote_splits else ""
-        margin = int(split.split("-")[0]) - int(split.split("-")[1]) if split and "-" in split else None
+            if maj + dis >= 5:
+                split = f"{maj}-{dis}"
+                margin = maj - dis
+                break
+
+        ia = name_to_ia.get(case_name, "Unknown")
+        disp = name_to_disp.get(case_name, "")
         rows.append({
-            "case": detail.get("name",""),
-            "issue_area": issue, "disposition": disp_label,
-            "vote_split": split, "margin": margin,
-            "decided_on": detail.get("decided_on",""),
+            "case": case_name,
+            "issue_area": ia,
+            "disposition": disp,
+            "vote_split": split,
+            "margin": margin,
+            "decided_on": "",
         })
-        time.sleep(0.02)
     return rows
 
 # ── Page ─────────────────────────────────────────────────────────────────────
@@ -227,8 +236,10 @@ with tab_state:
             d1.metric("Cases Reviewed",len(state_drill_df))
             d2.metric("Reversed",(state_drill_df["outcome"]=="Reversed/Vacated").sum())
             d3.metric("Affirmed",(state_drill_df["outcome"]=="Affirmed").sum())
-            st.dataframe(state_drill_df[["term","case","lower_court","outcome","issue_area"]]
-                         .sort_values("term",ascending=False),height=300)
+            display_df = (state_drill_df[["term","case","lower_court","outcome","issue_area"]]
+                          .sort_values("term",ascending=False)
+                          .rename(columns={"term":"Term","case":"Case","lower_court":"Lower Court","outcome":"Outcome","issue_area":"Issue Area"}))
+            st.dataframe(display_df,height=300, hide_index=True)
 
 # ──────────────────────────────────────────────────────────────────────────────
 # TAB 2: TERM-TO-TERM COMPARATOR
@@ -346,11 +357,11 @@ with tab_compare:
                 with col_ca_list:
                     st.markdown(f"**{label_a} Cases ({len(df_a)})**")
                     st.dataframe(df_a[["case","issue_area","vote_split","disposition"]].reset_index(drop=True),
-                                 height=400)
+                                 height=400, hide_index=True)
                 with col_cb_list:
                     st.markdown(f"**{label_b} Cases ({len(df_b)})**")
                     st.dataframe(df_b[["case","issue_area","vote_split","disposition"]].reset_index(drop=True),
-                                 height=400)
+                                 height=400, hide_index=True)
 
 # ──────────────────────────────────────────────────────────────────────────────
 # TAB 3: CITATION EXPLORER — Cross-court citations

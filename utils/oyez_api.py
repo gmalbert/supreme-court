@@ -15,7 +15,17 @@ _DETAIL_PARQUET     = os.path.join(_REPO_ROOT, "data", "case_detail.parquet")
 # Load both DataFrames once at import time (0.67 MB + 5.8 MB)
 try:
     _CASES_DF: pd.DataFrame | None = pd.read_parquet(_PARQUET_FILE)
-except Exception:
+except FileNotFoundError:
+    import warnings
+    warnings.warn(
+        f"[oyez_api] cases_by_term.parquet not found at {_PARQUET_FILE}. "
+        "Run scripts/build_cases_parquet.py to rebuild it.",
+        stacklevel=2,
+    )
+    _CASES_DF = None
+except Exception as _e:
+    import warnings
+    warnings.warn(f"[oyez_api] Failed to load cases_by_term.parquet: {_e}", stacklevel=2)
     _CASES_DF = None
 
 try:
@@ -24,7 +34,18 @@ try:
     _DETAIL_IDX: dict = {
         row["href"]: i for i, row in _DETAIL_DF[["href"]].iterrows()
     } if _DETAIL_DF is not None else {}
-except Exception:
+except FileNotFoundError:
+    import warnings
+    warnings.warn(
+        f"[oyez_api] case_detail.parquet not found at {_DETAIL_PARQUET}. "
+        "Run scripts/build_case_detail_parquet.py to rebuild it.",
+        stacklevel=2,
+    )
+    _DETAIL_DF  = None
+    _DETAIL_IDX = {}
+except Exception as _e:
+    import warnings
+    warnings.warn(f"[oyez_api] Failed to load case_detail.parquet: {_e}", stacklevel=2)
     _DETAIL_DF  = None
     _DETAIL_IDX = {}
 

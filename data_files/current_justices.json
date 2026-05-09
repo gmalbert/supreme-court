@@ -1,0 +1,11 @@
+[
+  {"short": "Roberts",   "full": "John G. Roberts",        "lean": "Conservative", "appointed_by": "G.W. Bush",  "year_confirmed": 2005, "seat": "Chief Justice"},
+  {"short": "Thomas",    "full": "Clarence Thomas",         "lean": "Conservative", "appointed_by": "G.H.W. Bush","year_confirmed": 1991, "seat": "Associate"},
+  {"short": "Alito",     "full": "Samuel Alito",            "lean": "Conservative", "appointed_by": "G.W. Bush",  "year_confirmed": 2006, "seat": "Associate"},
+  {"short": "Sotomayor", "full": "Sonia Sotomayor",         "lean": "Liberal",      "appointed_by": "Obama",      "year_confirmed": 2009, "seat": "Associate"},
+  {"short": "Kagan",     "full": "Elena Kagan",             "lean": "Liberal",      "appointed_by": "Obama",      "year_confirmed": 2010, "seat": "Associate"},
+  {"short": "Gorsuch",   "full": "Neil Gorsuch",            "lean": "Conservative", "appointed_by": "Trump",      "year_confirmed": 2017, "seat": "Associate"},
+  {"short": "Kavanaugh", "full": "Brett Kavanaugh",         "lean": "Moderate",     "appointed_by": "Trump",      "year_confirmed": 2018, "seat": "Associate"},
+  {"short": "Barrett",   "full": "Amy Coney Barrett",       "lean": "Conservative", "appointed_by": "Trump",      "year_confirmed": 2020, "seat": "Associate"},
+  {"short": "Jackson",   "full": "Ketanji Brown Jackson",   "lean": "Liberal",      "appointed_by": "Biden",      "year_confirmed": 2022, "seat": "Associate"}
+]

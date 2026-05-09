@@ -11,7 +11,7 @@ import time
 import datetime
 from collections import defaultdict
 from utils.charts import build_journey_diagram, build_voting_chart
-from utils.oyez_api import extract_court_journey
+from utils.oyez_api import extract_court_journey, get_cases_by_term, get_case_detail
 from utils.local_data import strip_html, safe_md, infer_issue_area
 
 
@@ -24,15 +24,11 @@ CURRENT_YEAR = datetime.date.today().year
 
 @st.cache_data(show_spinner=False)
 def _lt_fetch_cases_term(term: int) -> list[dict]:
-    from utils.local_data import fetch_oyez
-    data = fetch_oyez(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=300&page=0")
-    return data if isinstance(data, list) else []
+    return get_cases_by_term(term)
 
 @st.cache_data(show_spinner=False)
 def _lt_fetch_case(href: str) -> dict | None:
-    from utils.local_data import fetch_oyez
-    data = fetch_oyez(href)
-    return data if isinstance(data, dict) else None
+    return get_case_detail(href)
 
 @st.cache_data(show_spinner=False)
 def _lt_load_dispositions() -> dict:
@@ -113,65 +109,6 @@ JUSTICES_RECENT = [
 
 # Conservative bloc reference for alignment scoring
 CONSERVATIVE_BLOC = {"Thomas","Scalia","Rehnquist","Alito","Gorsuch","Barrett"}
-
-@st.cache_data(show_spinner=False)
-def _rs_fetch_cases_term(term: int) -> list[dict]:
-    try:
-        r = requests.get(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0",
-                         headers=HEADERS, timeout=10)
-        r.raise_for_status(); return r.json()
-    except Exception: return []
-
-@st.cache_data(show_spinner=False)
-def _rs_fetch_detail(href: str) -> dict | None:
-    try:
-        r = requests.get(href, headers=HEADERS, timeout=10)
-        r.raise_for_status(); return r.json()
-    except Exception: return None
-
-def _last_name(full: str) -> str:
-    return (full.strip().split()[-1]) if full.strip() else full
-
-@st.cache_data(show_spinner=False, ttl=3600)
-def _rs_load_drift_data(terms: tuple) -> list[dict]:
-    rows = []
-    for term in terms:
-        cases = _rs_fetch_cases_term(term)
-        for c in cases:
-            href = c.get("href","")
-            if not href: continue
-            detail = _rs_fetch_detail(href)
-            if not detail: continue
-            for decision in (detail.get("decisions") or []):
-                votes = decision.get("votes") or []
-                # Get conservative bloc votes for this case
-                cons_votes = {}
-                for vote in votes:
-                    member = vote.get("member") or {}
-                    j_name = _last_name(member.get("name","") if isinstance(member,dict) else "")
-                    if j_name in CONSERVATIVE_BLOC:
-                        cons_votes[j_name] = (vote.get("vote") or "").lower()
-                # Determine majority conservative position
-                cons_majority_vote = None
-                if len(cons_votes) >= 3:
-                    vote_vals = list(cons_votes.values())
-                    if vote_vals.count("majority") + vote_vals.count("concurrence") > len(vote_vals)/2:
-                        cons_majority_vote = "majority"
-                    elif vote_vals.count("dissent") > len(vote_vals)/2:
-                        cons_majority_vote = "dissent"
-                if not cons_majority_vote: continue
-                for vote in votes:
-                    member = vote.get("member") or {}
-                    j_full = member.get("name","") if isinstance(member,dict) else ""
-                    j_name = _last_name(j_full)
-                    v = (vote.get("vote") or "").lower()
-                    if j_name in CONSERVATIVE_BLOC: continue  # skip bloc itself
-                    aligned = (v in ("majority","concurrence") and cons_majority_vote=="majority") or \
-                              (v == "dissent" and cons_majority_vote == "dissent")
-                    rows.append({"term": term, "justice": j_name, "justice_full": j_full,
-                                  "aligned_with_cons": aligned, "vote": v})
-        time.sleep(0.02)
-    return rows
 
 # ── Doctrine Evolution data ────────────────────────────────────────────────────
 DOCTRINES = {
@@ -2194,10 +2131,8 @@ def _page_research():
         st.plotly_chart(fig_sens)
 
 # ── Page ─────────────────────────────────────────────────────────────────────
-_tab_0, _tab_1, _tab_2 = st.tabs(["📚 Legal Topics", "🕸️ Networks", "🔬 Research"])
+_tab_0, _tab_1 = st.tabs(["📚 Legal Topics", "🕸️ Networks"])
 with _tab_0:
     _page_legal_topics()
 with _tab_1:
     _page_networks()
-with _tab_2:
-    _page_research()

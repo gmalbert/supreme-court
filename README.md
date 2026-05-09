@@ -13,16 +13,17 @@ Whether you are a student, a legal researcher, a journalist, or simply a curious
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Home — Case Explorer](#home--case-explorer)
-3. [Cases](#cases)
-4. [People — Justices & Advocates](#people--justices--advocates)
-5. [Analysis](#analysis)
-6. [History](#history)
-7. [Legal Topics](#legal-topics)
-8. [Insights — Presidential Legacy & Predictions](#insights--presidential-legacy--predictions)
-9. [Data Source](#data-source)
-10. [Running the App](#running-the-app)
-11. [Oyez API Data Dictionary](docs/oyez_api_data_dictionary.md)
+2. [Branch Updates](#branch-updates)
+3. [Home — Case Explorer](#home--case-explorer)
+4. [Cases](#cases)
+5. [People — Justices & Advocates](#people--justices--advocates)
+6. [Analysis](#analysis)
+7. [History](#history)
+8. [Legal Topics](#legal-topics)
+9. [Insights — Presidential Legacy & Predictions](#insights--presidential-legacy--predictions)
+10. [Data Source](#data-source)
+11. [Running the App](#running-the-app)
+12. [Oyez API Data Dictionary](docs/oyez_api_data_dictionary.md)
 
 ---
 
@@ -30,7 +31,37 @@ Whether you are a student, a legal researcher, a journalist, or simply a curious
 
 SCOTUS Case Visualizer brings together a broad range of interactive tools in a single application. You can trace how an individual case traveled through the courts, study a justice's voting record across decades, compare how different presidential administrations shaped the bench, explore constitutional amendments and the landmark cases that define them, or even ask the app to predict how a hypothetical new case might be decided.
 
-All data comes live from [Oyez.org](https://www.oyez.org) — one of the most comprehensive free databases of Supreme Court information available to the public — and is automatically cached for faster repeat visits.
+All data is served from local Oyez caches and parquet snapshots — the app still uses Oyez as the source, but pages now read from local data files whenever possible to reduce live API dependence and improve load performance.
+
+## Branch Updates
+
+This branch adds a major offline-first migration and a host of reliability and analysis improvements:
+
+- Migrated all page-level case and detail loading to `utils/oyez_api.py` / local parquet data, removing direct runtime `requests.get(...)` and `time.sleep(...)` from app pages.
+- Added support for local cached data and new prebuilt assets: `data_files/current_justices.json`, `data_files/date_index.json`, `data_files/circuit_reversal_rates.json`, `data_files/changelog.json`, `data_files/advocate_stats.parquet`, and `data_files/circuit_stats.parquet`.
+- Added new utility modules for CSV export, TF-IDF case search, today-in-history lookup, transcript parsing, background batch loading, and optional CourtListener integration.
+- Added build scripts for the date index and circuit reversal rates: `scripts/build_date_index.py` and `scripts/build_circuit_reversal_rates.py`.
+- Added test coverage under `tests/` for data files, local helpers, Oyez API wrappers, text search, and ML predictor utilities.
+- Removed the duplicate `pages/Insights.py` page and simplified `pages/History.py` so Court History no longer duplicates Circuit Courts and Historical Data tabs.
+- Updated the home and navigation flow to be more reliable, with local-first caching and fewer live network dependencies.
+
+**Key new tools in this branch:**
+
+- `utils/export.py` — reusable DataFrame CSV download button
+- `utils/text_search.py` — TF-IDF based semantic case search
+- `utils/today_in_history.py` — Today in SCOTUS History widget support
+- `utils/transcript_parser.py` — oral argument transcript extraction and parsing
+- `utils/background_loader.py` — parallel cached detail loading
+- `utils/courtlistener_api.py` — optional CourtListener / Free Law Project integration
+
+**Page-level changes:**
+
+- Updated the `cases.py`, `pages/1_Cases.py`, `pages/2_Justices.py`, `pages/3_Court_History.py`, `pages/4_Analytics.py`, `pages/5_Circuit_Courts.py`, `pages/6_Legal_Topics.py`, `pages/8_Presidential_Legacy.py`, `pages/9_Predictions.py`, `pages/10_Research.py`, `pages/11_Advocates.py`, `pages/12_Geography.py`, `pages/13_Historical_Data.py`, `pages/Analysis.py`, `pages/History.py`, `pages/People.py`, and `pages/Topics.py` pages to use local cached data flows.
+- Removed the old Insights duplicate page and cleaned up navigation so each section is unique.
+
+**Why it matters:**
+
+This branch makes the app much more stable and responsive by serving data from local caches and precomputed snapshots, while preserving the underlying Oyez data source and enabling richer offline analytics.
 
 **Main sections of the app:**
 

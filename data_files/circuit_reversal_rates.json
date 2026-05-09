@@ -1,0 +1,5832 @@
+{
+  "10th Circuit": {
+    "total": 243,
+    "reversed_vacated": 133,
+    "affirmed": 13,
+    "remanded": 4,
+    "reversal_rate": 0.911,
+    "by_term": {
+      "1955": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1956": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1957": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1958": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "1959": {
+        "total": 4,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1960": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1961": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1962": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1963": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1964": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1965": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1966": {
+        "total": 6,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1967": {
+        "total": 6,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1968": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1969": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "1970": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1971": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1972": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1973": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1974": {
+        "total": 4,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1975": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1976": {
+        "total": 7,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1977": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1978": {
+        "total": 9,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1979": {
+        "total": 6,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "1980": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1981": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1982": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1983": {
+        "total": 6,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1984": {
+        "total": 6,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "1985": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1986": {
+        "total": 4,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1987": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1988": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1989": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1990": {
+        "total": 9,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1991": {
+        "total": 7,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1992": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1993": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1994": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1995": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1996": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1997": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1998": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1999": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2000": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2001": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2002": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2003": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2004": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2005": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2006": {
+        "total": 5,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2007": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2008": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2009": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2011": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2012": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2014": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2015": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2016": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2017": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.3333
+      },
+      "2018": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2019": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2020": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2021": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2022": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2023": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2024": {
+        "total": 4,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2025": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      }
+    },
+    "by_issue_area": {
+      "Administrative Law": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "Civil Rights": {
+        "total": 15,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "Criminal Procedure": {
+        "total": 27,
+        "reversed_vacated": 14,
+        "reversal_rate": 0.6667
+      },
+      "Due Process": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "Economic Activity": {
+        "total": 20,
+        "reversed_vacated": 9,
+        "reversal_rate": 0.8182
+      },
+      "Federal Taxation": {
+        "total": 8,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "Federalism": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "First Amendment": {
+        "total": 9,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.5
+      },
+      "Immigration": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "Judicial Power": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "Labor & Unions": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "Privacy": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "Unknown": {
+        "total": 141,
+        "reversed_vacated": 83,
+        "reversal_rate": 0.9881
+      }
+    }
+  },
+  "11th Circuit": {
+    "total": 232,
+    "reversed_vacated": 123,
+    "affirmed": 27,
+    "remanded": 4,
+    "reversal_rate": 0.82,
+    "by_term": {
+      "1983": {
+        "total": 9,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1984": {
+        "total": 8,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1985": {
+        "total": 6,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1986": {
+        "total": 10,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1987": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1988": {
+        "total": 7,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1989": {
+        "total": 6,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1990": {
+        "total": 7,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1991": {
+        "total": 9,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1992": {
+        "total": 11,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1993": {
+        "total": 6,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1994": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1995": {
+        "total": 6,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1996": {
+        "total": 6,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "1997": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1998": {
+        "total": 8,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1999": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2000": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2001": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2002": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.5
+      },
+      "2003": {
+        "total": 4,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "2004": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "2005": {
+        "total": 6,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "2006": {
+        "total": 6,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2007": {
+        "total": 6,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "2008": {
+        "total": 3,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2009": {
+        "total": 9,
+        "reversed_vacated": 6,
+        "reversal_rate": 0.75
+      },
+      "2010": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2011": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2012": {
+        "total": 6,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "2014": {
+        "total": 5,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "2015": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2016": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.5
+      },
+      "2017": {
+        "total": 6,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.8333
+      },
+      "2018": {
+        "total": 7,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.4286
+      },
+      "2019": {
+        "total": 7,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.5714
+      },
+      "2020": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.5
+      },
+      "2021": {
+        "total": 5,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2022": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2023": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.3333
+      },
+      "2024": {
+        "total": 3,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2025": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      }
+    },
+    "by_issue_area": {
+      "Administrative Law": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "Civil Rights": {
+        "total": 13,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "Criminal Procedure": {
+        "total": 69,
+        "reversed_vacated": 37,
+        "reversal_rate": 0.7551
+      },
+      "Due Process": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "Economic Activity": {
+        "total": 25,
+        "reversed_vacated": 15,
+        "reversal_rate": 0.75
+      },
+      "Environmental Law": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "Federal Taxation": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "Federalism": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "First Amendment": {
+        "total": 6,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "Immigration": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "Judicial Power": {
+        "total": 16,
+        "reversed_vacated": 8,
+        "reversal_rate": 0.6667
+      },
+      "Labor & Unions": {
+        "total": 7,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "Privacy": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "Unknown": {
+        "total": 75,
+        "reversed_vacated": 35,
+        "reversal_rate": 0.9459
+      }
+    }
+  },
+  "1st Circuit": {
+    "total": 174,
+    "reversed_vacated": 88,
+    "affirmed": 16,
+    "remanded": 3,
+    "reversal_rate": 0.8462,
+    "by_term": {
+      "1956": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1957": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1958": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1959": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1960": {
+        "total": 6,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1961": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1962": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1963": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1964": {
+        "total": 4,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1965": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1966": {
+        "total": 3,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1967": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1968": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1970": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1971": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1972": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1973": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1974": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1975": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1976": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1977": {
+        "total": 5,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1978": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1979": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1980": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1981": {
+        "total": 7,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1982": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1983": {
+        "total": 7,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1984": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1985": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "1986": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1987": {
+        "total": 4,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1988": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1989": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1990": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1991": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1992": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1994": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1995": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "1996": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1997": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1999": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2000": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2001": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2002": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2004": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2005": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2006": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2007": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2008": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2009": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2010": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2011": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2012": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2014": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2015": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.3333
+      },
+      "2016": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2017": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2018": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2019": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2020": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2021": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2022": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2023": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2024": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2025": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      }
+    },
+    "by_issue_area": {
+      "Administrative Law": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "Civil Rights": {
+        "total": 6,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "Criminal Procedure": {
+        "total": 16,
+        "reversed_vacated": 9,
+        "reversal_rate": 0.75
+      },
+      "Economic Activity": {
+        "total": 14,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.5
+      },
+      "Environmental Law": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "Federal Taxation": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "Federalism": {
+        "total": 7,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.3333
+      },
+      "First Amendment": {
+        "total": 8,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "Immigration": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "Judicial Power": {
+        "total": 6,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.6667
+      },
+      "Labor & Unions": {
+        "total": 7,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "Privacy": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "Unknown": {
+        "total": 103,
+        "reversed_vacated": 54,
+        "reversal_rate": 0.9643
+      }
+    }
+  },
+  "2nd Circuit": {
+    "total": 551,
+    "reversed_vacated": 279,
+    "affirmed": 26,
+    "remanded": 4,
+    "reversal_rate": 0.9148,
+    "by_term": {
+      "1955": {
+        "total": 14,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1956": {
+        "total": 14,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "1957": {
+        "total": 9,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1958": {
+        "total": 10,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "1959": {
+        "total": 9,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "1960": {
+        "total": 16,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "1961": {
+        "total": 10,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1962": {
+        "total": 12,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1963": {
+        "total": 19,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "1964": {
+        "total": 10,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1965": {
+        "total": 7,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1966": {
+        "total": 10,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1967": {
+        "total": 14,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1968": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1969": {
+        "total": 9,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1970": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1971": {
+        "total": 13,
+        "reversed_vacated": 6,
+        "reversal_rate": 0.8571
+      },
+      "1972": {
+        "total": 9,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1973": {
+        "total": 12,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1974": {
+        "total": 14,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1975": {
+        "total": 8,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1976": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1977": {
+        "total": 11,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1978": {
+        "total": 11,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1979": {
+        "total": 15,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "1980": {
+        "total": 10,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1981": {
+        "total": 16,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1982": {
+        "total": 10,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1983": {
+        "total": 9,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1984": {
+        "total": 11,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1985": {
+        "total": 7,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1986": {
+        "total": 10,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1987": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1988": {
+        "total": 14,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1989": {
+        "total": 10,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1990": {
+        "total": 7,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1991": {
+        "total": 9,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1992": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1993": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1994": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1995": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1996": {
+        "total": 6,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1997": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1998": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1999": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2000": {
+        "total": 8,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2001": {
+        "total": 4,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "2002": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2003": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2004": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2005": {
+        "total": 8,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "2006": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2007": {
+        "total": 8,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.4
+      },
+      "2008": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.8333
+      },
+      "2009": {
+        "total": 7,
+        "reversed_vacated": 6,
+        "reversal_rate": 0.8571
+      },
+      "2010": {
+        "total": 5,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "2011": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2012": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.8333
+      },
+      "2013": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2014": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2015": {
+        "total": 6,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.4
+      },
+      "2016": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.5
+      },
+      "2017": {
+        "total": 6,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.6
+      },
+      "2018": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2019": {
+        "total": 6,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2020": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2021": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2022": {
+        "total": 7,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.7143
+      },
+      "2023": {
+        "total": 7,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.8333
+      },
+      "2024": {
+        "total": 5,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2025": {
+        "total": 6,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      }
+    },
+    "by_issue_area": {
+      "Administrative Law": {
+        "total": 6,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "Civil Rights": {
+        "total": 16,
+        "reversed_vacated": 8,
+        "reversal_rate": 0.8889
+      },
+      "Criminal Procedure": {
+        "total": 55,
+        "reversed_vacated": 28,
+        "reversal_rate": 0.7368
+      },
+      "Due Process": {
+        "total": 13,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "Economic Activity": {
+        "total": 49,
+        "reversed_vacated": 25,
+        "reversal_rate": 0.7812
+      },
+      "Environmental Law": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "Federal Taxation": {
+        "total": 6,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.8333
+      },
+      "Federalism": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "First Amendment": {
+        "total": 24,
+        "reversed_vacated": 10,
+        "reversal_rate": 0.8333
+      },
+      "Immigration": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "Judicial Power": {
+        "total": 16,
+        "reversed_vacated": 11,
+        "reversal_rate": 0.8462
+      },
+      "Labor & Unions": {
+        "total": 10,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "Privacy": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "Unknown": {
+        "total": 344,
+        "reversed_vacated": 163,
+        "reversal_rate": 1.0
+      },
+      "Veterans & Military": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      }
+    }
+  },
+  "3rd Circuit": {
+    "total": 352,
+    "reversed_vacated": 186,
+    "affirmed": 19,
+    "remanded": 2,
+    "reversal_rate": 0.9073,
+    "by_term": {
+      "1955": {
+        "total": 7,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1956": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1957": {
+        "total": 6,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "1958": {
+        "total": 10,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1959": {
+        "total": 7,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1960": {
+        "total": 4,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1961": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "1962": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1963": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1964": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1965": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1966": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1967": {
+        "total": 11,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1968": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1969": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1970": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1972": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1973": {
+        "total": 7,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1974": {
+        "total": 10,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.8333
+      },
+      "1975": {
+        "total": 8,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1976": {
+        "total": 6,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1977": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1978": {
+        "total": 8,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1979": {
+        "total": 9,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1980": {
+        "total": 10,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1981": {
+        "total": 11,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1982": {
+        "total": 7,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1983": {
+        "total": 12,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1984": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1985": {
+        "total": 12,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1986": {
+        "total": 12,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1987": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1988": {
+        "total": 9,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1989": {
+        "total": 11,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1990": {
+        "total": 6,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1991": {
+        "total": 6,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "1992": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1993": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1994": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1995": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1996": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1997": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "1998": {
+        "total": 7,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1999": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2000": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2001": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2003": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2004": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2005": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2006": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2008": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2009": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.5
+      },
+      "2010": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.6
+      },
+      "2011": {
+        "total": 6,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.6
+      },
+      "2012": {
+        "total": 6,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "2014": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2015": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2016": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2017": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2018": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2019": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.5
+      },
+      "2020": {
+        "total": 6,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "2021": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2022": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2023": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.5
+      },
+      "2024": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2025": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      }
+    },
+    "by_issue_area": {
+      "Administrative Law": {
+        "total": 6,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "Civil Rights": {
+        "total": 7,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "Criminal Procedure": {
+        "total": 31,
+        "reversed_vacated": 16,
+        "reversal_rate": 0.6667
+      },
+      "Due Process": {
+        "total": 7,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.7143
+      },
+      "Economic Activity": {
+        "total": 19,
+        "reversed_vacated": 8,
+        "reversal_rate": 0.7273
+      },
+      "Environmental Law": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "Federal Taxation": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "Federalism": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "First Amendment": {
+        "total": 15,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "Immigration": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "Judicial Power": {
+        "total": 9,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.6667
+      },
+      "Labor & Unions": {
+        "total": 8,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "Privacy": {
+        "total": 7,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.8333
+      },
+      "Unknown": {
+        "total": 230,
+        "reversed_vacated": 119,
+        "reversal_rate": 0.9835
+      },
+      "Veterans & Military": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      }
+    }
+  },
+  "4th Circuit": {
+    "total": 364,
+    "reversed_vacated": 189,
+    "affirmed": 17,
+    "remanded": 2,
+    "reversal_rate": 0.9175,
+    "by_term": {
+      "1955": {
+        "total": 4,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1956": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1957": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1958": {
+        "total": 6,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1959": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1960": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1961": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1962": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1963": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1964": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1965": {
+        "total": 8,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1966": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1967": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1968": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1969": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1970": {
+        "total": 6,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1971": {
+        "total": 6,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1972": {
+        "total": 8,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1973": {
+        "total": 8,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1974": {
+        "total": 7,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1975": {
+        "total": 9,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1976": {
+        "total": 8,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1977": {
+        "total": 7,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1978": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1979": {
+        "total": 5,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1980": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1981": {
+        "total": 11,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1982": {
+        "total": 9,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1983": {
+        "total": 8,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1984": {
+        "total": 7,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1985": {
+        "total": 10,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1986": {
+        "total": 6,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1987": {
+        "total": 6,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1988": {
+        "total": 8,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1989": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1990": {
+        "total": 8,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1991": {
+        "total": 6,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1992": {
+        "total": 7,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1993": {
+        "total": 4,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1994": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1995": {
+        "total": 10,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "1996": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1997": {
+        "total": 3,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1998": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1999": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "2000": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2001": {
+        "total": 11,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "2002": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2003": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2004": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2005": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2006": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2007": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2008": {
+        "total": 8,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "2009": {
+        "total": 5,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "2010": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.5
+      },
+      "2011": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2012": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2014": {
+        "total": 7,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.4
+      },
+      "2015": {
+        "total": 6,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.4
+      },
+      "2016": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2017": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2018": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.5
+      },
+      "2019": {
+        "total": 5,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.25
+      },
+      "2020": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2021": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2022": {
+        "total": 3,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2023": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2024": {
+        "total": 8,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2025": {
+        "total": 5,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      }
+    },
+    "by_issue_area": {
+      "Administrative Law": {
+        "total": 7,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "Civil Rights": {
+        "total": 20,
+        "reversed_vacated": 13,
+        "reversal_rate": 1.0
+      },
+      "Criminal Procedure": {
+        "total": 50,
+        "reversed_vacated": 26,
+        "reversal_rate": 0.8966
+      },
+      "Due Process": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "Economic Activity": {
+        "total": 23,
+        "reversed_vacated": 13,
+        "reversal_rate": 0.8667
+      },
+      "Environmental Law": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "Federal Taxation": {
+        "total": 5,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.3333
+      },
+      "Federalism": {
+        "total": 4,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "First Amendment": {
+        "total": 13,
+        "reversed_vacated": 6,
+        "reversal_rate": 0.6667
+      },
+      "Immigration": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "Judicial Power": {
+        "total": 13,
+        "reversed_vacated": 9,
+        "reversal_rate": 0.9
+      },
+      "Labor & Unions": {
+        "total": 13,
+        "reversed_vacated": 12,
+        "reversal_rate": 1.0
+      },
+      "Privacy": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "Unknown": {
+        "total": 200,
+        "reversed_vacated": 99,
+        "reversal_rate": 0.9802
+      }
+    }
+  },
+  "5th Circuit": {
+    "total": 638,
+    "reversed_vacated": 368,
+    "affirmed": 28,
+    "remanded": 8,
+    "reversal_rate": 0.9293,
+    "by_term": {
+      "1955": {
+        "total": 10,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1956": {
+        "total": 10,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1957": {
+        "total": 11,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "1958": {
+        "total": 12,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1959": {
+        "total": 19,
+        "reversed_vacated": 11,
+        "reversal_rate": 1.0
+      },
+      "1960": {
+        "total": 7,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "1961": {
+        "total": 7,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1962": {
+        "total": 8,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1963": {
+        "total": 12,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "1964": {
+        "total": 9,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1965": {
+        "total": 14,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1966": {
+        "total": 7,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "1967": {
+        "total": 6,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1968": {
+        "total": 8,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1969": {
+        "total": 12,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "1970": {
+        "total": 14,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "1971": {
+        "total": 22,
+        "reversed_vacated": 12,
+        "reversal_rate": 0.8571
+      },
+      "1972": {
+        "total": 9,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1973": {
+        "total": 10,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1974": {
+        "total": 12,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1975": {
+        "total": 18,
+        "reversed_vacated": 13,
+        "reversal_rate": 1.0
+      },
+      "1976": {
+        "total": 16,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1977": {
+        "total": 14,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1978": {
+        "total": 15,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "1979": {
+        "total": 13,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1980": {
+        "total": 18,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1981": {
+        "total": 18,
+        "reversed_vacated": 12,
+        "reversal_rate": 1.0
+      },
+      "1982": {
+        "total": 16,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "1983": {
+        "total": 9,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1984": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1985": {
+        "total": 5,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1986": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1987": {
+        "total": 10,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "1988": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1989": {
+        "total": 8,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1990": {
+        "total": 16,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1991": {
+        "total": 12,
+        "reversed_vacated": 6,
+        "reversal_rate": 0.8571
+      },
+      "1992": {
+        "total": 9,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1993": {
+        "total": 6,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1994": {
+        "total": 8,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1995": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1996": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "1997": {
+        "total": 12,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1998": {
+        "total": 5,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1999": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "2000": {
+        "total": 7,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "2001": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2002": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2003": {
+        "total": 6,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "2004": {
+        "total": 8,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "2005": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2006": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2007": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "2008": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "2009": {
+        "total": 4,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "2010": {
+        "total": 5,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "2011": {
+        "total": 3,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2012": {
+        "total": 7,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "2014": {
+        "total": 8,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.7143
+      },
+      "2015": {
+        "total": 8,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.4286
+      },
+      "2016": {
+        "total": 5,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2017": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2018": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.3333
+      },
+      "2019": {
+        "total": 5,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "2020": {
+        "total": 6,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.5
+      },
+      "2021": {
+        "total": 10,
+        "reversed_vacated": 6,
+        "reversal_rate": 0.8571
+      },
+      "2022": {
+        "total": 8,
+        "reversed_vacated": 6,
+        "reversal_rate": 0.8571
+      },
+      "2023": {
+        "total": 10,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.7143
+      },
+      "2024": {
+        "total": 13,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "2025": {
+        "total": 11,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      }
+    },
+    "by_issue_area": {
+      "Administrative Law": {
+        "total": 13,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.6667
+      },
+      "Civil Rights": {
+        "total": 28,
+        "reversed_vacated": 16,
+        "reversal_rate": 0.8889
+      },
+      "Criminal Procedure": {
+        "total": 93,
+        "reversed_vacated": 56,
+        "reversal_rate": 0.8485
+      },
+      "Due Process": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.8333
+      },
+      "Economic Activity": {
+        "total": 26,
+        "reversed_vacated": 11,
+        "reversal_rate": 0.7333
+      },
+      "Environmental Law": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "Federal Taxation": {
+        "total": 8,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "Federalism": {
+        "total": 6,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "First Amendment": {
+        "total": 20,
+        "reversed_vacated": 7,
+        "reversal_rate": 0.7
+      },
+      "Immigration": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "Judicial Power": {
+        "total": 16,
+        "reversed_vacated": 11,
+        "reversal_rate": 0.8462
+      },
+      "Labor & Unions": {
+        "total": 10,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "Privacy": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "Unknown": {
+        "total": 395,
+        "reversed_vacated": 239,
+        "reversal_rate": 0.9917
+      }
+    }
+  },
+  "6th Circuit": {
+    "total": 456,
+    "reversed_vacated": 270,
+    "affirmed": 22,
+    "remanded": 5,
+    "reversal_rate": 0.9247,
+    "by_term": {
+      "1955": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1956": {
+        "total": 6,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "1957": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.8333
+      },
+      "1958": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1959": {
+        "total": 7,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1960": {
+        "total": 8,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "1961": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1962": {
+        "total": 6,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1963": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1964": {
+        "total": 7,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1965": {
+        "total": 9,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1966": {
+        "total": 6,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "1967": {
+        "total": 7,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1968": {
+        "total": 7,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1969": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1970": {
+        "total": 7,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1971": {
+        "total": 6,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1972": {
+        "total": 9,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1973": {
+        "total": 15,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "1974": {
+        "total": 6,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1975": {
+        "total": 11,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1976": {
+        "total": 10,
+        "reversed_vacated": 6,
+        "reversal_rate": 0.8571
+      },
+      "1977": {
+        "total": 10,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1978": {
+        "total": 8,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1979": {
+        "total": 9,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1980": {
+        "total": 6,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1981": {
+        "total": 8,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1982": {
+        "total": 6,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "1983": {
+        "total": 8,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.8333
+      },
+      "1984": {
+        "total": 17,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "1985": {
+        "total": 17,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "1986": {
+        "total": 7,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1987": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1988": {
+        "total": 7,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1989": {
+        "total": 5,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1990": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1991": {
+        "total": 6,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1992": {
+        "total": 6,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1993": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1994": {
+        "total": 7,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1995": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1996": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1997": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1998": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1999": {
+        "total": 5,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "2000": {
+        "total": 7,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "2001": {
+        "total": 8,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "2002": {
+        "total": 8,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "2003": {
+        "total": 8,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "2004": {
+        "total": 11,
+        "reversed_vacated": 7,
+        "reversal_rate": 0.875
+      },
+      "2005": {
+        "total": 7,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2006": {
+        "total": 7,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2007": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2008": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2009": {
+        "total": 6,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.8333
+      },
+      "2010": {
+        "total": 6,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.8333
+      },
+      "2011": {
+        "total": 5,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "2012": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2014": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "2015": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "2016": {
+        "total": 7,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.8333
+      },
+      "2017": {
+        "total": 4,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "2018": {
+        "total": 7,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.4
+      },
+      "2019": {
+        "total": 4,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2020": {
+        "total": 4,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "2021": {
+        "total": 7,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "2022": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2023": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2024": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2025": {
+        "total": 5,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      }
+    },
+    "by_issue_area": {
+      "Administrative Law": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "Civil Rights": {
+        "total": 18,
+        "reversed_vacated": 9,
+        "reversal_rate": 0.9
+      },
+      "Criminal Procedure": {
+        "total": 85,
+        "reversed_vacated": 54,
+        "reversal_rate": 0.8571
+      },
+      "Due Process": {
+        "total": 19,
+        "reversed_vacated": 13,
+        "reversal_rate": 1.0
+      },
+      "Economic Activity": {
+        "total": 15,
+        "reversed_vacated": 6,
+        "reversal_rate": 0.5455
+      },
+      "Environmental Law": {
+        "total": 3,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "Federal Taxation": {
+        "total": 7,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "Federalism": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "First Amendment": {
+        "total": 15,
+        "reversed_vacated": 11,
+        "reversal_rate": 1.0
+      },
+      "Immigration": {
+        "total": 7,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.6667
+      },
+      "Judicial Power": {
+        "total": 13,
+        "reversed_vacated": 6,
+        "reversal_rate": 0.8571
+      },
+      "Labor & Unions": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "Privacy": {
+        "total": 5,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.3333
+      },
+      "Unknown": {
+        "total": 252,
+        "reversed_vacated": 153,
+        "reversal_rate": 0.9935
+      }
+    }
+  },
+  "7th Circuit": {
+    "total": 418,
+    "reversed_vacated": 234,
+    "affirmed": 20,
+    "remanded": 3,
+    "reversal_rate": 0.9213,
+    "by_term": {
+      "1955": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1956": {
+        "total": 10,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1957": {
+        "total": 8,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1958": {
+        "total": 5,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1959": {
+        "total": 10,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1960": {
+        "total": 16,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "1961": {
+        "total": 7,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1962": {
+        "total": 6,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1963": {
+        "total": 8,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1964": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1965": {
+        "total": 8,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1966": {
+        "total": 8,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1967": {
+        "total": 9,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1968": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1969": {
+        "total": 4,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1970": {
+        "total": 9,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1971": {
+        "total": 8,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1972": {
+        "total": 10,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1973": {
+        "total": 13,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "1974": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1975": {
+        "total": 9,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1976": {
+        "total": 11,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1977": {
+        "total": 12,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "1978": {
+        "total": 15,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "1979": {
+        "total": 7,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1980": {
+        "total": 6,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1981": {
+        "total": 10,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1982": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1983": {
+        "total": 6,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "1984": {
+        "total": 10,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1985": {
+        "total": 7,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1986": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1987": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1988": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1989": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1990": {
+        "total": 8,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1991": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1992": {
+        "total": 6,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1993": {
+        "total": 8,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.5
+      },
+      "1994": {
+        "total": 7,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1995": {
+        "total": 7,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1996": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1997": {
+        "total": 8,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1998": {
+        "total": 4,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1999": {
+        "total": 8,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "2000": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2001": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2002": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2003": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2004": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2005": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2006": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2007": {
+        "total": 7,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.3333
+      },
+      "2008": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2009": {
+        "total": 9,
+        "reversed_vacated": 8,
+        "reversal_rate": 0.8889
+      },
+      "2010": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.5
+      },
+      "2011": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2012": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2014": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2015": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2016": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2017": {
+        "total": 7,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.5714
+      },
+      "2018": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2020": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2021": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.3333
+      },
+      "2022": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2023": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2024": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2025": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      }
+    },
+    "by_issue_area": {
+      "Administrative Law": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "Civil Rights": {
+        "total": 15,
+        "reversed_vacated": 8,
+        "reversal_rate": 0.7273
+      },
+      "Criminal Procedure": {
+        "total": 51,
+        "reversed_vacated": 31,
+        "reversal_rate": 0.8378
+      },
+      "Due Process": {
+        "total": 6,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.6
+      },
+      "Economic Activity": {
+        "total": 25,
+        "reversed_vacated": 15,
+        "reversal_rate": 0.8333
+      },
+      "Federal Taxation": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "Federalism": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "First Amendment": {
+        "total": 9,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "Judicial Power": {
+        "total": 10,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "Labor & Unions": {
+        "total": 13,
+        "reversed_vacated": 8,
+        "reversal_rate": 0.8
+      },
+      "Privacy": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "Unknown": {
+        "total": 277,
+        "reversed_vacated": 149,
+        "reversal_rate": 0.9803
+      }
+    }
+  },
+  "8th Circuit": {
+    "total": 321,
+    "reversed_vacated": 180,
+    "affirmed": 16,
+    "remanded": 9,
+    "reversal_rate": 0.9184,
+    "by_term": {
+      "1955": {
+        "total": 3,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1956": {
+        "total": 5,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1957": {
+        "total": 5,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "1958": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1959": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1960": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1962": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1963": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1964": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1965": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1966": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1967": {
+        "total": 5,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1968": {
+        "total": 6,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1969": {
+        "total": 6,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1971": {
+        "total": 9,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1972": {
+        "total": 6,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1973": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1974": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1975": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "1976": {
+        "total": 12,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1977": {
+        "total": 7,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1978": {
+        "total": 9,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1979": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "1980": {
+        "total": 6,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1981": {
+        "total": 9,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1982": {
+        "total": 10,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1983": {
+        "total": 11,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1984": {
+        "total": 6,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1985": {
+        "total": 6,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1986": {
+        "total": 6,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1987": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1988": {
+        "total": 9,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1989": {
+        "total": 8,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1990": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1991": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1992": {
+        "total": 10,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1993": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1994": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1995": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1996": {
+        "total": 8,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1997": {
+        "total": 13,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1998": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1999": {
+        "total": 5,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2000": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2001": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2002": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2003": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2004": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2005": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2006": {
+        "total": 6,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2007": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2008": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2009": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2010": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2012": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2014": {
+        "total": 8,
+        "reversed_vacated": 7,
+        "reversal_rate": 0.875
+      },
+      "2015": {
+        "total": 6,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.4
+      },
+      "2016": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2017": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2018": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2019": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2020": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2021": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2022": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.3333
+      },
+      "2023": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.5
+      },
+      "2024": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2025": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      }
+    },
+    "by_issue_area": {
+      "Administrative Law": {
+        "total": 9,
+        "reversed_vacated": 6,
+        "reversal_rate": 0.75
+      },
+      "Civil Rights": {
+        "total": 16,
+        "reversed_vacated": 10,
+        "reversal_rate": 0.8333
+      },
+      "Criminal Procedure": {
+        "total": 62,
+        "reversed_vacated": 39,
+        "reversal_rate": 0.8667
+      },
+      "Due Process": {
+        "total": 8,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "Economic Activity": {
+        "total": 16,
+        "reversed_vacated": 8,
+        "reversal_rate": 0.8889
+      },
+      "Environmental Law": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "Federal Taxation": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "Federalism": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "First Amendment": {
+        "total": 13,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "Immigration": {
+        "total": 3,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "Judicial Power": {
+        "total": 10,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "Labor & Unions": {
+        "total": 8,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "Privacy": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "Unknown": {
+        "total": 165,
+        "reversed_vacated": 95,
+        "reversal_rate": 1.0
+      }
+    }
+  },
+  "9th Circuit": {
+    "total": 1035,
+    "reversed_vacated": 650,
+    "affirmed": 50,
+    "remanded": 15,
+    "reversal_rate": 0.9286,
+    "by_term": {
+      "1955": {
+        "total": 11,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1956": {
+        "total": 13,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "1957": {
+        "total": 10,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1958": {
+        "total": 10,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1959": {
+        "total": 10,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1960": {
+        "total": 8,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1961": {
+        "total": 6,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1962": {
+        "total": 10,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1963": {
+        "total": 8,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1964": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1965": {
+        "total": 5,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1966": {
+        "total": 8,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1967": {
+        "total": 12,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "1968": {
+        "total": 7,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1969": {
+        "total": 10,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1970": {
+        "total": 14,
+        "reversed_vacated": 8,
+        "reversal_rate": 0.8889
+      },
+      "1971": {
+        "total": 12,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "1972": {
+        "total": 18,
+        "reversed_vacated": 13,
+        "reversal_rate": 1.0
+      },
+      "1973": {
+        "total": 17,
+        "reversed_vacated": 7,
+        "reversal_rate": 0.875
+      },
+      "1974": {
+        "total": 14,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1975": {
+        "total": 22,
+        "reversed_vacated": 15,
+        "reversal_rate": 1.0
+      },
+      "1976": {
+        "total": 9,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1977": {
+        "total": 16,
+        "reversed_vacated": 14,
+        "reversal_rate": 1.0
+      },
+      "1978": {
+        "total": 9,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1979": {
+        "total": 11,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "1980": {
+        "total": 18,
+        "reversed_vacated": 11,
+        "reversal_rate": 1.0
+      },
+      "1981": {
+        "total": 14,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1982": {
+        "total": 25,
+        "reversed_vacated": 15,
+        "reversal_rate": 1.0
+      },
+      "1983": {
+        "total": 28,
+        "reversed_vacated": 25,
+        "reversal_rate": 1.0
+      },
+      "1984": {
+        "total": 31,
+        "reversed_vacated": 20,
+        "reversal_rate": 1.0
+      },
+      "1985": {
+        "total": 19,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "1986": {
+        "total": 16,
+        "reversed_vacated": 6,
+        "reversal_rate": 0.8571
+      },
+      "1987": {
+        "total": 9,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "1988": {
+        "total": 18,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "1989": {
+        "total": 16,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1990": {
+        "total": 15,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "1991": {
+        "total": 17,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "1992": {
+        "total": 24,
+        "reversed_vacated": 14,
+        "reversal_rate": 1.0
+      },
+      "1993": {
+        "total": 14,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "1994": {
+        "total": 18,
+        "reversed_vacated": 11,
+        "reversal_rate": 0.9167
+      },
+      "1995": {
+        "total": 13,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "1996": {
+        "total": 29,
+        "reversed_vacated": 24,
+        "reversal_rate": 1.0
+      },
+      "1997": {
+        "total": 18,
+        "reversed_vacated": 13,
+        "reversal_rate": 1.0
+      },
+      "1998": {
+        "total": 19,
+        "reversed_vacated": 13,
+        "reversal_rate": 0.9286
+      },
+      "1999": {
+        "total": 11,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "2000": {
+        "total": 15,
+        "reversed_vacated": 11,
+        "reversal_rate": 1.0
+      },
+      "2001": {
+        "total": 19,
+        "reversed_vacated": 14,
+        "reversal_rate": 1.0
+      },
+      "2002": {
+        "total": 25,
+        "reversed_vacated": 14,
+        "reversal_rate": 0.875
+      },
+      "2003": {
+        "total": 25,
+        "reversed_vacated": 19,
+        "reversal_rate": 0.95
+      },
+      "2004": {
+        "total": 18,
+        "reversed_vacated": 14,
+        "reversal_rate": 0.9333
+      },
+      "2005": {
+        "total": 18,
+        "reversed_vacated": 11,
+        "reversal_rate": 0.9167
+      },
+      "2006": {
+        "total": 22,
+        "reversed_vacated": 15,
+        "reversal_rate": 0.9375
+      },
+      "2007": {
+        "total": 11,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.8333
+      },
+      "2008": {
+        "total": 16,
+        "reversed_vacated": 13,
+        "reversal_rate": 1.0
+      },
+      "2009": {
+        "total": 15,
+        "reversed_vacated": 8,
+        "reversal_rate": 0.6667
+      },
+      "2010": {
+        "total": 25,
+        "reversed_vacated": 17,
+        "reversal_rate": 0.7391
+      },
+      "2011": {
+        "total": 25,
+        "reversed_vacated": 18,
+        "reversal_rate": 0.8571
+      },
+      "2012": {
+        "total": 14,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "2014": {
+        "total": 15,
+        "reversed_vacated": 10,
+        "reversal_rate": 0.7692
+      },
+      "2015": {
+        "total": 12,
+        "reversed_vacated": 6,
+        "reversal_rate": 0.6
+      },
+      "2016": {
+        "total": 7,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.4
+      },
+      "2017": {
+        "total": 14,
+        "reversed_vacated": 10,
+        "reversal_rate": 0.7692
+      },
+      "2018": {
+        "total": 15,
+        "reversed_vacated": 10,
+        "reversal_rate": 0.8333
+      },
+      "2019": {
+        "total": 10,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "2020": {
+        "total": 15,
+        "reversed_vacated": 10,
+        "reversal_rate": 0.9091
+      },
+      "2021": {
+        "total": 13,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "2022": {
+        "total": 15,
+        "reversed_vacated": 11,
+        "reversal_rate": 0.8462
+      },
+      "2023": {
+        "total": 11,
+        "reversed_vacated": 7,
+        "reversal_rate": 0.6364
+      },
+      "2024": {
+        "total": 6,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2025": {
+        "total": 8,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      }
+    },
+    "by_issue_area": {
+      "Administrative Law": {
+        "total": 22,
+        "reversed_vacated": 12,
+        "reversal_rate": 0.9231
+      },
+      "Civil Rights": {
+        "total": 44,
+        "reversed_vacated": 26,
+        "reversal_rate": 0.9286
+      },
+      "Criminal Procedure": {
+        "total": 184,
+        "reversed_vacated": 139,
+        "reversal_rate": 0.891
+      },
+      "Due Process": {
+        "total": 31,
+        "reversed_vacated": 24,
+        "reversal_rate": 0.96
+      },
+      "Economic Activity": {
+        "total": 67,
+        "reversed_vacated": 40,
+        "reversal_rate": 0.8
+      },
+      "Environmental Law": {
+        "total": 10,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "Federal Taxation": {
+        "total": 18,
+        "reversed_vacated": 9,
+        "reversal_rate": 0.9
+      },
+      "Federalism": {
+        "total": 12,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "First Amendment": {
+        "total": 39,
+        "reversed_vacated": 25,
+        "reversal_rate": 0.8333
+      },
+      "Immigration": {
+        "total": 25,
+        "reversed_vacated": 18,
+        "reversal_rate": 0.9474
+      },
+      "Judicial Power": {
+        "total": 34,
+        "reversed_vacated": 19,
+        "reversal_rate": 0.9048
+      },
+      "Labor & Unions": {
+        "total": 28,
+        "reversed_vacated": 17,
+        "reversal_rate": 0.85
+      },
+      "Privacy": {
+        "total": 13,
+        "reversed_vacated": 10,
+        "reversal_rate": 0.9091
+      },
+      "Unknown": {
+        "total": 507,
+        "reversed_vacated": 295,
+        "reversal_rate": 0.9801
+      },
+      "Veterans & Military": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      }
+    }
+  },
+  "D.C. Circuit": {
+    "total": 410,
+    "reversed_vacated": 266,
+    "affirmed": 12,
+    "remanded": 1,
+    "reversal_rate": 0.9568,
+    "by_term": {
+      "1955": {
+        "total": 7,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1956": {
+        "total": 9,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1957": {
+        "total": 15,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "1958": {
+        "total": 15,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "1959": {
+        "total": 8,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1960": {
+        "total": 10,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1961": {
+        "total": 13,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "1962": {
+        "total": 6,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1963": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1964": {
+        "total": 9,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1965": {
+        "total": 6,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1966": {
+        "total": 5,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1967": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1968": {
+        "total": 4,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1969": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1970": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1971": {
+        "total": 6,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1972": {
+        "total": 11,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1973": {
+        "total": 14,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "1974": {
+        "total": 13,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "1975": {
+        "total": 16,
+        "reversed_vacated": 11,
+        "reversal_rate": 1.0
+      },
+      "1976": {
+        "total": 5,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1977": {
+        "total": 10,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1978": {
+        "total": 5,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1979": {
+        "total": 9,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1980": {
+        "total": 11,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1981": {
+        "total": 14,
+        "reversed_vacated": 14,
+        "reversal_rate": 1.0
+      },
+      "1982": {
+        "total": 18,
+        "reversed_vacated": 14,
+        "reversal_rate": 1.0
+      },
+      "1983": {
+        "total": 8,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1984": {
+        "total": 5,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1985": {
+        "total": 11,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "1986": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1987": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1988": {
+        "total": 8,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1989": {
+        "total": 7,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1990": {
+        "total": 6,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1991": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1992": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1993": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1994": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1995": {
+        "total": 5,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1996": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1997": {
+        "total": 8,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1998": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1999": {
+        "total": 3,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2000": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2001": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2002": {
+        "total": 3,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2003": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2005": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2006": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2007": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2008": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2009": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2011": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.3333
+      },
+      "2012": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2014": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "2015": {
+        "total": 3,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2016": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2017": {
+        "total": 5,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "2018": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.3333
+      },
+      "2019": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2020": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2021": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2022": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2023": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "2024": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2025": {
+        "total": 5,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      }
+    },
+    "by_issue_area": {
+      "Administrative Law": {
+        "total": 18,
+        "reversed_vacated": 9,
+        "reversal_rate": 0.75
+      },
+      "Civil Rights": {
+        "total": 10,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "Criminal Procedure": {
+        "total": 31,
+        "reversed_vacated": 16,
+        "reversal_rate": 0.8421
+      },
+      "Due Process": {
+        "total": 10,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "Economic Activity": {
+        "total": 17,
+        "reversed_vacated": 8,
+        "reversal_rate": 0.8889
+      },
+      "Environmental Law": {
+        "total": 5,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "Federal Taxation": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "Federalism": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "First Amendment": {
+        "total": 13,
+        "reversed_vacated": 7,
+        "reversal_rate": 0.875
+      },
+      "Immigration": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "Judicial Power": {
+        "total": 16,
+        "reversed_vacated": 9,
+        "reversal_rate": 0.8182
+      },
+      "Labor & Unions": {
+        "total": 9,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "Privacy": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "Unknown": {
+        "total": 271,
+        "reversed_vacated": 188,
+        "reversal_rate": 1.0
+      },
+      "Veterans & Military": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      }
+    }
+  },
+  "District Courts": {
+    "total": 49,
+    "reversed_vacated": 22,
+    "affirmed": 15,
+    "remanded": 2,
+    "reversal_rate": 0.5946,
+    "by_term": {
+      "1956": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1960": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1961": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "1967": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1968": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1969": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1970": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "1972": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1975": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1977": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1996": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2002": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2003": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2005": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2006": {
+        "total": 3,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2007": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2014": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2015": {
+        "total": 3,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2016": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2017": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "2018": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2020": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2021": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2022": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2023": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2025": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      }
+    },
+    "by_issue_area": {
+      "Administrative Law": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "Civil Rights": {
+        "total": 25,
+        "reversed_vacated": 12,
+        "reversal_rate": 0.6
+      },
+      "Criminal Procedure": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.3333
+      },
+      "Federal Taxation": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "First Amendment": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.25
+      },
+      "Judicial Power": {
+        "total": 8,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "Unknown": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      }
+    }
+  },
+  "Federal Circuit": {
+    "total": 114,
+    "reversed_vacated": 68,
+    "affirmed": 14,
+    "remanded": 1,
+    "reversal_rate": 0.8293,
+    "by_term": {
+      "1983": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1984": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1985": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1986": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1989": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1991": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1992": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1993": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1994": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "1995": {
+        "total": 4,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1996": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1997": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1998": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1999": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2000": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2001": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2002": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2003": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2004": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "2005": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2006": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2007": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2008": {
+        "total": 4,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "2009": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2010": {
+        "total": 7,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.5714
+      },
+      "2011": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2012": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2013": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2014": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2015": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2016": {
+        "total": 7,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.8333
+      },
+      "2017": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "2018": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.5
+      },
+      "2019": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2020": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2021": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2022": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2023": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2024": {
+        "total": 3,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2025": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      }
+    },
+    "by_issue_area": {
+      "Administrative Law": {
+        "total": 8,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "Criminal Procedure": {
+        "total": 12,
+        "reversed_vacated": 7,
+        "reversal_rate": 0.7778
+      },
+      "Due Process": {
+        "total": 5,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "Economic Activity": {
+        "total": 39,
+        "reversed_vacated": 24,
+        "reversal_rate": 0.8
+      },
+      "Environmental Law": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "Federal Taxation": {
+        "total": 7,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "First Amendment": {
+        "total": 4,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.3333
+      },
+      "Immigration": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "Judicial Power": {
+        "total": 8,
+        "reversed_vacated": 6,
+        "reversal_rate": 0.8571
+      },
+      "Labor & Unions": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "Privacy": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "Unknown": {
+        "total": 17,
+        "reversed_vacated": 11,
+        "reversal_rate": 1.0
+      },
+      "Veterans & Military": {
+        "total": 4,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      }
+    }
+  },
+  "State Courts": {
+    "total": 772,
+    "reversed_vacated": 443,
+    "affirmed": 37,
+    "remanded": 13,
+    "reversal_rate": 0.9229,
+    "by_term": {
+      "1955": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1957": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1958": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "1959": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1961": {
+        "total": 3,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1962": {
+        "total": 5,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1963": {
+        "total": 5,
+        "reversed_vacated": 2,
+        "reversal_rate": 0.6667
+      },
+      "1964": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "1966": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1967": {
+        "total": 6,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1968": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "1969": {
+        "total": 1,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "1970": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "1971": {
+        "total": 33,
+        "reversed_vacated": 14,
+        "reversal_rate": 1.0
+      },
+      "1972": {
+        "total": 22,
+        "reversed_vacated": 12,
+        "reversal_rate": 1.0
+      },
+      "1973": {
+        "total": 32,
+        "reversed_vacated": 21,
+        "reversal_rate": 0.9545
+      },
+      "1974": {
+        "total": 16,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "1975": {
+        "total": 24,
+        "reversed_vacated": 13,
+        "reversal_rate": 0.9286
+      },
+      "1976": {
+        "total": 28,
+        "reversed_vacated": 14,
+        "reversal_rate": 0.9333
+      },
+      "1977": {
+        "total": 26,
+        "reversed_vacated": 13,
+        "reversal_rate": 0.9286
+      },
+      "1978": {
+        "total": 26,
+        "reversed_vacated": 13,
+        "reversal_rate": 1.0
+      },
+      "1979": {
+        "total": 18,
+        "reversed_vacated": 11,
+        "reversal_rate": 1.0
+      },
+      "1980": {
+        "total": 25,
+        "reversed_vacated": 15,
+        "reversal_rate": 1.0
+      },
+      "1981": {
+        "total": 17,
+        "reversed_vacated": 12,
+        "reversal_rate": 1.0
+      },
+      "1982": {
+        "total": 15,
+        "reversed_vacated": 7,
+        "reversal_rate": 0.7778
+      },
+      "1983": {
+        "total": 23,
+        "reversed_vacated": 15,
+        "reversal_rate": 0.9375
+      },
+      "1984": {
+        "total": 18,
+        "reversed_vacated": 9,
+        "reversal_rate": 1.0
+      },
+      "1985": {
+        "total": 26,
+        "reversed_vacated": 15,
+        "reversal_rate": 1.0
+      },
+      "1986": {
+        "total": 28,
+        "reversed_vacated": 16,
+        "reversal_rate": 1.0
+      },
+      "1987": {
+        "total": 10,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1988": {
+        "total": 23,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1989": {
+        "total": 24,
+        "reversed_vacated": 12,
+        "reversal_rate": 0.9231
+      },
+      "1990": {
+        "total": 25,
+        "reversed_vacated": 14,
+        "reversal_rate": 0.9333
+      },
+      "1991": {
+        "total": 23,
+        "reversed_vacated": 17,
+        "reversal_rate": 1.0
+      },
+      "1992": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "1993": {
+        "total": 15,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "1994": {
+        "total": 12,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1995": {
+        "total": 9,
+        "reversed_vacated": 6,
+        "reversal_rate": 1.0
+      },
+      "1996": {
+        "total": 8,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "1997": {
+        "total": 7,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "1998": {
+        "total": 10,
+        "reversed_vacated": 8,
+        "reversal_rate": 1.0
+      },
+      "1999": {
+        "total": 6,
+        "reversed_vacated": 4,
+        "reversal_rate": 1.0
+      },
+      "2000": {
+        "total": 11,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "2001": {
+        "total": 8,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "2002": {
+        "total": 17,
+        "reversed_vacated": 11,
+        "reversal_rate": 0.9167
+      },
+      "2003": {
+        "total": 7,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2004": {
+        "total": 8,
+        "reversed_vacated": 5,
+        "reversal_rate": 1.0
+      },
+      "2005": {
+        "total": 13,
+        "reversed_vacated": 7,
+        "reversal_rate": 0.875
+      },
+      "2006": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2007": {
+        "total": 7,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.8333
+      },
+      "2008": {
+        "total": 12,
+        "reversed_vacated": 6,
+        "reversal_rate": 0.75
+      },
+      "2009": {
+        "total": 5,
+        "reversed_vacated": 3,
+        "reversal_rate": 1.0
+      },
+      "2010": {
+        "total": 7,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "2011": {
+        "total": 9,
+        "reversed_vacated": 5,
+        "reversal_rate": 0.625
+      },
+      "2012": {
+        "total": 10,
+        "reversed_vacated": 6,
+        "reversal_rate": 0.8571
+      },
+      "2014": {
+        "total": 5,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.3333
+      },
+      "2015": {
+        "total": 12,
+        "reversed_vacated": 8,
+        "reversal_rate": 0.6667
+      },
+      "2016": {
+        "total": 11,
+        "reversed_vacated": 10,
+        "reversal_rate": 1.0
+      },
+      "2017": {
+        "total": 5,
+        "reversed_vacated": 4,
+        "reversal_rate": 0.8
+      },
+      "2018": {
+        "total": 8,
+        "reversed_vacated": 6,
+        "reversal_rate": 0.8571
+      },
+      "2019": {
+        "total": 7,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.5
+      },
+      "2020": {
+        "total": 2,
+        "reversed_vacated": 0,
+        "reversal_rate": 0.0
+      },
+      "2022": {
+        "total": 4,
+        "reversed_vacated": 3,
+        "reversal_rate": 0.75
+      },
+      "2023": {
+        "total": 2,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "2024": {
+        "total": 3,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      },
+      "2025": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 0.5
+      }
+    },
+    "by_issue_area": {
+      "Administrative Law": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "Civil Rights": {
+        "total": 32,
+        "reversed_vacated": 18,
+        "reversal_rate": 0.7826
+      },
+      "Criminal Procedure": {
+        "total": 185,
+        "reversed_vacated": 122,
+        "reversal_rate": 0.9037
+      },
+      "Due Process": {
+        "total": 48,
+        "reversed_vacated": 27,
+        "reversal_rate": 0.871
+      },
+      "Economic Activity": {
+        "total": 10,
+        "reversed_vacated": 7,
+        "reversal_rate": 1.0
+      },
+      "Environmental Law": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "Federal Taxation": {
+        "total": 23,
+        "reversed_vacated": 13,
+        "reversal_rate": 0.9286
+      },
+      "Federalism": {
+        "total": 15,
+        "reversed_vacated": 9,
+        "reversal_rate": 0.8182
+      },
+      "First Amendment": {
+        "total": 50,
+        "reversed_vacated": 32,
+        "reversal_rate": 0.8
+      },
+      "Immigration": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "Judicial Power": {
+        "total": 10,
+        "reversed_vacated": 6,
+        "reversal_rate": 0.8571
+      },
+      "Labor & Unions": {
+        "total": 3,
+        "reversed_vacated": 2,
+        "reversal_rate": 1.0
+      },
+      "Privacy": {
+        "total": 2,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      },
+      "Unknown": {
+        "total": 389,
+        "reversed_vacated": 202,
+        "reversal_rate": 0.9854
+      },
+      "Veterans & Military": {
+        "total": 1,
+        "reversed_vacated": 1,
+        "reversal_rate": 1.0
+      }
+    }
+  }
+}

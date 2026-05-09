@@ -11,7 +11,8 @@ import time
 import datetime
 import re
 from collections import defaultdict
-from utils.local_data import fetch_oyez, infer_issue_area
+from utils.local_data import fetch_oyez, infer_issue_area, infer_disposition
+from utils.oyez_api import get_cases_by_term, get_case_detail
 
 
 from utils import add_sidebar_logo
@@ -24,8 +25,7 @@ CURRENT_YEAR = datetime.date.today().year
 # ── Shared fetch ──────────────────────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
 def _ch_fetch_cases_term(term: int) -> list[dict]:
-    data = fetch_oyez(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0")
-    return data if isinstance(data, list) else []
+    return get_cases_by_term(term)
 
 # ── Court Composition data ────────────────────────────────────────────────────
 JUSTICES = [
@@ -137,13 +137,16 @@ def _ch_load_era_data(start: int, end: int) -> pd.DataFrame:
     for term in range(start, end+1):
         cases = _ch_fetch_cases_term(term)
         for c in cases:
-            ia = c.get("issue_area"); d = c.get("disposition")
+            href = c.get("href") or ""
+            detail = get_case_detail(href) if href else None
+            issue_area = infer_issue_area(detail or c)
+            disposition = infer_disposition(detail or c)
             rows.append({
-                "Term": term, "Case": c.get("name",""),
-                "Issue Area": ia.get("label","Unknown") if isinstance(ia,dict) else str(ia or "Unknown"),
-                "Disposition": d.get("label","Unknown") if isinstance(d,dict) else str(d or "Unknown"),
+                "Term": term,
+                "Case": c.get("name", ""),
+                "Issue Area": issue_area,
+                "Disposition": disposition,
             })
-        time.sleep(0.03)
     return pd.DataFrame(rows)
 
 # ── Confirmation data ──────────────────────────────────────────────────────────
@@ -239,13 +242,11 @@ CIRCUIT_KEYWORDS = {**CIRCUITS,"State Courts":"state","District Courts":"distric
 # ── Shared fetch ──────────────────────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
 def _cc_fetch_cases_term(term: int) -> list[dict]:
-    data = fetch_oyez(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0")
-    return data if isinstance(data, list) else []
+    return get_cases_by_term(term)
 
 @st.cache_data(show_spinner=False)
 def _cc_fetch_detail(href: str) -> dict | None:
-    data = fetch_oyez(href)
-    return data if isinstance(data, dict) else None
+    return get_case_detail(href)
 
 def _court_matches(lc_name: str, search_term: str) -> bool:
     if not lc_name or not search_term: return False
@@ -300,20 +301,17 @@ def _cc_load_all_circuits(terms: tuple) -> pd.DataFrame:
                 rows.append({"Term":term,"Circuit":matched_circuit,"Case":detail.get("name",""),
                               "Lower Court":lc_name,"Disposition":disp_label,"Outcome":outcome,
                               "Issue Area":infer_issue_area(detail)})
-        time.sleep(0.03)
     return pd.DataFrame(rows)
 
 @st.cache_data(show_spinner=False, ttl=3600)
 def _cc_load_historical(terms: tuple) -> pd.DataFrame:
     rows = []
     for term in terms:
-        cases = fetch_oyez(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=100&page=0")
-        if not isinstance(cases, list):
-            continue
+        cases = get_cases_by_term(term)
         for c in cases:
             href = c.get("href","")
             if not href: continue
-            detail = fetch_oyez(href)
+            detail = get_case_detail(href)
             if not isinstance(detail, dict): continue
             lower = detail.get("lower_court") or {}
             lc_name = lower.get("name","") if isinstance(lower,dict) else str(lower)
@@ -477,13 +475,11 @@ PRE_OYEZ_RAW = [
 # ── Live Oyez fetch helpers ────────────────────────────────────────────────────
 @st.cache_data(show_spinner=False, ttl=3600)
 def _hist_fetch_term(term: int) -> list[dict]:
-    data = fetch_oyez(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=150&page=0")
-    return data if isinstance(data, list) else []
+    return get_cases_by_term(term)
 
 @st.cache_data(show_spinner=False, ttl=3600)
 def _hist_fetch_detail(href: str) -> dict | None:
-    data = fetch_oyez(href)
-    return data if isinstance(data, dict) else None
+    return get_case_detail(href)
 
 def _classify_disp(label: str) -> str:
     d = (label or "").lower()
@@ -525,8 +521,6 @@ def _hist_load_oyez_term(term: int) -> dict:
             votes = dec.get("votes") or []
             dis = sum(1 for v in votes if (v.get("vote") or "").lower() == "dissent")
             if dis == 0 and len(votes) >= 6: unanimous_ += 1
-
-        time.sleep(0.02)
 
     denom_rev = max(reversed_ + affirmed_, 1)
     return {
@@ -1002,7 +996,6 @@ def _page_circuit_courts():
                         rows.append({"Term":term,"Case":detail.get("name",""),"Lower Court":lc_name,
                                       "Disposition":disp_label,"Affirmed":affirmed,"Reversed":reversed_,
                                       "Issue Area":infer_issue_area(detail)})
-                    time.sleep(0.02)
                 return rows
 
             if st.button("Compare Courts", type="primary", key="cmp_btn"):
@@ -1841,10 +1834,4 @@ def _page_historical_data():
         st.plotly_chart(fig_ctx)
 
 # ── Page ─────────────────────────────────────────────────────────────────────
-_tab_0, _tab_1, _tab_2 = st.tabs(["🏛️ Court History", "⚖️ Circuit Courts", "📜 Historical Data"])
-with _tab_0:
-    _page_court_history()
-with _tab_1:
-    _page_circuit_courts()
-with _tab_2:
-    _page_historical_data()
+_page_court_history()
