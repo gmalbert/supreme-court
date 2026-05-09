@@ -554,7 +554,7 @@ with tab_training:
         if cached_terms_info:
             st.info(cached_terms_info)
         else:
-            st.info("No cached data yet. First run will fetch from Oyez API.")
+            st.info("No training data cached yet. Click 'Step 1: Collect Training Data' to build from local data.")
 
         clear_cache = st.checkbox("Clear cached data and re-fetch everything", value=False)
 

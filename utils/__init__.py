@@ -6,7 +6,7 @@ import os
 from datetime import date as _date
 
 
-def add_sidebar_logo(hide_sidebar_logo: bool = False):
+def add_sidebar_logo(hide_sidebar_logo: bool = False, **_kwargs):
     """Inject the site logo at the bottom-center of the sidebar."""
     import streamlit as st
     logo_path = os.path.abspath(

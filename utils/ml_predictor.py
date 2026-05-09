@@ -2,7 +2,7 @@
 ML Prediction engine for SCOTUS case outcomes.
 
 Pipeline:
-  1. Fetch historical case + vote data from Oyez (cached to CSV)
+  1. Load historical case + vote data from local parquet / JSON cache (no live API calls)
   2. Engineer features (circuit, issue area, term year, court composition)
   3. Train three model types:
        - Outcome model  : Affirm (0) vs Reverse/Vacate (1)
@@ -14,12 +14,12 @@ Pipeline:
 import os, time, json, re, glob, functools
 import numpy as np
 import pandas as pd
-import requests
 import joblib
 from pathlib import Path
 from collections import defaultdict
 
-from utils.local_data import fetch_oyez, DATA_DIR as _LOCAL_DATA_DIR, infer_issue_area
+from utils.local_data import DATA_DIR as _LOCAL_DATA_DIR, infer_issue_area
+from utils.oyez_api import get_cases_by_term, get_case_detail
 
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
@@ -44,7 +44,6 @@ DATA_DIR.mkdir(exist_ok=True)
 MODEL_DIR.mkdir(exist_ok=True)
 
 HEADERS  = {"Accept": "application/json", "User-Agent": "SCOTUS-MLPredictor/1.0"}
-OYEZ_BASE = "https://api.oyez.org"
 
 # ── Current justices we predict for ──────────────────────────────────────────
 CURRENT_JUSTICES = [
@@ -146,14 +145,7 @@ def normalise_split(split: str) -> str:
     if maj == 6:   return "6-3"
     return "5-4"
 
-# ── Oyez fetchers ─────────────────────────────────────────────────────────────
-def _fetch(url: str, timeout: int = 10) -> dict | list | None:
-    try:
-        r = requests.get(url, headers=HEADERS, timeout=timeout)
-        r.raise_for_status()
-        return r.json()
-    except Exception:
-        return None
+# ── Oyez fetchers (removed — now uses local parquet via get_cases_by_term / get_case_detail) ──
 
 def _last_name(full: str) -> str:
     parts = (full or "").strip().split()
@@ -211,8 +203,8 @@ def collect_training_data(
         # Batch-load all detail files for this term from local disk
         term_details = _load_term_details_local(term)
 
-        # Fall back to fetch_oyez for term index if local details are sparse
-        cases = fetch_oyez(f"{OYEZ_BASE}/cases?filter=term:{term}&per_page=300&page=0") or []
+        # Load cases from local parquet
+        cases = get_cases_by_term(term)
         if not isinstance(cases, list):
             cases = []
         n_cases = len(cases)
@@ -228,8 +220,8 @@ def collect_training_data(
             if not href:
                 continue
 
-            # Use local batch first, fall back to fetch_oyez (also cache-first)
-            detail = term_details.get(href) or fetch_oyez(href)
+            # Load detail from local parquet / JSON cache
+            detail = term_details.get(href) or get_case_detail(href)
             if not detail or not isinstance(detail, dict):
                 continue
 
