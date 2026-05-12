@@ -1,0 +1,57 @@
+{
+  "ID": 62836,
+  "name": "Neil Gorsuch",
+  "href": "https://api.oyez.org/people/neil_gorsuch",
+  "view_count": 0,
+  "first_name": "Neil",
+  "middle_name": null,
+  "last_name": "Gorsuch",
+  "name_suffix": null,
+  "date_of_birth": -73940400,
+  "place_of_birth": "Denver, CO",
+  "date_of_death": 0,
+  "place_of_death": null,
+  "gender": "Male",
+  "ethnicity": null,
+  "family_status": null,
+  "mother": "Anne McGill",
+  "father": "David Gorsuch",
+  "mothers_occupation": null,
+  "fathers_occupation": null,
+  "biography": "<p>Like his predecessor Antonin Scalia, Associate Justice Neil M. Gorsuch believes the US Constitution should be construed as it was by its original drafters. A Constitutional originalist, Justice Gorsuch joined the Court in April of 2017, roughly 14 months after the death of Justice Scalia. Neil Gorsuch was born in Denver, Colorado on August 29, 1967 but moved to Washington DC in his youth when his mother Anne became the first female Administrator of the US Environmental Protection Agency. He was a rare conservative voice at first the private high school he attended in Maryland, and then at Columbia University, where he graduated Phi Beta Kappa in 1988 with a degree in political science.</p>\n<p>Justice Gorsuch then attended Harvard Law School, where he was classmates with Barack Obama. Upon graduating cum laude in 1991, he clerked for Judge David B. Sentelle of the United States Court of Appeals for the District of Columbia Circuit. He then went on to clerk at the Supreme Court for Byron White and Anthony Kennedy. In 1995, he joined a Washington DC law firm where he focused on trial practice and not the appellate work typical of former Supreme Court clerks.\u00a0</p>\n<p>Justice Gorsuch was working for the US Department of Justice when George W. Bush nominated him to fill a vacancy on the US Court of Appeals for the Tenth Circuit in May of 2006. He was confirmed on July 20, 2006. \u00a0The opinions he would author there for the next decade reveal a commitment not only to Constitutional originalism, but to textualism\u2014the notion that evidence of legislative history and Congressional intent are far less important than the plain meaning of the words chosen by a legislature when drafting laws. He also gained a reputation for broadly defining and then protecting religious liberties, writing that the law \u201cdoesn't just apply to protect popular religious beliefs: it does perhaps its most important work in protecting unpopular religious beliefs, vindicating this nation's long-held aspiration to serve as a refuge of religious tolerance.\" He is also known for his criticism of the existing legal standard by which the Court reviews the actions of executive agencies, and for his tendency to favor state power over federal.\u00a0</p>\n<p>Justice Gorsuch is married and has two daughters. \u00a0As in his youth, during his time on the Tenth Circuit he lived near Denver, raising farm animals and engaging in several outdoor hobbies including hunting, fishing, and skiing.\u00a0</p>\n\n",
+  "roles": [
+    {
+      "id": 3506,
+      "type": "scotus_justice",
+      "date_start": 1491541200,
+      "date_end": 0,
+      "appointing_president": "Donald J. Trump",
+      "role_title": "Associate Justice of the Supreme Court of the United States",
+      "institution_name": "Supreme Court of the United States",
+      "href": "https://api.oyez.org/preson_role/scotus_justice/3506"
+    }
+  ],
+  "thumbnail": {
+    "id": 79753,
+    "mime": "image/png",
+    "size": 121461,
+    "href": "https://api.oyez.org/sites/default/files/filefield_paths/neil_gorsuch.thumb__0.png"
+  },
+  "images": [
+    {
+      "file": {
+        "id": 79754,
+        "mime": "image/jpeg",
+        "size": 648820,
+        "href": "https://api.oyez.org/sites/default/files/filefield_paths/neil-gorsuch-photo_0.jpg"
+      },
+      "image_field_caption": "<p>&nbsp;</p><p><span id=\"ctrlcCopy\" style=\"display: inline-block; position: absolute; left: -9999em;\"></span></p>"
+    }
+  ],
+  "religion": "Episcopal",
+  "length_of_service": 3220,
+  "identifier": "neil_gorsuch",
+  "law_school": "Harvard",
+  "number_of_children": 2,
+  "home_state": "Colorado"
+}

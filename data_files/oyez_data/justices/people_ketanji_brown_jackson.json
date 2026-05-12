@@ -1,0 +1,57 @@
+{
+  "ID": 33869,
+  "name": "Ketanji Brown Jackson",
+  "href": "https://api.oyez.org/people/ketanji_brown_jackson",
+  "view_count": 0,
+  "first_name": "Ketanji",
+  "middle_name": "david.kemp",
+  "last_name": "Jackson",
+  "name_suffix": null,
+  "date_of_birth": 22136400,
+  "place_of_birth": "Washington, DC",
+  "date_of_death": 0,
+  "place_of_death": null,
+  "gender": "Female",
+  "ethnicity": null,
+  "family_status": null,
+  "mother": "Ellery Brown",
+  "father": "Johnny Brown",
+  "mothers_occupation": "School Principal",
+  "fathers_occupation": "Lawyer",
+  "biography": "<p>Justice Ketanji Brown Jackson\u00a0was born in Washington, D.C., on September 14, 1970. She was the first of two children of Johnny and Ellery Brown, both of whom were public school teachers. She received a B.A., magna cum laude, from Harvard-Radcliffe College in 1992, and a J.D., cum laude, from Harvard Law School in 1996.</p>\n<p>She served as a law clerk for Judge Patti B. Saris of the U.S. District Court for the District of Massachusetts from 1996 to 1997, Judge Bruce M. Selya of the U.S. Court of Appeals for the First Circuit from 1997 to 1998, and Justice Stephen G. Breyer of the Supreme Court of the United States during the 1999 Term.</p>\n<p>After three years in private practice, she worked as an attorney at the U.S. Sentencing Commission for two years, as an assistant federal public defender in Washington, D.C., for two years, and again in private practice for three years. She then served as a Vice Chair and Commissioner on the U.S. Sentencing Commission from 2010 to 2014.</p>\n<p>In 2012, President Barack Obama nominated her to the U.S. District Court for the District of Columbia, where she served from 2013 to 2021.\u00a0 President Joe Biden appointed her to the U.S. Court of Appeals for the D.C. Circuit in 2021 and then nominated her as an Associate Justice of the U.S. Supreme Court in 2022. She took her seat on June 30, 2022, becoming the first Black woman to sit on the Court.</p>\n<p>Justice Jackson and her husband Patrick have two daughters.</p>\n\n",
+  "roles": [
+    {
+      "id": 3520,
+      "type": "scotus_justice",
+      "date_start": 1656565200,
+      "date_end": 0,
+      "appointing_president": null,
+      "role_title": "Associate Justice of the Supreme Court of the United States",
+      "institution_name": "Supreme Court of the United States",
+      "href": "https://api.oyez.org/preson_role/scotus_justice/3520"
+    }
+  ],
+  "thumbnail": {
+    "id": 82011,
+    "mime": "image/png",
+    "size": 58056,
+    "href": "https://api.oyez.org/sites/default/files/filefield_paths/thumbnail_ketanji_brown_jackson.png"
+  },
+  "images": [
+    {
+      "file": {
+        "id": 82010,
+        "mime": "image/jpeg",
+        "size": 2448103,
+        "href": "https://api.oyez.org/sites/default/files/filefield_paths/20220611_FS_183204_8x10C.jpeg"
+      },
+      "image_field_caption": "Fred Schilling, Collection of the Supreme Court of the United States"
+    }
+  ],
+  "religion": "Protestant",
+  "length_of_service": 1310,
+  "identifier": "ketanji_brown_jackson",
+  "law_school": "Harvard Law School",
+  "number_of_children": 2,
+  "home_state": null
+}

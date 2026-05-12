@@ -56,7 +56,13 @@ venv/
 .env
 
 # Oyez API cache (large, auto-downloaded at runtime)
-data_files/oyez_data/
+# Use /** (not /) so exceptions below are honoured — git won't descend into
+# a directory-level ignore to evaluate negation patterns.
+data_files/oyez_data/**
+# Justices are small (~250 KB) and infrequently added — keep them in the repo
+# so the cloud deployment can serve the Justice Career tab without live API calls.
+!data_files/oyez_data/justices/
+!data_files/oyez_data/justices/**
 
 # Local data — commit the Parquet files, ignore everything else
 data/*
