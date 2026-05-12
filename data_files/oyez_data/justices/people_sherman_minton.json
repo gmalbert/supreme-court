@@ -1,0 +1,57 @@
+{
+  "ID": 15037,
+  "name": "Sherman Minton",
+  "href": "https://api.oyez.org/people/sherman_minton",
+  "view_count": 0,
+  "first_name": "Sherman",
+  "middle_name": null,
+  "last_name": "Minton",
+  "name_suffix": null,
+  "date_of_birth": -2499271764,
+  "place_of_birth": "Georgetown, IN",
+  "date_of_death": -149277600,
+  "place_of_death": null,
+  "gender": "Male",
+  "ethnicity": "English",
+  "family_status": "Lower-middle class",
+  "mother": "Emma Lyvers",
+  "father": "John E. Minton",
+  "mothers_occupation": null,
+  "fathers_occupation": "Small farmer",
+  "biography": "<p>Despite his short tenure and failing health during his seven years on the Supreme Court of the United States, Sherman Minton was an asset to the bench. Sherman Minton was born October 20, 1890 in Georgetown, Indiana. He grew up with four siblings in the lower-middle class as the son of a farmer. He entered the work force when he was only eight years old, and lost his mother to cancer when he was nine. When his wages were not contributed to supporting his family, they were earmarked for his education at the collegiate level. Minton attended Indiana University and spent much of his time playing sports, including football and baseball. He moved on to Indiana School of Law, graduating first in his class in 1915. Scholarships made his education possible, and in 1916 Minton obtained a Master of Law degree from Yale Law School. It was during his time at Yale that Minton met former US President William Howard Taft. Minton took issue with a decision of the Supreme Court in a class Taft was teaching. Taft challenged him to become a Supreme Court justice and change it, if he disagreed so strongly. Minton accepted the challenge.</p>\n<p>When Minton left Yale, he returned to New Albany, Indiana to begin his private practice. Any progress he made in building a name for himself was disturbed by World War I. Minton served in the U.S. Army infantry overseas for a year as a captain. He would remain in the Officers\u2019 Reserve Corps until 1943. When Minton\u2019s tour of duty ended, he returned to Indiana and resumed his life as a private attorney. After the war, he had a newfound passion for politics and began participating in the Democratic Party. He ran unsuccessfully for a congressional seat in Indiana in 1920 and again in 1930. He was appointed to the Indiana Public Service Commission as their counsel in 1933, through which he reduced the state\u2019s utility rates. In 1934, Minton won a seat in the United States Senate as a Democrat. This opportunity catapulted Minton\u2019s career forward. In addition to serving as the party whip and assistant majority leader, Minton worked with future President Harry S. Truman, who was assigned the desk next to Minton in the Senate Chamber.</p>\n<p>Minton consistently championed President Roosevelt\u2019s New Deal programs. He even advocated for the program intended to break the Republican majority on the Supreme Court by adding justices to dilute the influence of the nine justices on the bench at the time. Minton was not reelected to his Senate seat in 1940, but President Roosevelt recruited Minton to serve as a special assistant in charge of coordinating military agencies. In this position, Minton used his influence to help further Truman\u2019s plan to establish a Senate committee focused on national defense. In May 1941, Roosevelt appointed Minton to serve as a judge on the U.S. Court of Appeals for the Seventh Circuit, a position he held until President Truman appointed him to the Supreme Court of the United States in 1949.</p>\n<p>Minton felt that his record on the bench should be enough to prove he was qualified to serve on the highest court in the land, and as such he deemed it unnecessary to testify at his Senate hearing, even though the Senate called for him. Despite this refusal, Minton was still confirmed by a vote of 48-16. Many predicted that due to Minton\u2019s record as a Senator, his voting record would be consistently liberal. While on the court, Minton actually championed a philosophy of deference to the legislative and executive branches of government, which often found him voting with the conservative side of the court. He rarely favored judicial interference if it could be avoided. In <em>Adler v. Board of Education</em> (1952), Minton wrote the majority opinion upholding a New York statute allowing schools to fire teachers who belonged to subversive groups; specifically groups that advocated overthrowing the government. Minton joined in the dissenting opinion in <em>Youngstown Sheet and Tube Co. v. Sawyer</em> (1952), a case that held unconstitutional President Truman utilizing executive authority to seize steel mills where the workers were striking. <em>United States ex. rel. Knauff v. Shaughnessy</em> (1950) was a case that centered around an American veteran with a German-born wife who was declared an undesirable alien. Minton authored the majority opinion upholding the Department of Justice\u2019s findings, stating nonresident aliens were not entitled to due process. Notably, in 1954 Minton did vote against the government in <em>Brown v. Board of Education</em>, which reversed the \u201cseparate but equal\u201d doctrine and desegregated schools. Minton was fearful of keeping his position past his ability to adequately fulfill his obligations to the Court, and thus retired in 1956 due to poor health. He lived another nine years before he died of pernicious anemia in his hometown of New Albany, Indiana in 1965.</p>\n",
+  "roles": [
+    {
+      "id": 2680,
+      "type": "scotus_justice",
+      "date_start": -638128800,
+      "date_end": -416948400,
+      "appointing_president": "Harry S. Truman",
+      "role_title": "Associate Justice of the Supreme Court of the United States",
+      "institution_name": "Supreme Court of the United States",
+      "href": "https://api.oyez.org/preson_role/scotus_justice/2680"
+    }
+  ],
+  "thumbnail": {
+    "id": 32794,
+    "mime": "image/png",
+    "size": 32795,
+    "href": "https://api.oyez.org/sites/default/files/images/people/sherman_minton/sherman_minton.thumb.png"
+  },
+  "images": [
+    {
+      "file": {
+        "id": 12123,
+        "mime": "image/jpeg",
+        "size": 28698,
+        "href": "https://api.oyez.org/sites/default/files/images/people/sherman_minton/sherman_minton.jpg"
+      },
+      "image_field_caption": "The Collection of the Supreme Court of the United States (Artist: Grace Annette Dupre)"
+    }
+  ],
+  "religion": "Protestant",
+  "length_of_service": 2560,
+  "identifier": "sherman_minton",
+  "law_school": "Indiana; Yale",
+  "number_of_children": 3,
+  "home_state": "Indiana"
+}

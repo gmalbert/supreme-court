@@ -1,0 +1,57 @@
+{
+  "ID": 15107,
+  "name": "William O. Douglas",
+  "href": "https://api.oyez.org/people/william_o_douglas",
+  "view_count": 0,
+  "first_name": "William",
+  "middle_name": "O.",
+  "last_name": "Douglas",
+  "name_suffix": null,
+  "date_of_birth": -2247156564,
+  "place_of_birth": "Maine, MN",
+  "date_of_death": 317109600,
+  "place_of_death": null,
+  "gender": "Male",
+  "ethnicity": "Scotch",
+  "family_status": "Lower class/poverty",
+  "mother": "Julia Bickford Fisk",
+  "father": "William Douglas",
+  "mothers_occupation": null,
+  "fathers_occupation": "Presbyterian minister",
+  "biography": "<p>Determined and competitive in nature, William O. Douglas set the record for longest continuous service on the Supreme Court. Douglas was born on October 16, 1898, in Maine, Minnesota, to Julia Fisk and Reverend William Douglas. The second of three children, he became his mother\u2019s favorite, earning the nickname \u201cTreasure.\u201d In 1901, Douglas was stricken with polio that proved nearly fatal. Shortly after his father\u2019s death in 1904, the Douglas family moved to Yakima, Washington, where Douglas spent most of his youth. Though the family struggled financially, Julia enrolled the children in Yakima High School, a highly competitive environment in which Douglas thrived. His peers described him as shy; however, Douglas was active in his high school debating team and rarely lost a debate. He once overheard his mother mention his fragile state, after which he began running every day in order to strengthen his legs. He also went on long hikes, which led to his lifelong love of being outdoors. Good grades were demanded by his mother and Douglas delivered, graduating valedictorian in 1916. He went to Whitman College in Walla Walla, Washington, on a full scholarship. During college, Douglas went to school in the mornings and often worked full days after class. He continued his good grades with ease, though few ever saw him study. Though his financial struggles continued, forcing him to live in a tent during one term of college, his situation did not detract from his involvement at Whitman. Douglas was a star of the debating team, student congress president, and president of Beta Theta Pi. He wrote for the campus literary magazine, occasionally delivered sermons at campus services, and tutored students for his economics professor.</p>\n<p>After graduating, Douglas took a job at his old high school to save money. During this time, he visited the courtrooms of Yakima to watch cases presented and decided that this was his calling. He arrived in New York City to attend Columbia Law School in 1922 with only six cents in his pocket. Douglas worked his way through law school by starting a tutoring service for high school seniors who wanted to attend an Ivy League School, eventually earning $25 an hour as his service grew in demand. In 1923, he married Mildred Riddle and spent most of his savings in order to do so. Douglas graduated second in his class at Columbia in 1925 and began working for one of the most prestigious Wall Street law firms, Cravath, Henderson &amp; de Gersdorff (now Cravath, Swaine &amp; Moore). After working as a lawyer for a few years, Douglas left to teach at Columbia Law School and then taught at Yale, becoming one of the law school\u2019s youngest chaired professors. He began to see legal doctrines not as concrete, but as devices that could be manipulated for good or ill. Douglas left Yale to go to Washington along with other legal scholars to work in the New Deal. He championed FDR\u2019s policies and soon became chairman of the Securities and Exchange Commission in 1937 while still dealing with financial problems.</p>\n<p>Due to Douglas\u2019s loyalty to the New Deal and his friends on the inside, he became the second-youngest Supreme Court appointee in history. Douglas was appointed Associate Justice of the Supreme Court by President Roosevelt and confirmed on April 4, 1939. Douglas was well-known for his strict commitment to civil liberties and authored many opinions that expressed his views on individual rights, such as free speech. He supported the right to privacy, limits on government interference, and the rights of illegitimate children. While critics claimed his work showed haste and that he did not develop a coherent legal analysis, defenders admired the forceful and blunt manner by which he reached the core issue in each case. Douglas supported New Deal legislation, especially in the areas of labor law and control of markets. He believed in regulating business and helped change the antitrust analysis of price fixing. Douglas often wrote or voted in support of the theories developed by Justice Hugo L. Black, who also championed civil liberties. With Chief Justice Burger, however, Douglas was less than agreeable and often teased the Chief Justice.</p>\n<p>Douglas\u2019 personal life, which included divorcing his wife and remarrying three times after, and his support of Red China led House Minority Leader Gerald R. Ford to call for Douglas\u2019 impeachment in 1970, though the charges were rejected. On December 31, 1974, Douglas suffered a stroke and was partially paralyzed. He returned to the Supreme Court but submitted his letter of retirement in 1975 after 36 years on the bench. He passed away on January 19, 1980.</p>\n",
+  "roles": [
+    {
+      "id": 2751,
+      "type": "scotus_justice",
+      "date_start": -969127200,
+      "date_end": 185004000,
+      "appointing_president": "Franklin D. Roosevelt",
+      "role_title": "Associate Justice of the Supreme Court of the United States",
+      "institution_name": "Supreme Court of the United States",
+      "href": "https://api.oyez.org/preson_role/scotus_justice/2751"
+    }
+  ],
+  "thumbnail": {
+    "id": 32781,
+    "mime": "image/png",
+    "size": 56651,
+    "href": "https://api.oyez.org/sites/default/files/images/people/william_o_douglas/william_o_douglas.thumb.png"
+  },
+  "images": [
+    {
+      "file": {
+        "id": 12193,
+        "mime": "image/jpeg",
+        "size": 28567,
+        "href": "https://api.oyez.org/sites/default/files/images/people/william_o_douglas/william_o_douglas.jpg"
+      },
+      "image_field_caption": "The Collection of the Supreme Court of the United States (Artist: Elek Kanarek)"
+    }
+  ],
+  "religion": "Presbyterian",
+  "length_of_service": 13358,
+  "identifier": "william_o_douglas",
+  "law_school": "Columbia",
+  "number_of_children": 2,
+  "home_state": "Connecticut"
+}

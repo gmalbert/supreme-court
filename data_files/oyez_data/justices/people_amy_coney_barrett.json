@@ -1,0 +1,57 @@
+{
+  "ID": 63282,
+  "name": "Amy Coney Barrett",
+  "href": "https://api.oyez.org/people/amy_coney_barrett",
+  "view_count": 0,
+  "first_name": "Amy",
+  "middle_name": "Coney",
+  "last_name": "Barrett",
+  "name_suffix": null,
+  "date_of_birth": 65426400,
+  "place_of_birth": "New Orleans, LA",
+  "date_of_death": 0,
+  "place_of_death": null,
+  "gender": "Female",
+  "ethnicity": null,
+  "family_status": null,
+  "mother": "Linda Coney",
+  "father": "Mike Coney",
+  "mothers_occupation": "French teacher",
+  "fathers_occupation": "attorney",
+  "biography": "<p>Amy Coney Barrett was a law professor at Notre Dame when President Donald J. Trump nominated her to the U.S. Court of Appeals for the Seventh Circuit in 2017. She served as a federal appeals judge for three years before being confirmed as a U.S. Supreme Court Justice in October 2020.</p>\n<p>Born Amy Vivian Coney in New Orleans, Louisiana, Barrett was the oldest of seven children. Her father, Mike, was an attorney for Shell Oil, and her mother, Linda, was a French teacher. Barrett grew up in Old Metairie, where she attended St. Catherine of Siena for elementary school and went on to St. Mary's Dominican High School. She attended Rhodes College in Memphis, Tennessee, where she graduated magna cum laude with a B.A. in English literature. She then went on to attend law school at Notre Dame, where she graduated summa cum laude.</p>\n<p>After law school, Barrett was a judicial clerk for Judge Laurence Silberman of the D.C. Circuit and then for Supreme Court Justice Antonin Scalia. In 1999, after her clerkship with Justice Scalia ended, Barrett worked at the D.C. law firm of Miller, Cassidy, Larroca &amp; Lewin.</p>\n<p>In 2001, Barrett accepted a position as the John M. Olin Fellow at Law at George Washington University Law School. In 2002, she returned to her alma mater as an assistant professor of law. As a professor at Notre Dame, she became known as an expert on federal courts, constitutional law, and statutory interpretation. She also gained recognition as a staunchly conservative Catholic. In 2012, she signed a statement criticizing President Barack Obama's Affordable Care Act (ACA) for its contraceptive mandate.</p>\n<p>In May 2017, President Trump nominated Barrett to the Seventh Circuit, and she was confirmed in October 2017 by a vote of 55-43. Democrats at her confirmation hearings expressed concern that she would be unduly influenced by her religious beliefs. A list of opinions Judge Barrett authored while a judge on the Seventh Circuit is <a href=\"https://supreme.justia.com/7th-circuit-judge-amy-barrett-opinions/\">available from Justia</a>.</p>\n<p>On September 26, 2020\u2014one week after Justice Ruth Bader Ginsburg died and on the eve of the 2020 Presidential Election\u2014President Trump nominated Barrett to the Supreme Court to fill Justice Ginsburg's seat. Her selection was extremely contentious, due in large part to the hypocritical push by Senate Majority Leader Mitch McConnell to confirm her just before the election despite refusing to hold a hearing four years earlier on President Obama's Supreme Court nominee, Merrick Garland.</p>\n<p>On October 22, 2020, the Senate Judiciary Committee voted unanimously (with the Democrats boycotting the vote) to advance Barrett's nomination, and on October 26, the Senate confirmed her by a 52-48 vote. She was sworn in by Justice Clarence Thomas.</p>\n<p>\u00a0</p>\n\n",
+  "roles": [
+    {
+      "id": 3511,
+      "type": "scotus_justice",
+      "date_start": 1603774800,
+      "date_end": 0,
+      "appointing_president": "Donald J. Trump",
+      "role_title": "Associate Justice of the Supreme Court of the United States",
+      "institution_name": "Supreme Court of the United States",
+      "href": "https://api.oyez.org/preson_role/scotus_justice/3511"
+    }
+  ],
+  "thumbnail": {
+    "id": 81207,
+    "mime": "image/png",
+    "size": 47722,
+    "href": "https://api.oyez.org/sites/default/files/filefield_paths/barret-thumb.png"
+  },
+  "images": [
+    {
+      "file": {
+        "id": 81208,
+        "mime": "image/jpeg",
+        "size": 31374,
+        "href": "https://api.oyez.org/sites/default/files/filefield_paths/barret.jpeg"
+      },
+      "image_field_caption": "Fred Schilling, Collection of the Supreme Court of the United States"
+    }
+  ],
+  "religion": "Roman Catholic",
+  "length_of_service": 1921,
+  "identifier": "amy_coney_barrett",
+  "law_school": "Notre Dame Law School",
+  "number_of_children": 0,
+  "home_state": null
+}

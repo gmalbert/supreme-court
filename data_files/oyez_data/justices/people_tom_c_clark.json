@@ -1,0 +1,57 @@
+{
+  "ID": 15083,
+  "name": "Tom C. Clark",
+  "href": "https://api.oyez.org/people/tom_c_clark",
+  "view_count": 0,
+  "first_name": "Tom",
+  "middle_name": "C.",
+  "last_name": "Clark",
+  "name_suffix": null,
+  "date_of_birth": -2217607764,
+  "place_of_birth": "Dallas, TX",
+  "date_of_death": 235026000,
+  "place_of_death": null,
+  "gender": "Male",
+  "ethnicity": "Scotch",
+  "family_status": "Upper-middle class",
+  "mother": "Jennie Falls",
+  "father": "William H. Clark",
+  "mothers_occupation": null,
+  "fathers_occupation": "Lawyer",
+  "biography": "<p>Justice Thomas \u201cTom\u201d Clark, a balanced legal mind dedicated to the work of judging, was born on September 23, 1899 in Dallas, Texas. He was born to William Henry and Virginia Maxey Clark. After graduating from Dallas High School, he served as an infantryman in the United States National Guard in 1918 during World War I. Hailing from a family of attorneys, he pursued a law degree at University of Texas School of Law, graduating with a Bachelor\u2019s degree and an L.L.B. in 1922. While in school, Clark was a brother of Delta Tau Delta fraternity, later serving as its international president.</p>\n<p>After obtaining his law degree, Clark joined his family\u2019s Dallas law firm. He worked there for the better part of fifteen years, leaving private practice briefly in order to work as an assistant district attorney for the city of Dallas between 1927 and 1932. In 1937, Clark joined the U.S. Department of Justice, where he became a political ally of future president Harry Truman. Clark initially worked in the war risk litigation section, and later the antitrust division; being appointed as head of the department\u2019s western coast antitrust office in 1940. After the attacks on Pearl Harbor in December 1941, he worked as a coordinator for the forcible relocation and internment of Japanese-Americans. Clark would later acknowledge that the government initiative was a mistake. His dedicated work on the Special Committee to Investigate the National Defense Program, informally referred to as the \u201cTruman Committee,\u201d established Clark as a politically credible candidate. His family was politically connected to several Democratic politicians, allowing him access to Congressman Sam Rayburn (later Speaker of the House) and Senator Tom Connally.</p>\n<p>Clark supported then-Senator Truman in his campaign for the vice presidential nomination in 1944 all the way to the White House. When Truman succeeded President Roosevelt in 1945, he appointed Clark as Attorney General. Clark worked diligently in major antitrust cases and prosecuted suspected Communists according to the president\u2019s agenda. He also dealt with several unfortunate by-products of World War II, including the internment and deportation of international residents, black marketeering, and government-financed war factories. Despite his sometimes immovable adherence to moderation, he steadfastly remained President Truman\u2019s biggest advocate. Clark intended to return to private practice in Texas after working on President Truman\u2019s reelection campaign; however, the death of Supreme Court Justice Frank Murphy caused Truman to nominate Clark to fill the vacancy. Clark faced a very difficult confirmation process; he was criticized for his lack of judicial experience, among other things. He declined to testify before the Judiciary Committee since he believed it would \u201c[jeopardize] his future effectiveness on the Court.\u201d Nevertheless, he received Senate confirmation with only eight dissenting votes.</p>\n<p>Justice Clark was neither a staunch liberal or conservative justice. He voted with Chief Justice Vinson the majority of the time in his first years on the Court, which provided a somewhat predictable voting estimate. However, when Vinson died in 1953 and Chief Justice Earl Warren succeeded him, Justice Clark began issuing a balanced mix of liberal and conservative opinions. This approach was reflected in his equal use of judicial restraint and expansive constitutional interpretation. He generally supported government laws intended to protect or promote racial equality. He joined opinions of cases that utilized the Equal Protection Clause against racial discrimination in education (e.g., <em>Sweatt v. Painter</em> and <em>McLaurin v. Oklahoma State Regents</em>), which created the groundwork for the <em>Brown v. Board of Education</em> decision. He also faced challenges to Cold War-era laws that he initiated or created. While he usually recused himself from such cases, he deferred to the government in the cases he did participate in (e.g., <em>Garner v. Board of Public Works</em>, a decision he authored that upheld a city\u2019s right to require public employees to submit affidavits that they were never members of the Community Party). Justice Clark\u2019s career history as an assistant district attorney and attorney general influenced his opinions on criminal procedure and the rights of criminal defendants. He usually backed government prosecutorial efforts in his early years; however, as the makeup of the Court began to shift, he allied with the liberal justices on several key decisions (e.g., <em>Gideon v. Wainwright</em>, <em>Mapp v. Ohio</em>, and <em>Berger v. New York</em>). Also noteworthy, Justice Clark penned the opinion in <em>Abington School District v. Schempp</em>, a First Amendment Establishment Clause case that ruled Bible-reading exercises and mandated prayer in public schools were unconstitutional. He wrote, \u201cThe Constitution says that the government shall take no part in the establishment of religion . . . [and] [n]o means no.\u201d</p>\n<p>Justice Clark retired from the Court on June 12, 1967 in order to avoid a conflict of interest when his son, Ramsey, was named Attorney General. He was succeeded by Thurgood Marshall, the first African-American Supreme Court justice. Clark spent his retirement as a visiting judge on various federal appellate courts, director of the Federal Judicial Center, and Chair on the Board of Directors for the American Judicature Society. He died of natural causes on June 13, 1977 in New York City and was entombed in his home city of Dallas, Texas.</p>\n",
+  "roles": [
+    {
+      "id": 2727,
+      "type": "scotus_justice",
+      "date_start": -642366000,
+      "date_end": -80679600,
+      "appointing_president": "Harry S. Truman",
+      "role_title": "Associate Justice of the Supreme Court of the United States",
+      "institution_name": "Supreme Court of the United States",
+      "href": "https://api.oyez.org/preson_role/scotus_justice/2727"
+    }
+  ],
+  "thumbnail": {
+    "id": 32771,
+    "mime": "image/png",
+    "size": 50879,
+    "href": "https://api.oyez.org/sites/default/files/images/people/tom_c_clark/tom_c_clark.thumb.png"
+  },
+  "images": [
+    {
+      "file": {
+        "id": 12169,
+        "mime": "image/jpeg",
+        "size": 38720,
+        "href": "https://api.oyez.org/sites/default/files/images/people/tom_c_clark/tom_c_clark.jpg"
+      },
+      "image_field_caption": "The Collection of the Supreme Court of the United States (Artist: C. Gregory Stapko)"
+    }
+  ],
+  "religion": "Presbyterian",
+  "length_of_service": 6501,
+  "identifier": "tom_c_clark",
+  "law_school": "Texas",
+  "number_of_children": 3,
+  "home_state": "Texas"
+}

@@ -1,0 +1,57 @@
+{
+  "ID": 17766,
+  "name": "Brett M. Kavanaugh",
+  "href": "https://api.oyez.org/people/brett_m_kavanaugh",
+  "view_count": 0,
+  "first_name": "Brett",
+  "middle_name": "M.",
+  "last_name": "Kavanaugh",
+  "name_suffix": null,
+  "date_of_birth": -154116000,
+  "place_of_birth": "Washington, DC",
+  "date_of_death": 0,
+  "place_of_death": null,
+  "gender": "Male",
+  "ethnicity": null,
+  "family_status": null,
+  "mother": "Martha Kavanaugh",
+  "father": "Everett Edward Kavanaugh, Jr.",
+  "mothers_occupation": null,
+  "fathers_occupation": null,
+  "biography": "<p>After one of the most contentious confirmation hearings in US history, Associate Justice Brett M. Kavanaugh was confirmed by the Senate on October 6, 2018, to fill the seat vacated by Justice Anthony Kennedy. The addition of Justice Kavanaugh to the Court marks the first time in over half a century that the Court is comprised of a solid conservative majority.</p>\n<p>A native of DC, Kavanaugh attended the prestigious Georgetown Preparatory School before attending Yale College and Yale Law School. He graduated from law school in 1990 and went on to clerk for Judge Walter Stapleton of the US Court of Appeals for the Third Circuit and Judge Alex Kozinski of the Ninth Circuit.</p>\n<p>Following these clerkships, Kavanaugh spent one year in the office of then-US Solicitor General Kenneth Starr and then served as a clerk for Justice Anthony Kennedy in 1993\u201394. Kavanaugh returned to work with Starr at the Office of Independent Counsel, where he led the investigation into the death of Vince Foster, an aide to President Bill Clinton. Notably during his tenure in the Office of Independent Counsel, Kavanaugh helped author the 1998 Starr Report, which outlined 11 grounds for Clinton's impeachment.</p>\n<p>After working at the law firm Kirkland &amp; Ellis, Kavanaugh moved to the White House after the election of President George W. Bush and served first as counsel to the president and then as staff secretary to the president.</p>\n<p>President Bush first nominated Kavanaugh to the US Court of Appeals for the DC Circuit on July 25, 2003, but his nomination was stalled by Democratic senators alleging that he was overly partisan. President Bush nominated him again in 2006, and despite similar objections by Democratic senators, he was confirmed by a 57\u201336 vote.</p>\n<p>Judge Kavanaugh sat on the DC Circuit from 2006 until 2018, during which time he predictably established a conservative track record on a range of hot-button issues.</p>\n<p>Justice Kavanaugh and his wife Ashley have two daughters.</p>\n\n",
+  "roles": [
+    {
+      "id": 3507,
+      "type": "scotus_justice",
+      "date_start": 1538802000,
+      "date_end": 0,
+      "appointing_president": "Donald J. Trump",
+      "role_title": "Associate Justice of the Supreme Court of the United States",
+      "institution_name": "Supreme Court of the United States",
+      "href": "https://api.oyez.org/preson_role/scotus_justice/3507"
+    }
+  ],
+  "thumbnail": {
+    "id": 80518,
+    "mime": "image/png",
+    "size": 91566,
+    "href": "https://api.oyez.org/sites/default/files/filefield_paths/Kavanaugh-thumb.png"
+  },
+  "images": [
+    {
+      "file": {
+        "id": 80520,
+        "mime": "image/jpeg",
+        "size": 136832,
+        "href": "https://api.oyez.org/sites/default/files/filefield_paths/Kavanaugh_0.jpg"
+      },
+      "image_field_caption": "The Collection of the Supreme Court of the United States"
+    }
+  ],
+  "religion": "Roman Catholic",
+  "length_of_service": 2673,
+  "identifier": "brett_m_kavanaugh",
+  "law_school": "Yale Law School",
+  "number_of_children": 2,
+  "home_state": "Washington, DC"
+}
