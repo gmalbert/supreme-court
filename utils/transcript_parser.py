@@ -20,6 +20,7 @@ Usage (live — downloads a single argument from Oyez API):
 """
 import re
 import os
+import sys
 import json
 import requests
 from typing import NamedTuple
@@ -114,13 +115,16 @@ def _load_parquet_turns(
             parquet_path,
             filters=[("argument_id", "in", argument_ids)],
         )
-    except Exception:
+    except Exception as _e:
+        print(f"[transcript_parser] Parquet filter read failed ({_e}), retrying without filters",
+              file=sys.stderr)
         # Fallback: some pyarrow/pandas versions have issues with predicate pushdown;
         # read the full file and filter in Python instead.
         try:
             df = pd.read_parquet(parquet_path)
             df = df[df["argument_id"].isin(argument_ids)]
-        except Exception:
+        except Exception as _e2:
+            print(f"[transcript_parser] Parquet full read also failed ({_e2})", file=sys.stderr)
             return None
 
     if df.empty:
@@ -281,14 +285,21 @@ def parse_case_transcript(detail: dict) -> list[Turn]:
                 except Exception:
                     pass
 
-    # 4. Live Oyez API fallback — used when the Parquet file is absent (e.g. first
-    #    deploy before parquet is committed) or the JSON cache doesn't exist on the
-    #    cloud.  fetch_and_parse_argument makes a direct requests.get call.
+    # 4. Live Oyez API fallback — direct requests.get when Parquet is absent or
+    #    unreadable on the cloud and no JSON cache exists locally.
     if not all_turns:
         for oa in oa_list:
-            if isinstance(oa, dict) and "href" in oa:
-                fetched = fetch_and_parse_argument(oa["href"])
-                all_turns.extend(fetched)
+            if not isinstance(oa, dict) or "href" not in oa:
+                continue
+            try:
+                resp = requests.get(oa["href"], headers=_HEADERS, timeout=20)
+                resp.raise_for_status()
+                oa_data = resp.json()
+                sections = (oa_data.get("transcript") or {}).get("sections") or []
+                all_turns.extend(_parse_sections(sections, advocate_sides))
+            except Exception as _e:
+                print(f"[transcript_parser] Live API fallback failed for {oa.get('href')}: {_e}",
+                      file=sys.stderr)
 
     return all_turns
 
