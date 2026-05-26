@@ -1166,7 +1166,7 @@ def _page_advocates():
 
         with sub_live:
             st.markdown("Analyze the transcript of a specific oral argument — count questions, speaking time, and patterns.")
-            available_terms_oa = list(range(CURRENT_YEAR-1, CURRENT_YEAR-11,-1))
+            available_terms_oa = list(range(CURRENT_YEAR-1, 1955,-1))
             oa_term_live = st.selectbox("Select Term", available_terms_oa, key="oa_live_term")
             with st.spinner("Loading cases..."):
                 live_cases = _adv_fetch_term(oa_term_live)

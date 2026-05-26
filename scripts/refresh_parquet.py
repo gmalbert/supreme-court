@@ -79,20 +79,28 @@ def _fetch_cases_for_term(term: int) -> list[dict]:
     return data if isinstance(data, list) else []
 
 
-def _fetch_case_detail(href: str) -> dict | None:
-    """Fetch case detail (tries local JSON cache first)."""
+def _fetch_case_detail(href: str, force: bool = False) -> dict | None:
+    """Fetch case detail (tries local JSON cache first unless force=True)."""
     # Derive expected local path from the href
     path_part = href.replace(BASE_URL, "").strip("/")  # e.g. cases/2024/23-191
     parts = path_part.split("/")
+    local = None
     if len(parts) >= 3:  # cases / <term> / <docket>
         local = os.path.join(DETAIL_JSON_DIR, parts[1],
                              "_".join(parts) + ".json")
-        if os.path.exists(local):
+        if not force and os.path.exists(local):
             with open(local, encoding="utf-8") as f:
                 return json.load(f)
 
     data = _get(href)
-    return data if isinstance(data, dict) else None
+    if isinstance(data, dict):
+        # Update local cache with fresh data
+        if local:
+            os.makedirs(os.path.dirname(local), exist_ok=True)
+            with open(local, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+        return data
+    return None
 
 
 # ── Row builders ───────────────────────────────────────────────────────────────
@@ -130,7 +138,7 @@ def current_term() -> int:
     return today.year if today.month >= 10 else today.year - 1
 
 
-def refresh(n_terms: int = 2) -> None:
+def refresh(n_terms: int = 2, force: bool = False) -> None:
     os.makedirs(os.path.join(REPO_ROOT, "data"), exist_ok=True)
 
     # Load existing Parquet files (may not exist on first run)
@@ -165,7 +173,7 @@ def refresh(n_terms: int = 2) -> None:
             href = c.get("href", "")
             if not href:
                 continue
-            detail = _fetch_case_detail(href)
+            detail = _fetch_case_detail(href, force=force)
             if detail:
                 new_detail_rows.append(_detail_row(detail))
 
@@ -199,5 +207,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--terms", type=int, default=2,
                         help="Number of most-recent terms to refresh (default: 2)")
+    parser.add_argument("--force", action="store_true",
+                        help="Bypass local JSON cache and re-fetch from Oyez API")
     args = parser.parse_args()
-    refresh(args.terms)
+    refresh(args.terms, force=args.force)

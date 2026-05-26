@@ -197,7 +197,23 @@ with tab_voting:
                 else:
                     decisions = jv_detail.get("decisions") or []
                     if not decisions:
-                        st.info("No voting data available for this case.")
+                        # Check if the case was decided but Oyez hasn't published votes yet
+                        timeline = jv_detail.get("timeline") or []
+                        decided_event = next(
+                            (e for e in reversed(timeline)
+                             if isinstance(e, dict) and "decided" in (e.get("event") or "").lower()),
+                            None,
+                        )
+                        if decided_event:
+                            import datetime as _dt
+                            dates = decided_event.get("dates") or []
+                            if dates:
+                                decided_date = _dt.datetime.fromtimestamp(dates[-1]).strftime("%B %d, %Y")
+                                st.info(f"This case was decided on {decided_date}, but individual justice votes have not yet been published on Oyez.")
+                            else:
+                                st.info("This case has been decided, but individual justice votes have not yet been published on Oyez.")
+                        else:
+                            st.info("No voting data available for this case.")
                     else:
                         for decision in decisions:
                             winning_party = decision.get("winning_party","Unknown")

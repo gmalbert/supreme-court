@@ -12,6 +12,7 @@ import datetime
 from collections import defaultdict
 from utils.oyez_api import get_cases_by_term, get_case_detail
 from utils.local_data import fetch_oyez, infer_issue_area, infer_disposition
+from utils.transcript_parser import parse_case_transcript, compute_question_counts
 
 from utils import add_sidebar_logo
 add_sidebar_logo()
@@ -72,9 +73,10 @@ def _adv_load_advocate_data(terms: tuple) -> list[dict]:
 
 # ── Oral Argument Analysis helpers ────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
-def _adv_load_transcript(arg_href: str) -> dict | None:
-    data = fetch_oyez(arg_href)
-    return data if isinstance(data, dict) else None
+def _adv_parse_transcript(detail: dict) -> list:
+    """Return parsed Turn list for a case detail dict (Parquet → JSON cache → API)."""
+    return parse_case_transcript(detail)
+
 
 # ── Amicus brief curated data ──────────────────────────────────────────────────
 AMICUS_ORGS = [
@@ -435,36 +437,22 @@ with tab_oral:
                     if not oral_args_live:
                         st.warning("No oral argument audio found for this case.")
                     else:
-                        for arg_entry in oral_args_live[:1]:
-                            if not isinstance(arg_entry,dict): continue
-                            arg_href = arg_entry.get("href","")
-                            if not arg_href: continue
-                            with st.spinner("Loading transcript..."):
-                                arg_detail = _adv_load_transcript(arg_href)
-                            if not arg_detail: st.warning("Could not load transcript."); continue
-                            transcript = arg_detail.get("transcript") or {}
-                            sections = transcript.get("sections") or []
-                            if not sections: st.info("No transcript text available for this argument."); continue
-
-                            # Count questions per speaker
+                        with st.spinner("Loading transcript..."):
+                            turns_live = _adv_parse_transcript(detail_live)
+                        if not turns_live:
+                            st.warning("Could not load transcript.")
+                        else:
+                            # Aggregate per-speaker stats from Turn objects
                             speaker_turns: dict[str,int] = defaultdict(int)
                             speaker_words: dict[str,int] = defaultdict(int)
-                            justice_questions: dict[str,int] = defaultdict(int)
-                            all_turns = []
-                            for section in sections:
-                                for turn in (section.get("turns") or []):
-                                    speaker = turn.get("speaker") or {}
-                                    name = speaker.get("name","Unknown") if isinstance(speaker,dict) else str(speaker)
-                                    role = speaker.get("roles") or []
-                                    is_justice = any("justice" in str(r).lower() for r in role) if isinstance(role,list) else False
-                                    blocks = turn.get("text_blocks") or []
-                                    text = " ".join(b.get("text","") for b in blocks if isinstance(b,dict))
-                                    words = len(text.split())
-                                    q_count = text.count("?")
-                                    speaker_turns[name] += 1
-                                    speaker_words[name] += words
-                                    if is_justice: justice_questions[name] += q_count
-                                    all_turns.append({"speaker":name,"is_justice":is_justice,"words":words,"questions":q_count,"text":text[:200]})
+                            for t in turns_live:
+                                speaker_turns[t.speaker] += 1
+                                speaker_words[t.speaker] += len(t.text.split())
+                            counts_live = compute_question_counts(turns_live)
+                            justice_questions: dict[str,int] = {
+                                j: info["total_questions"]
+                                for j, info in counts_live["by_justice"].items()
+                            }
 
                             st.subheader(f"Oral Argument Analysis: {sel_case_live}")
                             col_turns, col_words = st.columns(2)

@@ -68,9 +68,11 @@ data_files/oyez_data/**
 data/*
 !data/cases_by_term.parquet
 !data/case_detail.parquet
+!data/transcripts_*.parquet
 
 # Streamlit cache
 .streamlit/secrets.toml
 
 scripts/merge_pages.py
 old/*
+supreme-court.code-workspace
