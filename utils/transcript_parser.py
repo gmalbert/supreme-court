@@ -115,7 +115,13 @@ def _load_parquet_turns(
             filters=[("argument_id", "in", argument_ids)],
         )
     except Exception:
-        return None
+        # Fallback: some pyarrow/pandas versions have issues with predicate pushdown;
+        # read the full file and filter in Python instead.
+        try:
+            df = pd.read_parquet(parquet_path)
+            df = df[df["argument_id"].isin(argument_ids)]
+        except Exception:
+            return None
 
     if df.empty:
         return None
@@ -274,6 +280,15 @@ def parse_case_transcript(detail: dict) -> list[Turn]:
                     all_turns.extend(_parse_sections(cached_sections, advocate_sides))
                 except Exception:
                     pass
+
+    # 4. Live Oyez API fallback — used when the Parquet file is absent (e.g. first
+    #    deploy before parquet is committed) or the JSON cache doesn't exist on the
+    #    cloud.  fetch_and_parse_argument makes a direct requests.get call.
+    if not all_turns:
+        for oa in oa_list:
+            if isinstance(oa, dict) and "href" in oa:
+                fetched = fetch_and_parse_argument(oa["href"])
+                all_turns.extend(fetched)
 
     return all_turns
 
