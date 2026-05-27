@@ -428,6 +428,7 @@ with tab_oral:
             live_case_names = sorted([c.get("name","") for c in live_cases])
             sel_case_live = st.selectbox("Select Case", live_case_names, key="oa_live_case")
             sel_live = next((c for c in live_cases if c.get("name")==sel_case_live), None)
+            st.caption("build: 733a023")
             if sel_live and st.button("Analyze Oral Argument", key="oa_live_btn"):
                 href = sel_live.get("href","")
                 detail_live = _adv_fetch_detail(href) if href else None
@@ -445,7 +446,7 @@ with tab_oral:
                                 turns_live = []
                         if not turns_live:
                             st.warning("Could not load transcript.")
-                            with st.expander("⚠️ Debug info"):
+                            with st.expander("⚠️ Debug info", expanded=True):
                                 import os as _os
                                 import pandas as _pd
                                 oa_dbg = detail_live.get("oral_argument_audio") or []
