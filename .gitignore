@@ -65,10 +65,10 @@ data_files/oyez_data/**
 !data_files/oyez_data/justices/**
 
 # Local data — commit the Parquet files, ignore everything else
-data/*
-!data/cases_by_term.parquet
-!data/case_detail.parquet
-!data/transcripts_*.parquet
+data/models/*
+# !data/cases_by_term.parquet
+# !data/case_detail.parquet
+# !data/transcripts_*.parquet
 
 # Streamlit cache
 .streamlit/secrets.toml
