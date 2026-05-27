@@ -72,7 +72,6 @@ def _adv_load_advocate_data(terms: tuple) -> list[dict]:
     return rows
 
 # ── Oral Argument Analysis helpers ────────────────────────────────────────────
-@st.cache_data(show_spinner=False)
 def _adv_parse_transcript(detail: dict) -> list:
     """Return parsed Turn list for a case detail dict (Parquet → JSON cache → API)."""
     return parse_case_transcript(detail)
@@ -438,7 +437,14 @@ with tab_oral:
                         st.warning("No oral argument audio found for this case.")
                     else:
                         with st.spinner("Loading transcript..."):
-                            turns_live = _adv_parse_transcript(detail_live)
+                            try:
+                                turns_live = _adv_parse_transcript(detail_live)
+                            except Exception as _parse_err:
+                                turns_live = []
+                                with st.expander("⚠️ Transcript load error (debug info)"):
+                                    st.code(str(_parse_err))
+                                    import traceback
+                                    st.code(traceback.format_exc())
                         if not turns_live:
                             st.warning("Could not load transcript.")
                         else:

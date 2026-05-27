@@ -33,6 +33,8 @@ import os
 import sys
 
 import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 REPO_ROOT  = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ORAL_DIR   = os.path.join(REPO_ROOT, "data_files", "oyez_data", "oral_arguments")
@@ -225,17 +227,37 @@ def main(out_dir: str = OUT_DIR, only_terms: list[int] | None = None) -> None:
 
         df = pd.DataFrame(rows)
 
-        # Enforce correct dtypes before writing
-        df["argument_id"]  = df["argument_id"].astype("int32")
-        df["term"]         = df["term"].astype("int16")
+        # Enforce dtypes — use int64 for argument_id/term so Python `int` filter
+        # values match without silent type-mismatch failures in pyarrow 14+.
+        df["argument_id"]  = df["argument_id"].astype("int64")
+        df["term"]         = df["term"].astype("int64")
         df["section_idx"]  = df["section_idx"].astype("int8")
         df["turn_idx"]     = df["turn_idx"].astype("int16")
-        df["speaker_id"]   = pd.to_numeric(df["speaker_id"], errors="coerce").astype("Int32")
+        df["speaker_id"]   = pd.to_numeric(df["speaker_id"], errors="coerce").fillna(0).astype("int64")
         df["start"]        = df["start"].astype("float32")
         df["stop"]         = df["stop"].astype("float32")
+        # Fill string nulls so pd.NA can't appear when reading with pandas 3.0+
+        for _c in ["argument_title", "section_title", "speaker_name", "text"]:
+            df[_c] = df[_c].fillna("").astype(str)
 
+        # Write with explicit pyarrow schema: utf8 strings (not large_string) for
+        # broadest compatibility across pyarrow versions.
+        _schema = pa.schema([
+            pa.field("argument_id",    pa.int64()),
+            pa.field("argument_title", pa.utf8()),
+            pa.field("term",           pa.int64()),
+            pa.field("section_idx",    pa.int8()),
+            pa.field("section_title",  pa.utf8()),
+            pa.field("turn_idx",       pa.int16()),
+            pa.field("speaker_name",   pa.utf8()),
+            pa.field("speaker_id",     pa.int64()),
+            pa.field("start",          pa.float32()),
+            pa.field("stop",           pa.float32()),
+            pa.field("text",           pa.utf8()),
+        ])
+        tbl = pa.Table.from_pandas(df[list(_schema.names)], schema=_schema, preserve_index=False)
         out_path = os.path.join(out_dir, f"transcripts_{start}_{end}.parquet")
-        df.to_parquet(out_path, index=False, compression="zstd")
+        pq.write_table(tbl, out_path, compression="zstd")
 
         size_mb = os.path.getsize(out_path) / 1_048_576
         total_parquet_bytes += os.path.getsize(out_path)

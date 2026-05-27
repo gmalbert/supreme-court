@@ -110,19 +110,21 @@ def _load_parquet_turns(
     if parquet_path is None:
         return None
 
+    # Cast to int64 to match the rebuilt parquet column type (avoids type-mismatch
+    # silent-empty-filter bug in pyarrow 14+ when column is int64 and values are int32)
+    arg_ids_i64 = [int(a) for a in argument_ids]
     try:
         df = pd.read_parquet(
             parquet_path,
-            filters=[("argument_id", "in", argument_ids)],
+            filters=[("argument_id", "in", arg_ids_i64)],
         )
     except Exception as _e:
         print(f"[transcript_parser] Parquet filter read failed ({_e}), retrying without filters",
               file=sys.stderr)
-        # Fallback: some pyarrow/pandas versions have issues with predicate pushdown;
-        # read the full file and filter in Python instead.
+        # Fallback: read the full file and filter in Python instead.
         try:
             df = pd.read_parquet(parquet_path)
-            df = df[df["argument_id"].isin(argument_ids)]
+            df = df[df["argument_id"].isin(arg_ids_i64)]
         except Exception as _e2:
             print(f"[transcript_parser] Parquet full read also failed ({_e2})", file=sys.stderr)
             return None
@@ -131,30 +133,38 @@ def _load_parquet_turns(
         return None
 
     turns: list[Turn] = []
-    for _, row in df.sort_values(["argument_id", "section_idx", "turn_idx"]).iterrows():
-        speaker_name = row["speaker_name"] or "Unknown"
-        role         = _classify_role(speaker_name)
-        section_side = _side_from_section_title(str(row.get("section_title") or ""))
+    try:
+        for _, row in df.sort_values(["argument_id", "section_idx", "turn_idx"]).iterrows():
+            # Use pd.isna() for null checks — handles both None and pd.NA (pandas 3.0+)
+            _sn = row["speaker_name"]
+            speaker_name = (str(_sn) if pd.notna(_sn) else "") or "Unknown"
+            role         = _classify_role(speaker_name)
+            _st = row.get("section_title")
+            section_side = _side_from_section_title(str(_st) if pd.notna(_st) else "")
 
-        if role == "justice":
-            side = section_side
-        else:
-            side = "unknown"
-            for known_adv, known_side in advocate_sides.items():
-                if known_adv.lower() in speaker_name.lower():
-                    side = known_side
-                    break
-            if side == "unknown":
+            if role == "justice":
                 side = section_side
+            else:
+                side = "unknown"
+                for known_adv, known_side in advocate_sides.items():
+                    if known_adv.lower() in speaker_name.lower():
+                        side = known_side
+                        break
+                if side == "unknown":
+                    side = section_side
 
-        text = row["text"] or ""
-        turns.append(Turn(
-            speaker=speaker_name,
-            role=role,
-            side=side,
-            text=text,
-            question_count=_count_questions(text),
-        ))
+            _tx = row["text"]
+            text = str(_tx) if pd.notna(_tx) else ""
+            turns.append(Turn(
+                speaker=speaker_name,
+                role=role,
+                side=side,
+                text=text,
+                question_count=_count_questions(text),
+            ))
+    except Exception as _e3:
+        print(f"[transcript_parser] Row iteration failed ({_e3})", file=sys.stderr)
+        return None
 
     return turns if turns else None
 
@@ -367,17 +377,18 @@ def fetch_and_parse_argument(oa_href: str) -> list[Turn]:
                 path = os.path.join(_DATA_DIR, f"transcripts_{start}_{end}.parquet")
                 if not os.path.exists(path):
                     continue
-                df = pd.read_parquet(path, filters=[("argument_id", "==", oa_id)])
+                df = pd.read_parquet(path, filters=[("argument_id", "==", int(oa_id))])
                 if df.empty:
                     continue
                 turns: list[Turn] = []
                 for _, row in df.sort_values(["section_idx", "turn_idx"]).iterrows():
-                    speaker_name = row["speaker_name"] or "Unknown"
+                    _sn = row["speaker_name"]
+                    speaker_name = (str(_sn) if pd.notna(_sn) else "") or "Unknown"
                     role         = _classify_role(speaker_name)
-                    side         = _side_from_section_title(str(row.get("section_title") or ""))
-                    if role != "justice" and side == "unknown":
-                        side = _side_from_section_title(str(row.get("section_title") or ""))
-                    text = row["text"] or ""
+                    _st = row.get("section_title")
+                    side         = _side_from_section_title(str(_st) if pd.notna(_st) else "")
+                    _tx = row["text"]
+                    text = str(_tx) if pd.notna(_tx) else ""
                     turns.append(Turn(
                         speaker=speaker_name,
                         role=role,
