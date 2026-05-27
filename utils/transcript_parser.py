@@ -113,11 +113,14 @@ def _load_parquet_turns(
     # Cast to int64 to match the rebuilt parquet column type (avoids type-mismatch
     # silent-empty-filter bug in pyarrow 14+ when column is int64 and values are int32)
     arg_ids_i64 = [int(a) for a in argument_ids]
+    print(f"[transcript_parser] _load_parquet_turns: path={parquet_path}, ids={arg_ids_i64}",
+          file=sys.stderr)
     try:
         df = pd.read_parquet(
             parquet_path,
             filters=[("argument_id", "in", arg_ids_i64)],
         )
+        print(f"[transcript_parser] filter read: {len(df)} rows", file=sys.stderr)
     except Exception as _e:
         print(f"[transcript_parser] Parquet filter read failed ({_e}), retrying without filters",
               file=sys.stderr)
@@ -125,11 +128,13 @@ def _load_parquet_turns(
         try:
             df = pd.read_parquet(parquet_path)
             df = df[df["argument_id"].isin(arg_ids_i64)]
+            print(f"[transcript_parser] full read + isin filter: {len(df)} rows", file=sys.stderr)
         except Exception as _e2:
             print(f"[transcript_parser] Parquet full read also failed ({_e2})", file=sys.stderr)
             return None
 
     if df.empty:
+        print(f"[transcript_parser] df empty after filter", file=sys.stderr)
         return None
 
     turns: list[Turn] = []
@@ -263,11 +268,19 @@ def parse_case_transcript(detail: dict) -> list[Turn]:
         except Exception:
             term = None
 
+    print(f"[transcript_parser] parse_case_transcript: oa_list={len(oa_list)}, "
+          f"argument_ids={argument_ids}, term={term!r}", file=sys.stderr)
+
     # 1. Try Parquet
     if argument_ids and isinstance(term, int):
         parquet_turns = _load_parquet_turns(argument_ids, term, advocate_sides)
         if parquet_turns is not None:
+            print(f"[transcript_parser] Parquet hit: {len(parquet_turns)} turns", file=sys.stderr)
             return parquet_turns
+        print(f"[transcript_parser] Parquet miss for ids={argument_ids} term={term}", file=sys.stderr)
+    else:
+        print(f"[transcript_parser] Skipping parquet: argument_ids={argument_ids}, term={term!r}",
+              file=sys.stderr)
 
     # 2. Embedded transcript (live API response)
     all_turns: list[Turn] = []
@@ -298,6 +311,8 @@ def parse_case_transcript(detail: dict) -> list[Turn]:
     # 4. Live Oyez API fallback — direct requests.get when Parquet is absent or
     #    unreadable on the cloud and no JSON cache exists locally.
     if not all_turns:
+        print(f"[transcript_parser] Trying live API fallback for {len(oa_list)} oa entries",
+              file=sys.stderr)
         for oa in oa_list:
             if not isinstance(oa, dict) or "href" not in oa:
                 continue
@@ -306,11 +321,14 @@ def parse_case_transcript(detail: dict) -> list[Turn]:
                 resp.raise_for_status()
                 oa_data = resp.json()
                 sections = (oa_data.get("transcript") or {}).get("sections") or []
+                print(f"[transcript_parser] API returned {len(sections)} sections for {oa.get('href')}",
+                      file=sys.stderr)
                 all_turns.extend(_parse_sections(sections, advocate_sides))
             except Exception as _e:
                 print(f"[transcript_parser] Live API fallback failed for {oa.get('href')}: {_e}",
                       file=sys.stderr)
 
+    print(f"[transcript_parser] Returning {len(all_turns)} turns total", file=sys.stderr)
     return all_turns
 
 

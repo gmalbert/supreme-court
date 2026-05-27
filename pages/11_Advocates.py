@@ -436,17 +436,50 @@ with tab_oral:
                     if not oral_args_live:
                         st.warning("No oral argument audio found for this case.")
                     else:
+                        _parse_error = None
                         with st.spinner("Loading transcript..."):
                             try:
                                 turns_live = _adv_parse_transcript(detail_live)
                             except Exception as _parse_err:
+                                _parse_error = _parse_err
                                 turns_live = []
-                                with st.expander("⚠️ Transcript load error (debug info)"):
-                                    st.code(str(_parse_err))
-                                    import traceback
-                                    st.code(traceback.format_exc())
                         if not turns_live:
                             st.warning("Could not load transcript.")
+                            with st.expander("⚠️ Debug info"):
+                                import os as _os
+                                import pandas as _pd
+                                oa_dbg = detail_live.get("oral_argument_audio") or []
+                                st.write(f"**oral_argument_audio entries:** {len(oa_dbg)}")
+                                for _i, _oa in enumerate(oa_dbg[:3]):
+                                    if isinstance(_oa, dict):
+                                        st.write(f"- [{_i}] id={_oa.get('id')!r}  href={str(_oa.get('href',''))[:80]}")
+                                st.write(f"**term:** {detail_live.get('term')!r}")
+                                _term_val = detail_live.get("term")
+                                try:
+                                    _term_int = int(_term_val) if _term_val is not None else None
+                                except Exception:
+                                    _term_int = None
+                                _decades = [(1955,1964),(1965,1974),(1975,1984),(1985,1994),(1995,2004),(2005,2014),(2015,2025)]
+                                _pq_path = None
+                                for _s, _e in _decades:
+                                    if _term_int and _s <= _term_int <= _e:
+                                        _pq_path = _os.path.join("data", f"transcripts_{_s}_{_e}.parquet")
+                                        break
+                                st.write(f"**parquet path:** {_pq_path}")
+                                st.write(f"**parquet exists:** {_os.path.exists(_pq_path) if _pq_path else 'N/A'}")
+                                if _pq_path and _os.path.exists(_pq_path) and oa_dbg:
+                                    _arg_ids = [int(_oa["id"]) for _oa in oa_dbg if isinstance(_oa, dict) and "id" in _oa]
+                                    st.write(f"**argument_ids:** {_arg_ids}")
+                                    try:
+                                        _df = _pd.read_parquet(_pq_path, filters=[("argument_id", "in", _arg_ids)])
+                                        st.write(f"**parquet rows matched:** {len(_df)}")
+                                        st.write(f"**parquet dtypes:** {dict(_df.dtypes)}")
+                                    except Exception as _pe:
+                                        st.write(f"**parquet read error:** {_pe}")
+                                if _parse_error:
+                                    import traceback
+                                    st.code(str(_parse_error))
+                                    st.code(traceback.format_exc())
                         else:
                             # Aggregate per-speaker stats from Turn objects
                             speaker_turns: dict[str,int] = defaultdict(int)
