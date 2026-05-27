@@ -10,6 +10,7 @@ import time
 import datetime
 from collections import defaultdict
 from utils.oyez_api import get_cases_by_term, get_case_detail, get_recent_terms
+from utils.transcript_parser import parse_case_transcript
 from utils.charts import build_voting_chart
 from utils.local_data import fetch_oyez, infer_issue_area
 from utils.export import csv_download_button
@@ -1182,36 +1183,25 @@ def _page_advocates():
                         if not oral_args_live:
                             st.warning("No oral argument audio found for this case.")
                         else:
-                            for arg_entry in oral_args_live[:1]:
-                                if not isinstance(arg_entry,dict): continue
-                                arg_href = arg_entry.get("href","")
-                                if not arg_href: continue
-                                with st.spinner("Loading transcript..."):
-                                    arg_detail = _adv_load_transcript(arg_href)
-                                if not arg_detail: st.warning("Could not load transcript."); continue
-                                transcript = arg_detail.get("transcript") or {}
-                                sections = transcript.get("sections") or []
-                                if not sections: st.info("No transcript text available for this argument."); continue
-
-                                # Count questions per speaker
+                            with st.spinner("Loading transcript..."):
+                                _ppl_turns = parse_case_transcript(detail_live)
+                            if not _ppl_turns:
+                                st.warning("Could not load transcript.")
+                            else:
+                                # Aggregate from Turn objects (parquet-backed)
                                 speaker_turns: dict[str,int] = defaultdict(int)
                                 speaker_words: dict[str,int] = defaultdict(int)
                                 justice_questions: dict[str,int] = defaultdict(int)
                                 all_turns = []
-                                for section in sections:
-                                    for turn in (section.get("turns") or []):
-                                        speaker = turn.get("speaker") or {}
-                                        name = speaker.get("name","Unknown") if isinstance(speaker,dict) else str(speaker)
-                                        role = speaker.get("roles") or []
-                                        is_justice = any("justice" in str(r).lower() for r in role) if isinstance(role,list) else False
-                                        blocks = turn.get("text_blocks") or []
-                                        text = " ".join(b.get("text","") for b in blocks if isinstance(b,dict))
-                                        words = len(text.split())
-                                        q_count = text.count("?")
-                                        speaker_turns[name] += 1
-                                        speaker_words[name] += words
-                                        if is_justice: justice_questions[name] += q_count
-                                        all_turns.append({"speaker":name,"is_justice":is_justice,"words":words,"questions":q_count,"text":text[:200]})
+                                for t in _ppl_turns:
+                                    name = t.speaker
+                                    is_justice = (t.role == "justice")
+                                    words = len(t.text.split())
+                                    speaker_turns[name] += 1
+                                    speaker_words[name] += words
+                                    if is_justice: justice_questions[name] += t.question_count
+                                    all_turns.append({"speaker":name,"is_justice":is_justice,"words":words,"questions":t.question_count,"text":t.text[:200]})
+                            if _ppl_turns:
 
                                 st.subheader(f"Oral Argument Analysis: {sel_case_live}")
                                 st.caption("Includes both justices and advocates.")
