@@ -1,0 +1,27 @@
+name: supreme-scrutiny
+services:
+  site:
+    build:
+      context: .
+      target: runtime
+    ports:
+      - "127.0.0.1:${SUPREME_PORT:-8787}:8787"
+    env_file:
+      - path: ./web/.dev.vars
+        required: false
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 20s
+  e2e:
+    profiles: [test]
+    build:
+      context: .
+      target: e2e
+    environment:
+      PLAYWRIGHT_BASE_URL: http://site:8787
+      CI: "true"
+    depends_on:
+      site:
+        condition: service_healthy
+    init: true
+    shm_size: 1gb

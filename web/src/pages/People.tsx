@@ -48,7 +48,7 @@ export default function People() {
       : "Present / not recorded";
   return (
     <>
-      <PageTitle title="The people of the Court" eyebrow="Justices & advocates">
+      <PageTitle title="👥 Justices & Advocates" eyebrow="Justices & advocates">
         Explore careers, voting records, and the lawyers who argued before the
         bench.
       </PageTitle>

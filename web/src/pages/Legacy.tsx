@@ -57,7 +57,7 @@ export default function Legacy() {
   return (
     <>
       <PageTitle
-        title="The presidential legacy"
+        title="🏛️ Presidential Legacy"
         eyebrow="Appointments & influence"
       >
         Compare appointment cohorts and their recorded votes across the Court’s

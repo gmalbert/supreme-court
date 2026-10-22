@@ -3,9 +3,9 @@ name: Cloudflare React app
 on:
   push:
     branches: [main, master, codex/cloudflare-react-migration]
-    paths: ['web/**', 'scripts/export_web_data.py', 'scripts/train_web_model.py', 'scripts/check_web_release.mjs', 'scripts/requirements-web.txt', 'data/**', 'data_files/**', 'pages/**', 'utils/local_data.py', 'tests/test_web_export.py', '.github/workflows/cloudflare-web.yml']
+    paths: ['web/**', 'scripts/**', 'Dockerfile', 'compose.yaml', '.dockerignore', 'data/**', 'data_files/**', 'pages/**', 'utils/local_data.py', 'tests/test_web_export.py', '.github/workflows/cloudflare-web.yml']
   pull_request:
-    paths: ['web/**', 'scripts/**', 'data/**', 'data_files/**', 'pages/**', 'utils/local_data.py', 'tests/test_web_export.py', '.github/workflows/cloudflare-web.yml']
+    paths: ['web/**', 'scripts/**', 'Dockerfile', 'compose.yaml', '.dockerignore', 'data/**', 'data_files/**', 'pages/**', 'utils/local_data.py', 'tests/test_web_export.py', '.github/workflows/cloudflare-web.yml']
   workflow_dispatch:
     inputs:
       deploy:
@@ -48,13 +48,28 @@ jobs:
       - name: Export static case and transcript release
         run: python scripts/export_web_data.py
       - name: Verify data preservation
-        run: python -m pytest tests/test_web_export.py -q
+        run: |
+          python scripts/check_python.py
+          python -m pytest tests/test_web_export.py -q
       - name: Test frontend calculations, search, and Worker API
         working-directory: web
         run: npm test
       - name: Build React app
         working-directory: web
         run: npm run build
+      - name: Install Chromium and run desktop/mobile Playwright
+        working-directory: web
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-failure-report
+          path: |
+            web/playwright-report
+            web/test-results
+          retention-days: 7
       - name: Verify Cloudflare asset limits and package Worker
         run: |
           node scripts/check_web_release.mjs
@@ -68,9 +83,27 @@ jobs:
             web/worker
             web/wrangler.jsonc
           retention-days: 7
+  docker:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Compose and start the complete image
+        run: |
+          docker compose config --quiet
+          docker compose up --build -d --wait --wait-timeout 180
+      - name: Run desktop/mobile tests against the container
+        run: docker compose --profile test run --build --rm e2e
+      - name: Show container logs
+        if: failure()
+        run: docker compose logs --no-color
+      - name: Stop containers
+        if: always()
+        run: docker compose --profile test down
   deploy:
     if: github.event_name == 'workflow_dispatch' && inputs.deploy && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    needs: verify
+    needs: [verify, docker]
     runs-on: ubuntu-latest
     environment: cloudflare-production
     steps:

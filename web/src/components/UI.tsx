@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import type { CaseRecord } from "../types";
 import { caseURL, downloadCSV, percent, rate } from "../lib/data";
@@ -14,9 +14,7 @@ export function PageTitle({
 }) {
   return (
     <header className="page-title">
-      <div className="eyebrow">{eyebrow || "Supreme Scrutiny"}</div>
       <h1>{title}</h1>
-      {children ? <p>{children}</p> : null}
     </header>
   );
 }
@@ -88,6 +86,42 @@ export function CaseMetrics({ rows }: { rows: CaseRecord[] }) {
     />
   );
 }
+const tabLabels: Record<string, string> = {
+  "Find by description": "💬 Find by Description",
+  "Search cases": "🔍 Search Cases",
+  "Timeline browser": "📅 Timeline Browser",
+  "Oral arguments": "🎙️ Oral Arguments",
+  "Term calendar": "🗓️ Term Calendar",
+  "Case outcome": "🎯 Case Outcome Predictor",
+  "Model performance": "📈 Model Performance",
+  "Model training": "⚙️ Model Training",
+  "Cert grant": "📋 Cert Grant Predictor",
+  "Docket watch": "🔴 Docket Watch",
+  "Justice simulator": "🔄 Justice Simulator",
+  "Model card": "📄 Model Card",
+  "Voting patterns": "Voting Patterns",
+  "Justice careers": "Justice Career",
+  "Agreement matrix": "Agreement Matrix",
+  "Ideological drift": "Ideological Drift",
+  Advocates: "🏆 Win Rates",
+  "Amicus briefs": "📋 Amicus Brief Tracker",
+  "Oral argument analytics": "🎙️ Oral Argument Analytics",
+  "Term statistics": "📊 Term Statistics",
+  "Close decisions": "⚖️ Close Decisions",
+  "Win rates": "🏆 Win Rates",
+  "SCOTUS vs. Congress": "🏛️ SCOTUS vs. Congress",
+  "Chief Justice eras": "Chief Justice Eras",
+  Confirmations: "Confirmation Timeline",
+  "Service timeline": "Service Timeline",
+  "Court snapshot": "Court Snapshot",
+  "Ideological balance": "Ideological Balance",
+  "Issue areas": "Issue Areas",
+  Amendments: "Amendments",
+  "Constitutional provisions": "Constitutional Provisions",
+  "Landmark cases": "Landmark Cases",
+  "Citation network": "Citation Network",
+  "Precedent network": "Precedent Network",
+};
 export function Tabs({
   items,
   children,
@@ -96,34 +130,108 @@ export function Tabs({
   children: (selected: string) => ReactNode;
 }) {
   const [params, setParams] = useSearchParams();
-  const selected = items.includes(params.get("view") || "")
-    ? params.get("view")!
-    : items[0];
+  const id = useId();
+  const groups: { name: string; items: string[] }[] = items.includes(
+    "Justice careers",
+  )
+    ? [
+        {
+          name: "👨‍⚖️ Justices",
+          items: [
+            "Voting patterns",
+            "Justice careers",
+            "Agreement matrix",
+            "Ideological drift",
+          ],
+        },
+        {
+          name: "⚖️ Advocates & Arguments",
+          items: ["Advocates", "Amicus briefs", "Oral argument analytics"],
+        },
+      ]
+    : items.includes("Service timeline")
+      ? [
+          {
+            name: "Court Composition",
+            items: [
+              "Service timeline",
+              "Court snapshot",
+              "Ideological balance",
+            ],
+          },
+          { name: "Chief Justice Eras", items: ["Chief Justice eras"] },
+          { name: "Confirmation Timeline", items: ["Confirmations"] },
+        ]
+      : items.includes("Citation network")
+        ? [
+            {
+              name: "📚 Legal Topics",
+              items: [
+                "Issue areas",
+                "Amendments",
+                "Constitutional provisions",
+                "Landmark cases",
+              ],
+            },
+            {
+              name: "🕸️ Networks",
+              items: ["Citation network", "Precedent network", "Coalitions"],
+            },
+          ]
+        : [];
+  const view = params.get("view") || "";
+  const group =
+    groups.find((g) => g.name === params.get("group")) ||
+    groups.find((g) => g.items.includes(view)) ||
+    groups[0];
+  const visible = group?.items || items;
+  const selected = visible.includes(view) ? view : visible[0];
+  function choose(t: string) {
+    setParams((p) => {
+      p.set("view", t);
+      return p;
+    });
+  }
   return (
     <>
+      {groups.length ? (
+        <div className="tabs" role="tablist" aria-label="Categories">
+          {groups.map((g) => (
+            <button
+              key={g.name}
+              role="tab"
+              aria-selected={g === group}
+              onClick={() =>
+                setParams((p) => {
+                  p.set("group", g.name);
+                  p.set("view", g.items[0]);
+                  return p;
+                })
+              }
+            >
+              {g.name}
+            </button>
+          ))}
+        </div>
+      ) : null}
       <div className="tabs" role="tablist" aria-label="Sections">
-        {items.map((t, i) => (
+        {visible.map((t, i) => (
           <button
             role="tab"
-            id={`tab-${i}`}
+            id={`${id}-tab-${i}`}
             aria-selected={selected === t}
-            aria-controls="section-content"
+            aria-controls={`${id}-panel`}
             key={t}
-            onClick={() => {
-              setParams((p) => {
-                p.set("view", t);
-                return p;
-              });
-            }}
+            onClick={() => choose(t)}
           >
-            {t}
+            {tabLabels[t] || t}
           </button>
         ))}
       </div>
       <div
         role="tabpanel"
-        id="section-content"
-        aria-labelledby={`tab-${items.indexOf(selected)}`}
+        id={`${id}-panel`}
+        aria-labelledby={`${id}-tab-${visible.indexOf(selected)}`}
       >
         {children(selected)}
       </div>
@@ -239,7 +347,7 @@ export function Trend({
         <line x1="30" y1="185" x2="775" y2="185" stroke="#d7dfd8" />
         <polyline
           fill="none"
-          stroke="#29634f"
+          stroke="#636efa"
           strokeWidth="3"
           points={data
             .map(
@@ -254,7 +362,7 @@ export function Trend({
             cx={30 + (i / Math.max(1, data.length - 1)) * 745}
             cy={185 - (d.value / max) * 155}
             r="3"
-            fill="#29634f"
+            fill="#636efa"
           >
             <title>
               {d.year}: {d.value.toFixed(1)} {label}

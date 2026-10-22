@@ -77,7 +77,7 @@ export default function Analysis() {
   );
   return (
     <>
-      <PageTitle title="Patterns in the decisions" eyebrow="Analytics">
+      <PageTitle title="📊 Analytics" eyebrow="Analytics">
         Look across terms, outcomes, and the cases that divided the Court.
       </PageTitle>
       <Tabs
@@ -266,7 +266,7 @@ export function CircuitCourts() {
     .filter((c) => c.Cases);
   return (
     <>
-      <PageTitle title="Circuit courts" eyebrow="The appellate landscape">
+      <PageTitle title="🏛️ Circuit Courts" eyebrow="The appellate landscape">
         Compare the lower courts whose decisions reach the Supreme Court.
       </PageTitle>
       <div className="filters">

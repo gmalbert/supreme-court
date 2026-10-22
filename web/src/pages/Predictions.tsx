@@ -58,10 +58,7 @@ export default function Predictions() {
   );
   return (
     <>
-      <PageTitle
-        title="Explore the possibilities"
-        eyebrow="Predictions & scenarios"
-      >
+      <PageTitle title="🔮 Predictions" eyebrow="Predictions & scenarios">
         Experiment with a transparent statistical baseline and hypothetical
         Court compositions.
       </PageTitle>
@@ -74,11 +71,11 @@ export default function Predictions() {
       <Tabs
         items={[
           "Case outcome",
+          "Model performance",
+          "Model training",
           "Cert grant",
           "Docket watch",
           "Justice simulator",
-          "Model performance",
-          "Model training",
           "Model card",
         ]}
       >
@@ -359,7 +356,31 @@ export default function Predictions() {
               </Panel>
             ) : null}
             {selected === "Model card" ? (
-              <Panel title="Statistical baseline model card">
+              <Panel title="📄 Model Card — Supreme Scrutiny Outcome Predictor">
+                <p className="caption">
+                  A transparency document describing how this model works, its
+                  limitations, and appropriate use.
+                </p>
+                <hr />
+                <div className="two-columns">
+                  <section>
+                    <h3>Overview</h3>
+                    <p>
+                      The statistical baseline combines historical circuit and
+                      issue rates with petitioner type, Court composition, and
+                      supporting factors.
+                    </p>
+                  </section>
+                  <section>
+                    <h3>Performance at a Glance</h3>
+                    <Notice>
+                      No measured accuracy or calibration is claimed for the
+                      statistical baseline.
+                    </Notice>
+                  </section>
+                </div>
+                <hr />
+                <h3>Features Used</h3>
                 <DataTable
                   rows={[
                     {
@@ -393,6 +414,33 @@ export default function Predictions() {
                     },
                   ]}
                 />
+                <hr />
+                <h3>Known Limitations</h3>
+                <details>
+                  <summary>
+                    ⚠️ Read before citing this model's predictions
+                  </summary>
+                  <p>
+                    This heuristic uses structured metadata rather than case
+                    text. Its probabilities, per-justice estimates, and vote
+                    splits are illustrative and are not calibrated forecasts.
+                    Coverage and inferred issue classifications vary.
+                  </p>
+                </details>
+                <hr />
+                <h3>Architecture Details</h3>
+                <p>
+                  The original baseline runs in the browser. Optional models are
+                  trained offline and exported with their own held-out metrics.
+                </p>
+                <hr />
+                <h3>Data Provenance</h3>
+                <p>
+                  Case records are sourced from the{" "}
+                  <a href="https://www.oyez.org">Oyez Project</a> and served
+                  from a versioned data release. This application is not
+                  affiliated with or endorsed by Oyez.
+                </p>
               </Panel>
             ) : null}
           </>

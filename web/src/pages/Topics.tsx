@@ -141,7 +141,7 @@ export default function Topics() {
   const edges: any[] = catalog.Topics.EDGES_CN || [];
   return (
     <>
-      <PageTitle title="Ideas that shape the law" eyebrow="Topics & networks">
+      <PageTitle title="📚 Topics & Networks" eyebrow="Topics & networks">
         Explore issue areas, constitutional provisions, and the relationships
         between landmark decisions.
       </PageTitle>

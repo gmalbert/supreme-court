@@ -1,129 +1,125 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useData } from "../context";
-import { monthDay } from "../lib/data";
-import { SearchBox } from "../components/SearchBox";
-import { CaseList, Metrics, Panel } from "../components/UI";
 const destinations = [
   [
     "Cases",
-    "Case library",
-    "Read the facts, trace the arguments, and examine the decisions.",
-    "01",
+    "⚖️",
+    "Cases",
+    "Search and browse 8,000+ cases by name, term, keyword, or plain-language description.",
   ],
   [
     "People",
-    "The people of the Court",
-    "Explore justice voting records, careers, and advocates.",
-    "02",
-  ],
-  [
-    "Analysis",
-    "Patterns in the decisions",
-    "Compare terms, close decisions, and outcomes.",
-    "03",
-  ],
-  [
-    "History",
-    "Two centuries of history",
-    "Follow the changing bench and Chief Justice eras.",
-    "04",
-  ],
-  [
-    "Topics",
-    "Constitutional questions",
-    "Trace amendments, doctrines, and landmark cases.",
-    "05",
+    "👥",
+    "Justices & Advocates",
+    "Voting records, ideology drift over time, agreement matrices, and advocate win rates.",
   ],
   [
     "Predictions",
-    "Explore the possibilities",
-    "Experiment with the statistical outcome calculator.",
-    "06",
+    "🔮",
+    "Predictions",
+    "ML-powered outcome predictions, cert grant estimator, model card, and docket watch.",
+  ],
+  [
+    "Analysis",
+    "📊",
+    "Analytics",
+    "Term-by-term statistics, issue-area breakdowns, reversal rates, and voting trends.",
   ],
 ];
 export default function Home() {
-  const { cases, manifest, watchlist } = useData();
-  const today = monthDay();
-  const anniversary = cases
-    .filter((c) => c.decided.slice(5) === today)
-    .sort((a, b) => b.term - a.term)[0];
+  const { manifest } = useData();
+  const [query, setQuery] = useState("");
+  const [limit, setLimit] = useState(15);
+  const [error, setError] = useState(false);
+  const navigate = useNavigate();
   return (
     <>
-      <section className="hero">
-        <div className="eyebrow">An independent lens on the highest court</div>
-        <h1>
-          Understand the cases.
-          <br />
-          <em>See the bigger picture.</em>
-        </h1>
-        <p>
-          Explore Supreme Court history through its decisions, its people, and
-          the patterns that connect them.
-        </p>
-        <SearchBox />
-        <div className="example-links">
-          Explore: <Link to="/Cases?q=free%20speech">Free speech</Link>
-          <Link to="/Cases?q=equal%20protection">Equal protection</Link>
-          <Link to="/Cases?q=search%20and%20seizure">Search & seizure</Link>
-        </div>
-      </section>
-      <Metrics
-        items={[
-          {
-            label: "Cases in the archive",
-            value: manifest.cases.toLocaleString(),
-          },
-          {
-            label: "Terms covered",
-            value: `${Math.min(...manifest.terms)}–${Math.max(...manifest.terms)}`,
-          },
-          {
-            label: "Argument sessions",
-            value: manifest.arguments.toLocaleString(),
-          },
-          { label: "Latest recorded decision", value: manifest.latestDecision },
-        ]}
-      />
-      {anniversary ? (
-        <Panel title="On this day in Court history">
-          <CaseList rows={[anniversary]} />
-        </Panel>
-      ) : null}
-      <div className="section-heading">
-        <div className="eyebrow">Follow your curiosity</div>
-        <h2>Explore the Court</h2>
+      <div className="home-heading">
+        <img src="/brand.png" alt="Supreme Scrutiny logo" />
+        <h1>Supreme Scrutiny</h1>
       </div>
+      <hr />
+      <form
+        className="home-search"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (query.trim().length < 10) {
+            setError(true);
+            return;
+          }
+          navigate(
+            `/Cases?q=${encodeURIComponent(query.trim())}&limit=${limit}`,
+          );
+        }}
+      >
+        <h4>🔍 Find Cases by Description</h4>
+        <p className="caption">
+          Describe a legal situation in plain language and find the most
+          relevant Supreme Court cases.
+        </p>
+        <textarea
+          aria-label="Describe a legal situation"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={
+            "e.g. police searched a suspect's cell phone without a warrant\ne.g. government required a license to display a religious symbol\ne.g. employer fired a worker for union organizing activity"
+          }
+        />
+        <div className="home-search-actions">
+          <label className="field">
+            Results <output>{limit}</output>
+            <input
+              type="range"
+              min={3}
+              max={20}
+              value={limit}
+              onChange={(e) => setLimit(+e.target.value)}
+            />
+          </label>
+          <button className="button primary">🔍 Find Cases</button>
+        </div>
+        {error ? (
+          <p role="alert">Please enter at least 10 characters.</p>
+        ) : null}
+      </form>
+      <hr />
+      <h3>Explore the Court</h3>
       <div className="destination-grid">
-        {destinations.map(([path, title, description, n]) => (
-          <Link to={`/${path}`} className="destination" key={path}>
-            <span className="destination-number">{n}</span>
-            <h3>{title}</h3>
-            <p>{description}</p>
-            <span className="destination-arrow">Explore →</span>
-          </Link>
+        {destinations.map(([path, icon, title, description]) => (
+          <section className="destination" key={path}>
+            <h4>
+              {icon} {title}
+            </h4>
+            <p className="caption">{description}</p>
+            <Link className="button" to={`/${path}`}>
+              Open {title} →
+            </Link>
+          </section>
         ))}
       </div>
-      {watchlist.length ? (
-        <Panel title="Your saved cases">
-          <CaseList rows={cases.filter((c) => watchlist.includes(c.id))} />
-        </Panel>
-      ) : null}
-      <Panel title="About this archive">
+      <hr />
+      <details className="about">
+        <summary>ℹ️ About Supreme Scrutiny</summary>
         <p>
-          Case records and oral-argument transcripts come from Oyez. Issue areas
-          and party types are inferred categories; historical and ideological
-          annotations are curated context. Coverage varies by term. A snapshot
-          is a research starting point—verify current law and case status with
-          authoritative sources.
+          <strong>Supreme Scrutiny</strong> is an open-source data visualization
+          and analysis tool for U.S. Supreme Court history.
         </p>
-        <p className="muted">
-          Data release {manifest.version} · Court records are served from
-          versioned files. Saved cases stay in this browser.
+        <p>
+          <strong>Data sources and Coverage:</strong>
         </p>
-        <a href="https://www.oyez.org" target="_blank" rel="noreferrer">
-          Visit Oyez ↗
-        </a>
-      </Panel>
+        <ul>
+          <li>
+            <a href="https://www.oyez.org">Oyez</a> — case metadata, oral
+            argument audio, and justice records
+          </li>
+          <li>
+            Terms: {Math.min(...manifest.terms)}–{Math.max(...manifest.terms)}
+          </li>
+          <li>Cases: {manifest.cases.toLocaleString()}</li>
+          <li>Voting data: Included for cases with recorded decisions</li>
+        </ul>
+      </details>
     </>
   );
 }

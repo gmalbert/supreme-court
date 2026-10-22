@@ -42,7 +42,17 @@ export default function Cases() {
   const { watchlist } = useData();
   const { results, busy, error, search } = useSearch();
   useEffect(() => {
-    if (q) search(q);
+    if (q && !legacyCase) {
+      search(q);
+      if (!params.get("view"))
+        setParams(
+          (p) => {
+            p.set("view", "Find by description");
+            return p;
+          },
+          { replace: true },
+        );
+    }
   }, [q]);
   const byId = useMemo(() => new Map(cases.map((c) => [c.id, c])), [cases]);
   const filtered = useMemo(
@@ -73,14 +83,14 @@ export default function Cases() {
   }
   return (
     <>
-      <PageTitle title="The case library" eyebrow="Cases & arguments">
+      <PageTitle title="⚖️ Cases" eyebrow="Cases & arguments">
         Explore decisions, read the record, and follow the questions before the
         Court.
       </PageTitle>
       <Tabs
         items={[
-          "Find by description",
           "Search cases",
+          "Find by description",
           "Timeline browser",
           "Oral arguments",
           "Term calendar",
@@ -91,50 +101,66 @@ export default function Cases() {
             {selected === "Find by description" ||
             selected === "Search cases" ? (
               <>
+                <p>
+                  {selected === "Search cases"
+                    ? "Search by case name across recent terms (2000–present)."
+                    : "Describe a legal situation in plain language to find relevant Supreme Court cases."}
+                </p>
                 <SearchBox
                   compact
                   initial={q}
                   onSearch={setQuery}
                   busy={busy}
+                  description={selected === "Find by description"}
                 />
                 {error ? <Notice error>{error}</Notice> : null}
-                <div className="filters">
-                  <Select
-                    label="Issue area"
-                    value={issue}
-                    options={issues}
-                    onChange={setIssue}
-                  />
-                  <label className="check">
-                    <input
-                      type="checkbox"
-                      checked={savedOnly}
-                      onChange={(e) => setSavedOnly(e.target.checked)}
+                {q ? (
+                  <div className="filters">
+                    <Select
+                      label="Issue area"
+                      value={issue}
+                      options={issues}
+                      onChange={setIssue}
                     />
-                    Saved cases only
-                  </label>
-                </div>
-                <p className="muted" aria-live="polite">
-                  {busy
-                    ? "Searching the archive…"
-                    : q
-                      ? `${results.length} ranked results for “${q}”`
-                      : `${cases.length.toLocaleString()} cases · newest terms first`}
-                </p>
-                <CaseList
-                  rows={(selected === "Search cases" && q
-                    ? cases.filter((c) =>
-                        `${c.name} ${c.docket}`
-                          .toLowerCase()
-                          .includes(q.toLowerCase()),
-                      )
-                    : ranked
-                  ).filter(
-                    (c) =>
-                      (issue === "All issues" || c.issue === issue) &&
-                      (!savedOnly || watchlist.includes(c.id)),
-                  )}
-                />
+                    <label className="check">
+                      <input
+                        type="checkbox"
+                        checked={savedOnly}
+                        onChange={(e) => setSavedOnly(e.target.checked)}
+                      />
+                      Saved cases only
+                    </label>
+                  </div>
+                ) : null}
+                {q ? (
+                  <>
+                    <p className="muted" aria-live="polite">
+                      {busy
+                        ? "Searching the archive…"
+                        : q
+                          ? `${results.length} ranked results for “${q}”`
+                          : `${cases.length.toLocaleString()} cases · newest terms first`}
+                    </p>
+                    <CaseList
+                      limit={Math.max(
+                        3,
+                        Math.min(20, Number(params.get("limit")) || 20),
+                      )}
+                      rows={(selected === "Search cases" && q
+                        ? cases.filter((c) =>
+                            `${c.name} ${c.docket}`
+                              .toLowerCase()
+                              .includes(q.toLowerCase()),
+                          )
+                        : ranked
+                      ).filter(
+                        (c) =>
+                          (issue === "All issues" || c.issue === issue) &&
+                          (!savedOnly || watchlist.includes(c.id)),
+                      )}
+                    />
+                  </>
+                ) : null}
               </>
             ) : null}
             {selected === "Timeline browser" ? (

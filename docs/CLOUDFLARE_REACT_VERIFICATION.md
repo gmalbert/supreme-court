@@ -13,6 +13,22 @@ this branch does not change DNS, publish a Worker, or remove the old deployment.
   Worker secrets. Existing local credentials were not copied or exposed.
 - Offline data/model jobs, Cloudflare package configuration, and GitHub CI.
 
+## Original appearance and local startup
+
+The React shell now follows the deployed Streamlit application: Source Sans
+(with its SIL license included), white main canvas, 300-pixel light-gray sidebar,
+red controls, grouped navigation, original page names, homepage search/cards,
+and nested People, History, and Topics tabs. The prediction model card restores
+the original section hierarchy while documenting the actual converted model.
+Reference captures are `streamlit-reference.png` and
+`streamlit-cases-reference.png`; `react-preview.png` shows the converted homepage.
+The shared styling is matched; individual custom charts and several consolidated
+analysis subviews are not pixel-identical reproductions of Streamlit/Plotly.
+
+`docker compose up --build` builds the data and application and serves it at
+http://localhost:8787. See [INSTALLATION.md](../INSTALLATION.md) for native/Docker
+setup, tests, Cloudflare installation, domain cutover, and rollback.
+
 ## Automated checks
 
 - 23 Vitest tests: real-corpus named-case and school-speech search, statistical
@@ -21,6 +37,10 @@ this branch does not change DNS, publish a Worker, or remove the old deployment.
 - 3 Python export checks: negative-epoch dates, safe curated-content extraction,
   source/export counts, unique IDs, Cloudflare asset limits, and every available
   transcript reference.
+- 92 Python files compiled successfully using `py_compile`.
+- 20/20 desktop and Pixel 7 Playwright checks passed, covering all 55 feature sections,
+  search recall, saved cases/reload, transcripts, CSV, baseline changes, model-card
+  layout, original visual tokens, and static cache/404 handling.
 - Strict TypeScript check and production Vite build.
 - Static release completeness/size checks and Wrangler deployment dry run.
 
@@ -62,8 +82,10 @@ unavailable instead of offering a broken transcript request.
   deployment does not import them. Pre-existing uncommitted work is preserved.
 - Actual provider calls were mocked during testing; no billable AI requests were
   made. A real Worker secret is needed to validate live AI responses.
-- Desktop browser flows were exercised. A physical/mobile viewport and a hosted
-  Cloudflare production deployment still require acceptance testing before DNS
-  cutover. Static SPA case pages are not prerendered for search crawlers.
+- Desktop and emulated mobile browser flows were exercised. Physical-device and
+  hosted Cloudflare acceptance tests remain before DNS cutover.
+- Docker is not installed on the development machine. Compose YAML was parsed
+  and checked, but the image build/start was not run locally. CI includes a real
+  Docker build, health check, and Playwright run against the container. Static SPA case pages are not prerendered for search crawlers.
 
-Deployment and local build instructions: [web/README.md](../web/README.md).
+Deployment and local build instructions: [INSTALLATION.md](../INSTALLATION.md).

@@ -106,7 +106,7 @@ export default function Geography() {
   const stateRows = rows.filter((c) => c.state);
   return (
     <>
-      <PageTitle title="The geography of review" eyebrow="States & terms">
+      <PageTitle title="🗺️ Geography & Tools" eyebrow="States & terms">
         Follow where cases began and compare the Court across terms.
       </PageTitle>
       <Tabs

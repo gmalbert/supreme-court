@@ -28,7 +28,7 @@ export default function History() {
   );
   return (
     <>
-      <PageTitle title="A changing institution" eyebrow="Court history">
+      <PageTitle title="🏛️ Court History" eyebrow="Court history">
         Trace the people, appointments, and eras that shaped the bench.
       </PageTitle>
       <Tabs
@@ -216,7 +216,7 @@ export function HistoricalData() {
   return (
     <>
       <PageTitle
-        title="The full historical timeline"
+        title="📜 Historical Data Explorer"
         eyebrow="1790 to the present"
       >
         Explore historical series alongside the modern case archive.

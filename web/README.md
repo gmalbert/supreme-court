@@ -9,6 +9,12 @@ The original Streamlit source remains available during migration and rollback.
 
 ## Build and run
 
+For one-command local startup, run `docker compose up --build` from the repository
+root and open `http://localhost:8787`. Docker builds the data release automatically;
+no host Python or Node installation is needed. See [INSTALLATION.md](../INSTALLATION.md)
+for Compose tests, optional AI credentials, and the Cloudflare installation/cutover
+procedure. The native build commands below remain available without Docker.
+
 From the repository root (Python 3.13 and Node 24):
 
 ```powershell
@@ -123,6 +129,9 @@ training are replaced by offline metrics and transparent baseline features.
 - `npm run build`: strict TypeScript checking and optimized lazy route bundles.
 - `node scripts/check_web_release.mjs`: production completeness and asset limits.
 - `npx wrangler deploy --dry-run`: actual Cloudflare Worker packaging validation.
+- `npm run test:e2e`: reproducible desktop/mobile Playwright tests against the
+  real Worker (allocates free local ports unless `PLAYWRIGHT_BASE_URL` is supplied).
+- `python scripts/check_python.py` from the root: `py_compile` for project Python.
 
 Legacy route paths such as `/Cases`, `/People`, and `/Predictions` are preserved.
 New case links use `/case/<term>/<docket>`. Selected sections use the `view` query

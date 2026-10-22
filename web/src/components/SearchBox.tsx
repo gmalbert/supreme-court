@@ -6,11 +6,13 @@ export function SearchBox({
   onSearch,
   busy = false,
   compact = false,
+  description = false,
 }: {
   initial?: string;
   onSearch?: (query: string) => void;
   busy?: boolean;
   compact?: boolean;
+  description?: boolean;
 }) {
   const [query, setQuery] = useState(initial);
   const navigate = useNavigate();
@@ -28,21 +30,30 @@ export function SearchBox({
       onSubmit={submit}
     >
       <label htmlFor="case-query">
-        Find a case or explore a legal question
+        {description ? "Describe a legal situation" : "Search by case name"}
       </label>
       <div className="search-input">
-        <input
-          id="case-query"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Try ‘student speech in public schools’"
-          maxLength={1000}
-        />
+        {description ? (
+          <textarea
+            id="case-query"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="e.g. a student was suspended for expressing an opinion at school"
+            maxLength={1000}
+          />
+        ) : (
+          <input
+            id="case-query"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="e.g. Brown v. Board of Education"
+            maxLength={1000}
+          />
+        )}
         <button type="submit" disabled={busy || !query.trim()}>
-          {busy ? "Searching…" : "Search cases →"}
+          {busy ? "Searching…" : "🔍 Find Cases"}
         </button>
       </div>
-      <p>Search across names, facts, questions, and holdings.</p>
     </form>
   );
 }

@@ -18,7 +18,7 @@ export default function Research() {
   const [query, setQuery] = useState("");
   return (
     <>
-      <PageTitle title="Follow the legal question" eyebrow="Research">
+      <PageTitle title="🔬 Research" eyebrow="Research">
         Ask grounded questions, trace doctrines, and inspect the underlying
         record.
       </PageTitle>

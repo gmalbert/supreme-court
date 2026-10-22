@@ -5,3 +5,6 @@ dist/
 public/data/
 public/brand.png
 public/states.json
+test-results/
+playwright-report/
+cloudflare-package/
