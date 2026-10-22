@@ -29,8 +29,17 @@ def test_static_catalog_extraction_keeps_dict_rows_without_running_pages():
 def test_release_has_no_lost_cases_or_broken_argument_links():
     cases=json.loads((DATA/'cases.json').read_text(encoding='utf-8'))
     manifest=json.loads((DATA/'manifest.json').read_text())
-    assert len(cases)==len(pd.read_parquet(ROOT/'data/cases_by_term.parquet'))==manifest['cases']
-    assert len({c['id'] for c in cases})==len(cases)
+    listed=pd.read_parquet(ROOT/'data/cases_by_term.parquet',columns=['href'])
+    details=pd.read_parquet(ROOT/'data/case_detail.parquet',columns=['href'])
+    listed_ids={module.case_key(href) for href in listed['href']}
+    detail_ids={module.case_key(href) for href in details['href']}
+    exported_ids={c['id'] for c in cases}
+    # Independently refreshed snapshots can contain detail-only cases. Preserve
+    # the exact union, rather than assuming the listing is the complete source.
+    assert exported_ids==listed_ids | detail_ids
+    assert len(exported_ids)==len(cases)==manifest['cases']
+    assert {c['id'] for c in cases if c['detail']}==detail_ids
+    assert manifest['details']==len(detail_ids)
     files=list(DATA.rglob('*.json'))
     assert len(files)<20000
     assert max(p.stat().st_size for p in files)<25*1024**2

@@ -45,6 +45,10 @@ CMD ["npm", "run", "test:e2e"]
 
 # Local Cloudflare runtime: no Python, Streamlit, credentials, or source data caches.
 FROM node:24-bookworm-slim AS runtime
+# workerd loads the system trust store even when serving only local assets.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 ENV NODE_ENV=production \
     WRANGLER_SEND_METRICS=false \
     WRANGLER_LOG_PATH=/app/web/.wrangler/logs
