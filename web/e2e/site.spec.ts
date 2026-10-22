@@ -161,12 +161,19 @@ test("all routes and feature sections render", async ({ page }) => {
       ? await categories.getByRole("tab").allTextContents()
       : [null];
     for (const group of groups) {
-      if (group)
-        await categories.getByRole("tab", { name: group, exact: true }).click();
+      if (group) {
+        const category = categories.getByRole("tab", { name: group, exact: true });
+        await category.click();
+        // click() dispatches the event before React necessarily commits the
+        // replacement tab list. Read its labels only after the group changes.
+        await expect(category).toHaveAttribute("aria-selected", "true");
+      }
       const tabs = page.getByRole("tablist", { name: "Sections" });
       const labels = await tabs.getByRole("tab").allTextContents();
       for (const label of labels) {
-        await tabs.getByRole("tab", { name: label, exact: true }).click();
+        const tab = tabs.getByRole("tab", { name: label, exact: true });
+        await tab.click();
+        await expect(tab).toHaveAttribute("aria-selected", "true");
         await expect(page.getByRole("tabpanel")).toBeVisible();
         await expect(
           page.getByText("We couldn’t display this page.", { exact: true }),
