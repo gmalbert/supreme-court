@@ -1,6 +1,10 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import { resolve, join } from "node:path";
-const directory = resolve(process.argv[2] || "web/dist");
+import { fileURLToPath } from "node:url";
+// Docker runs this from web/, while CI and local instructions use the repo root.
+const directory = process.argv[2]
+  ? resolve(process.argv[2])
+  : fileURLToPath(new URL("../web/dist/", import.meta.url));
 async function walk(dir) {
   const list = await readdir(dir, { withFileTypes: true });
   return (
