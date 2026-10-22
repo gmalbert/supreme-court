@@ -1,0 +1,7 @@
+# Build-time dependencies only. None run on the Cloudflare deployment.
+pandas==3.0.*
+numpy==2.4.*
+pyarrow>=14.0.0
+scikit-learn==1.8.*
+requests==2.33.*
+pytest>=8.0
